@@ -1,0 +1,62 @@
+{
+  "base_model": "D2_gated_fusion",
+  "dataset": "full",
+  "disclosure": "long_form",
+  "model": "D2t_gated_fusion",
+  "model_config": {
+    "compute": {
+      "estimated_hours_per_seed": 0.3,
+      "required_gpu": "A100_40G"
+    },
+    "encoder": {
+      "max_length": 64,
+      "pretrained": "ProsusAI/finbert"
+    },
+    "fusion": {
+      "proj_dim": 128
+    },
+    "head": {
+      "dropout": 0.1,
+      "hidden_dim": 128
+    },
+    "model_class": "sp500vol.models.fusion.gated_fusion.GatedFusion",
+    "model_id": "D2_gated_fusion",
+    "training": {
+      "batch_size": 8,
+      "dataloader_num_workers": 0,
+      "dataloader_persistent_workers": false,
+      "dataloader_pin_memory": true,
+      "dataloader_prefetch_factor": 4,
+      "early_stopping": true,
+      "es_min_delta": 0.0,
+      "es_patience": 1,
+      "log_target": true,
+      "lr": 2e-05,
+      "max_epochs": 3,
+      "mixed_precision": "no",
+      "optimizer": "adamw",
+      "pretokenize": true,
+      "tokenizer_threads": 24,
+      "warmup_ratio": 0.06,
+      "weight_decay": 0.01
+    }
+  },
+  "row3_selection": {
+    "criterion": "min pooled validation QLIKE (vol-unit), all horizons",
+    "grid_lrs": [
+      5e-06,
+      1e-05,
+      2e-05
+    ],
+    "selected_grid_run": "D2_gated_fusion_full_long_form_lr2e-5_seed2026",
+    "selected_lr": 2e-05,
+    "tuned_training": {
+      "early_stopping": true,
+      "es_min_delta": 0.0,
+      "es_patience": 1,
+      "max_epochs": 5
+    },
+    "val_qlike": 0.8720231553469853
+  },
+  "seed": 2026
+}

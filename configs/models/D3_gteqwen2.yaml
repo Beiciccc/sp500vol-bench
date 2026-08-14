@@ -1,0 +1,45 @@
+# D3 (gte-Qwen2-7B-instruct) — gated fusion of HAR-RV price features and a frozen
+# gte-Qwen2-7B disclosure embedding. Modern-LLM fusion lineage 2 of 3.
+
+defaults:
+  - /base
+  - _self_
+
+model_id: D3_gteqwen2
+model_class: sp500vol.models.fusion.llm_fusion.D3LLMFusion
+strategy: D3_gteqwen2
+
+encoder:
+  pretrained: Alibaba-NLP/gte-Qwen2-7B-instruct
+  max_length: 4096
+
+llm:
+  instruction: "Represent this corporate financial disclosure for forecasting the issuing firm's future stock-return volatility"
+  normalize_emb: true
+  encode_batch_size: 8
+  cache_embeddings: true     # shares the C5_gteqwen2 embedding cache
+
+fusion:
+  proj_dim: 128
+
+head:
+  hidden_dim: 128
+  dropout: 0.1
+
+training:
+  optimizer: adamw
+  lr: 1.0e-4
+  weight_decay: 0.01
+  batch_size: 512
+  mixed_precision: bf16
+  warmup_ratio: 0.06
+  max_epochs: 40            # head-only probe (cached embeddings) is cheap; generous cap + early stop guards against underfit (vs fine-tune 15)
+  early_stopping: true
+  es_patience: 3
+  es_min_delta: 0.0
+  log_target: true
+  tokenizer_threads: 24            # pin RAYON for the up-front 7B-encode tokenise
+
+compute:
+  required_gpu: A100_40G
+  estimated_hours_per_seed: 0.5

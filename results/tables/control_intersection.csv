@@ -1,0 +1,70 @@
+disc,model,h,clu_genuine_raw,clu_genuine_holm,maximal_raw,maximal_holm,firm_raw,firm_holm,withindate_crosssec,withindate_verdict,seed_ens_genuine,AND_maximal_firm_raw,AND_maximal_firm_holm,AND_full_raw,AND_full_holm,AND_5way_raw,AND_5way_holm,rel_impr_pct,rel_impr_pct_maximal,rel_impr_pct_firm
+event_driven,B1_bow_ridge,5,True,True,False,False,True,True,True,cross-sectional,True,False,False,False,False,False,False,1.331417884609428,0.3122559643525115,0.4614762928848334
+event_driven,B1_bow_ridge,10,True,True,False,False,True,True,True,cross-sectional,True,False,False,False,False,False,False,1.228718774588584,-0.1566523524011691,0.2503934385545798
+event_driven,B1_bow_ridge,20,True,False,False,False,False,False,True,cross-sectional,False,False,False,False,False,False,False,1.5311119888873268,-0.2666154547425453,-0.1929512232630929
+event_driven,B2_tfidf_ridge,5,True,False,False,False,True,False,True,cross-sectional,False,False,False,False,False,False,False,1.2074814852932854,0.1474650996193851,0.4435060552205759
+event_driven,B2_tfidf_ridge,10,True,False,False,False,True,True,True,cross-sectional,False,False,False,False,False,False,False,1.3547084106734637,-0.0576037379135628,0.2812042843458857
+event_driven,B2_tfidf_ridge,20,True,False,False,False,False,False,True,cross-sectional,False,False,False,False,False,False,False,1.839723831694415,-0.1273948128971892,-0.0451100564968601
+event_driven,B3_lm_linear,5,True,False,False,False,True,False,False,regime-timing,False,False,False,False,False,False,False,0.2476552098957819,0.1607652035984077,0.1104712123827451
+event_driven,B3_lm_linear,10,False,False,False,False,False,False,True,cross-sectional,False,False,False,False,False,False,False,0.2001155233282068,0.0873400993915986,0.1079528026898246
+event_driven,B3_lm_linear,20,False,False,False,False,True,False,False,n/a (not genuine),False,False,False,False,False,False,False,0.2595112607503413,0.0940899972008299,0.1696191259451645
+event_driven,B4_lm_features,5,False,False,False,False,False,False,False,regime-timing,False,False,False,False,False,False,False,0.1842237215472996,0.1948934653110163,0.218061153708448
+event_driven,B4_lm_features,10,True,False,True,False,True,False,True,cross-sectional,False,True,False,True,False,False,False,0.0820115707812811,0.084346348343745,0.1304350276414691
+event_driven,B4_lm_features,20,True,False,False,False,True,False,True,cross-sectional,False,False,False,False,False,False,False,0.2470349948307292,0.0855867687723877,0.1101905017582833
+event_driven,C2_finbert_s1,5,True,True,False,False,False,False,False,n/a (not genuine),True,False,False,False,False,False,False,2.1354108463976527,0.5684564618058107,-0.2824107274048019
+event_driven,C2_finbert_s1,10,True,True,False,False,False,False,True,cross-sectional,True,False,False,False,False,False,False,2.103684316886877,0.2110065525050266,-1.222864920999435
+event_driven,C2_finbert_s1,20,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,0.9196526269056868,-4.539568799259102,0.5777402830426177
+event_driven,C6_llmtext,5,True,True,False,False,True,True,False,mixed,True,False,False,False,False,False,False,1.214090285102993,0.3980001429655966,0.5184357464578844
+event_driven,C6_llmtext,10,True,True,False,False,True,True,True,cross-sectional,True,False,False,False,False,False,False,0.9983330757402844,0.1205721167264328,0.2436713506495467
+event_driven,C6_llmtext,20,True,False,False,False,True,True,False,n/a (not genuine),False,False,False,False,False,False,False,0.6582441286840103,0.0861290724358363,0.2148651384537262
+event_driven,D2_gated_fusion,5,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,0.5087523314740983,0.2561054925790931,0.3778657517066164
+event_driven,D2_gated_fusion,10,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,0.2308031510747592,0.0084422379279942,0.1373435123511268
+event_driven,D2_gated_fusion,20,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-2.869476411334253,-2.422164808653963,-4.597713366435835
+event_driven,D4_llmfused,5,False,False,True,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-0.0127643731423575,0.1139886284541762,-0.0715131609277423
+event_driven,D4_llmfused,10,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-0.0080156793875912,-0.0295755195925998,-0.0208584760453533
+event_driven,D4_llmfused,20,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-0.3547645092034865,-0.2427982814417879,-0.251193378631016
+long_form,B1_bow_ridge,5,True,True,True,False,False,False,True,cross-sectional,True,False,False,False,False,False,False,1.6453166106838288,0.8702402004086593,-0.1384609402121484
+long_form,B1_bow_ridge,10,True,True,False,False,False,False,True,cross-sectional,True,False,False,False,False,False,False,1.4430793808168212,0.5055245411598753,-2.7204936922898173
+long_form,B1_bow_ridge,20,True,True,True,False,False,False,True,cross-sectional,True,False,False,False,False,False,False,2.9855262769060005,1.6075089729734726,-4.984587316943238
+long_form,B2_tfidf_ridge,5,True,True,True,True,False,False,True,cross-sectional,True,False,False,False,False,False,False,3.3305014262665753,1.6721243059592703,-0.6147533787598136
+long_form,B2_tfidf_ridge,10,True,True,True,True,False,False,True,cross-sectional,True,False,False,False,False,False,False,3.4823316043620314,1.9517436929438372,-3.892169412007764
+long_form,B2_tfidf_ridge,20,True,True,True,True,False,False,False,n/a (not genuine),True,False,False,False,False,False,False,5.9198595954670425,4.012857915594649,-8.089490036358773
+long_form,B3_lm_linear,5,True,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,0.4946605450340297,-0.2209014523741708,0.2073709853793816
+long_form,B3_lm_linear,10,True,True,True,False,True,True,False,regime-timing,True,True,False,True,False,False,False,1.7940860314836526,0.640650752913478,0.2605291683595561
+long_form,B3_lm_linear,20,True,True,True,False,False,False,True,cross-sectional,True,False,False,False,False,False,False,3.484928689567737,1.9268909711669004,-0.0168896389289407
+long_form,B4_lm_features,5,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,0.1127912726488379,0.0232105443868957,-0.1389235411319873
+long_form,B4_lm_features,10,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-0.9221600983274052,-0.7288209043307747,-2.7672721184718916
+long_form,B4_lm_features,20,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-1.920474136598029,-1.5541543078803324,-7.132788699177395
+long_form,C1_bert_s1,5,True,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,0.1184815464271077,-0.0026839542739312,-0.3503516511579339
+long_form,C1_bert_s1,10,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-1.2823173171873985,0.0639877213540946,-6.059560296290867
+long_form,C1_bert_s1,20,True,True,True,False,False,False,True,cross-sectional,True,False,False,False,False,False,False,2.950124040620903,1.318007722733248,-5.7961895701674
+long_form,C2_finbert_s1,5,False,False,False,False,False,False,True,cross-sectional,False,False,False,False,False,False,False,0.5621361399397723,0.089613937711077,-0.1819328687341162
+long_form,C2_finbert_s1,10,True,True,True,False,False,False,True,cross-sectional,True,False,False,False,False,False,False,4.55810848141576,1.9471432196813068,-0.6045030636825292
+long_form,C2_finbert_s1,20,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-0.0837431042934366,-0.0139035506473084,-0.9235921207996672
+long_form,C2_finbert_s2,5,True,True,True,False,False,False,True,cross-sectional,True,False,False,False,False,False,False,1.733647133918385,0.5584382719917814,-0.3070483213688739
+long_form,C2_finbert_s2,10,True,True,False,False,False,False,True,cross-sectional,True,False,False,False,False,False,False,0.2435323005883947,-0.1231296796451191,-2.801994025366848
+long_form,C2_finbert_s2,20,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-5.189522358036292,-2.073813850820985,-4.990198698129876
+long_form,C2_finbert_s3,5,True,True,True,False,False,False,True,cross-sectional,True,False,False,False,False,False,False,2.386963439261433,0.9263456628115114,-1.1610664151918055
+long_form,C2_finbert_s3,10,True,True,True,False,False,False,True,cross-sectional,True,False,False,False,False,False,False,3.0309953748126643,1.3416589598646356,-1.559656770998391
+long_form,C2_finbert_s3,20,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-0.7577394756180948,-4.74768301209409,-0.7424029615592052
+long_form,C2_finbert_s4,5,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-1.0912473387564317,-1.065287452839229,-1.3217790933983082
+long_form,C2_finbert_s4,10,True,True,True,True,False,False,True,cross-sectional,True,False,False,False,False,False,False,2.280783498232488,0.9801865467453208,-3.2404999921920807
+long_form,C2_finbert_s4,20,True,True,True,True,False,False,True,cross-sectional,True,False,False,False,False,False,False,3.453562065421156,2.3157255578486144,-5.175226304571473
+long_form,C3_roberta_s1,5,True,True,False,False,False,False,True,cross-sectional,True,False,False,False,False,False,False,0.6742480435965201,-0.0210598297148094,-2.5565368273395177
+long_form,C3_roberta_s1,10,True,True,True,False,False,False,True,cross-sectional,True,False,False,False,False,False,False,1.9773753930897624,-0.2000444632640177,-0.4503230467598256
+long_form,C3_roberta_s1,20,False,False,False,False,False,False,True,cross-sectional,False,False,False,False,False,False,False,0.2368086782855594,0.011228343908134,-0.5679480985482853
+long_form,C4_longformer,5,True,True,True,True,False,False,True,cross-sectional,True,False,False,False,False,False,False,1.5263781171705129,0.5338197337754246,-0.9657455337654564
+long_form,C4_longformer,10,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-2.60763409942578,-2.860080265532081,-10.843496437079258
+long_form,C4_longformer,20,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-9.341306531512824,-5.8778911866556545,-10.416488417261768
+long_form,C6_llmtext,5,True,True,True,True,False,False,True,cross-sectional,True,False,False,False,False,False,False,1.7942379073494623,1.0455397088134586,-0.1835090922270036
+long_form,C6_llmtext,10,True,True,True,True,False,False,True,cross-sectional,True,False,False,False,False,False,False,2.2515608914093357,1.0658540273160524,-0.4332262742505682
+long_form,C6_llmtext,20,True,True,True,False,True,True,False,n/a (not genuine),True,True,False,True,False,False,False,0.2748020035212486,0.2332909716110316,0.0794222049970927
+long_form,D1_concat_mlp,5,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-0.0134141540600605,-0.0231368744549626,-0.0579943327943818
+long_form,D1_concat_mlp,10,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,0.1831618687191947,-0.6075185204449095,0.0078283216727099
+long_form,D1_concat_mlp,20,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-0.0805661317901641,-0.5648240624708888,-0.0449641535385578
+long_form,D2_gated_fusion,5,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-0.1171051018852159,-0.0467126779603203,-0.3871029527084143
+long_form,D2_gated_fusion,10,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,0.1348815382416968,-0.4821257122640367,-0.5779770976179033
+long_form,D2_gated_fusion,20,False,False,False,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-6.000683385285942,-1.374167784542036,-8.470679956796891
+long_form,D4_llmfused,5,False,False,False,False,False,False,False,regime-timing,False,False,False,False,False,False,False,0.1492378604554772,-0.1054641454436383,-0.0008496564248395
+long_form,D4_llmfused,10,False,False,True,False,False,False,False,n/a (not genuine),False,False,False,False,False,False,False,-0.1482727617976476,0.2884318226602492,-0.1488928809151774
+long_form,D4_llmfused,20,True,True,True,False,True,False,True,cross-sectional,True,True,False,True,False,True,False,0.6049002013926658,0.3651431169030308,0.0831122342490437

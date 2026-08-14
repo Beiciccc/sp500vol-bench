@@ -1,0 +1,24 @@
+
+=== Diebold-Mariano vs A2_har_rv (dataset=full, disclosure=event_driven, split=test) ===
+Positive DM = challenger WORSE than baseline. p<0.05 = significant.
+
+--- B1_bow_ridge vs A2_har_rv ---
+  h= 5: DM=+7.326 p=0.0000  ** p<0.01  -> B1_bow_ridge WORSE   MAE(C/B)=0.1241/0.1034
+  h=10: DM=+7.531 p=0.0000  ** p<0.01  -> B1_bow_ridge WORSE   MAE(C/B)=0.1143/0.0899
+  h=20: DM=+8.557 p=0.0000  ** p<0.01  -> B1_bow_ridge WORSE   MAE(C/B)=0.1062/0.0789
+
+--- B2_tfidf_ridge vs A2_har_rv ---
+  h= 5: DM=+30.674 p=0.0000  ** p<0.01  -> B2_tfidf_ridge WORSE   MAE(C/B)=0.1225/0.1034
+  h=10: DM=+29.369 p=0.0000  ** p<0.01  -> B2_tfidf_ridge WORSE   MAE(C/B)=0.1134/0.0899
+  h=20: DM=+28.164 p=0.0000  ** p<0.01  -> B2_tfidf_ridge WORSE   MAE(C/B)=0.1072/0.0789
+
+--- B3_lm_linear vs A2_har_rv ---
+  h= 5: DM=+30.131 p=0.0000  ** p<0.01  -> B3_lm_linear WORSE   MAE(C/B)=0.1204/0.1034
+  h=10: DM=+28.125 p=0.0000  ** p<0.01  -> B3_lm_linear WORSE   MAE(C/B)=0.1094/0.0899
+  h=20: DM=+26.727 p=0.0000  ** p<0.01  -> B3_lm_linear WORSE   MAE(C/B)=0.1008/0.0789
+
+--- B4_lm_features vs A2_har_rv ---
+  h= 5: DM=+29.647 p=0.0000  ** p<0.01  -> B4_lm_features WORSE   MAE(C/B)=0.1199/0.1034
+  h=10: DM=+27.500 p=0.0000  ** p<0.01  -> B4_lm_features WORSE   MAE(C/B)=0.1086/0.0899
+  h=20: DM=+26.184 p=0.0000  ** p<0.01  -> B4_lm_features WORSE   MAE(C/B)=0.0998/0.0789
+

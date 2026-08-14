@@ -1,0 +1,19 @@
+{
+  "clip_range": [
+    0.03,
+    3.0
+  ],
+  "llm": "mistralai/Mistral-Small-24B-Instruct-2501",
+  "model_id": "C6_llmtext_mistral24ens",
+  "note": "3-seed ensemble of the third-family Mistral-Small-24B-Instruct-2501 (bf16, no quantization) 8-K forecaster (prereg \u00a7B1). Per-observation ARITHMETIC MEAN of prediction_realised_vol across vLLM seeds 2026+2027+2028, inner-joined on (ticker,accession,horizon_days) \u2014 identical convention to the C-model seed-ensemble primary (m1_ensemble_primary.ensemble_text) and to C6_llmtext_llama70ens. VAL+TEST only.",
+  "seeds_used": [
+    "2026",
+    "2027",
+    "2028"
+  ],
+  "stats": {
+    "n_filings": 39322,
+    "n_rows": 117407,
+    "n_seeds": 3
+  }
+}

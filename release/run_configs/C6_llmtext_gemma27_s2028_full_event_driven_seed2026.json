@@ -1,0 +1,32 @@
+{
+  "chat_template_note": "Gemma has no system role: committed C6 system message folded verbatim into the user turn (disclosed protocol delta)",
+  "clip_range": [
+    0.03,
+    3.0
+  ],
+  "llm": "hf/hub/models--unsloth--gemma-3-27b-it/snapshots/7a5a3053dbd5d1d58e48159e87b9df2fc545a49a",
+  "model_id": "C6_llmtext_gemma27_s2028",
+  "note": "Prereg B2 fourth-family probe (prereg-rfa v1.3). Zero-shot C6 prompt verbatim; protocol byte-identical to C6/llama70/mistral24 (prompt cap 6000, guided JSON, clip [0.03,3.0], on_missing=rv22).",
+  "on_missing": "rv22",
+  "prereg": "prereg-rfa v1.3 B2",
+  "prompt_cap_tokens": 6000,
+  "sampling": {
+    "guided_json": true,
+    "max_model_len": 8192,
+    "max_tokens": 120,
+    "retry_temperature": 0.2,
+    "temperature": 0.0,
+    "tp": 2
+  },
+  "seed_label": "2028",
+  "stats": {
+    "clipped_rate": 0.0,
+    "clipped_rows": 0,
+    "n_filings": 39322,
+    "n_rows": 117407,
+    "parse_fail_rate": 0.0,
+    "parse_fail_rows": 0
+  },
+  "system_fold": true,
+  "variant": "c6_text"
+}

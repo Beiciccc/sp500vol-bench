@@ -1,0 +1,70 @@
+# DM: full long_form test vs C2_finbert_s1
+
+=== Diebold-Mariano vs C2_finbert_s1 (dataset=full, disclosure=long_form, split=test) ===
+Positive DM = challenger WORSE than baseline. p<0.05 = significant.
+
+--- A2_har_rv vs C2_finbert_s1 ---
+  h= 5: DM=-17.382 p=0.0000  ** p<0.01  -> A2_har_rv BETTER   MAE(C/B)=0.1071/0.1236
+  h=10: DM=-14.360 p=0.0000  ** p<0.01  -> A2_har_rv BETTER   MAE(C/B)=0.0927/0.1072
+  h=20: DM=-18.449 p=0.0000  ** p<0.01  -> A2_har_rv BETTER   MAE(C/B)=0.0778/0.1122
+
+--- B1_bow_ridge vs C2_finbert_s1 ---
+  h= 5: DM=+2.292 p=0.0219  * p<0.05  -> B1_bow_ridge WORSE   MAE(C/B)=0.1332/0.1236
+  h=10: DM=+2.276 p=0.0228  * p<0.05  -> B1_bow_ridge WORSE   MAE(C/B)=0.1176/0.1072
+  h=20: DM=-0.504 p=0.6144    ns      -> B1_bow_ridge BETTER   MAE(C/B)=0.1021/0.1122
+
+--- B2_tfidf_ridge vs C2_finbert_s1 ---
+  h= 5: DM=-13.434 p=0.0000  ** p<0.01  -> B2_tfidf_ridge BETTER   MAE(C/B)=0.1177/0.1236
+  h=10: DM=-1.074 p=0.2827    ns      -> B2_tfidf_ridge BETTER   MAE(C/B)=0.1061/0.1072
+  h=20: DM=-23.039 p=0.0000  ** p<0.01  -> B2_tfidf_ridge BETTER   MAE(C/B)=0.0934/0.1122
+
+--- B3_lm_linear vs C2_finbert_s1 ---
+  h= 5: DM=-5.424 p=0.0000  ** p<0.01  -> B3_lm_linear BETTER   MAE(C/B)=0.1202/0.1236
+  h=10: DM=+7.251 p=0.0000  ** p<0.01  -> B3_lm_linear WORSE   MAE(C/B)=0.1084/0.1072
+  h=20: DM=-18.587 p=0.0000  ** p<0.01  -> B3_lm_linear BETTER   MAE(C/B)=0.0939/0.1122
+
+--- B4_lm_features vs C2_finbert_s1 ---
+  h= 5: DM=+1.536 p=0.1244    ns      -> B4_lm_features WORSE   MAE(C/B)=0.1227/0.1236
+  h=10: DM=+9.209 p=0.0000  ** p<0.01  -> B4_lm_features WORSE   MAE(C/B)=0.1097/0.1072
+  h=20: DM=-17.746 p=0.0000  ** p<0.01  -> B4_lm_features BETTER   MAE(C/B)=0.0952/0.1122
+
+--- C1_bert_s1 vs C2_finbert_s1 ---
+  h= 5: DM=+31.982 p=0.0000  ** p<0.01  -> C1_bert_s1 WORSE   MAE(C/B)=0.1369/0.1236
+  h=10: DM=+26.670 p=0.0000  ** p<0.01  -> C1_bert_s1 WORSE   MAE(C/B)=0.1322/0.1072
+  h=20: DM=+12.269 p=0.0000  ** p<0.01  -> C1_bert_s1 WORSE   MAE(C/B)=0.1176/0.1122
+
+--- C2_finbert_s2 vs C2_finbert_s1 ---
+  h= 5: DM=-2.453 p=0.0142  * p<0.05  -> C2_finbert_s2 BETTER   MAE(C/B)=0.1284/0.1236
+  h=10: DM=+18.049 p=0.0000  ** p<0.01  -> C2_finbert_s2 WORSE   MAE(C/B)=0.1193/0.1072
+  h=20: DM=-15.825 p=0.0000  ** p<0.01  -> C2_finbert_s2 BETTER   MAE(C/B)=0.0983/0.1122
+
+--- C2_finbert_s3 vs C2_finbert_s1 ---
+  h= 5: DM=+6.347 p=0.0000  ** p<0.01  -> C2_finbert_s3 WORSE   MAE(C/B)=0.1317/0.1236
+  h=10: DM=-2.525 p=0.0116  * p<0.05  -> C2_finbert_s3 BETTER   MAE(C/B)=0.1082/0.1072
+  h=20: DM=-10.438 p=0.0000  ** p<0.01  -> C2_finbert_s3 BETTER   MAE(C/B)=0.1064/0.1122
+
+--- C2_finbert_s4 vs C2_finbert_s1 ---
+  h= 5: DM=+8.728 p=0.0000  ** p<0.01  -> C2_finbert_s4 WORSE   MAE(C/B)=0.1325/0.1236
+  h=10: DM=+11.110 p=0.0000  ** p<0.01  -> C2_finbert_s4 WORSE   MAE(C/B)=0.1190/0.1072
+  h=20: DM=-12.899 p=0.0000  ** p<0.01  -> C2_finbert_s4 BETTER   MAE(C/B)=0.1025/0.1122
+
+--- C3_roberta_s1 vs C2_finbert_s1 ---
+  h= 5: DM=-4.234 p=0.0000  ** p<0.01  -> C3_roberta_s1 BETTER   MAE(C/B)=0.1217/0.1236
+  h=10: DM=+10.397 p=0.0000  ** p<0.01  -> C3_roberta_s1 WORSE   MAE(C/B)=0.1117/0.1072
+  h=20: DM=-16.487 p=0.0000  ** p<0.01  -> C3_roberta_s1 BETTER   MAE(C/B)=0.1011/0.1122
+
+--- C4_longformer vs C2_finbert_s1 ---
+  h= 5: DM=-14.917 p=0.0000  ** p<0.01  -> C4_longformer BETTER   MAE(C/B)=0.1169/0.1236
+  h=10: DM=-4.844 p=0.0000  ** p<0.01  -> C4_longformer BETTER   MAE(C/B)=0.1044/0.1072
+  h=20: DM=-21.014 p=0.0000  ** p<0.01  -> C4_longformer BETTER   MAE(C/B)=0.0962/0.1122
+
+--- D1_concat_mlp vs C2_finbert_s1 ---
+  h= 5: DM=-19.159 p=0.0000  ** p<0.01  -> D1_concat_mlp BETTER   MAE(C/B)=0.1079/0.1236
+  h=10: DM=-15.667 p=0.0000  ** p<0.01  -> D1_concat_mlp BETTER   MAE(C/B)=0.0942/0.1072
+  h=20: DM=-19.946 p=0.0000  ** p<0.01  -> D1_concat_mlp BETTER   MAE(C/B)=0.0878/0.1122
+
+--- D2_gated_fusion vs C2_finbert_s1 ---
+  h= 5: DM=-18.107 p=0.0000  ** p<0.01  -> D2_gated_fusion BETTER   MAE(C/B)=0.1075/0.1236
+  h=10: DM=-8.928 p=0.0000  ** p<0.01  -> D2_gated_fusion BETTER   MAE(C/B)=0.1008/0.1072
+  h=20: DM=-18.485 p=0.0000  ** p<0.01  -> D2_gated_fusion BETTER   MAE(C/B)=0.0893/0.1122
+

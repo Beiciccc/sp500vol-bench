@@ -1,0 +1,62 @@
+{
+  "dataset": "full",
+  "disclosure": "long_form",
+  "event_driven_note": "event_driven (8-K) delta variant SKIPPED by design: 8-Ks are event-driven, not periodic \u2014 consecutive 8-Ks of the same firm report unrelated events, so a consecutive-filing TF-IDF difference does not isolate disclosure change the way a 10-K/10-Q same-form diff does (Lazy Prices is defined on periodic filings). Disclosed in the paper as a scope note.",
+  "model": "B2d_tfidf_delta",
+  "model_config": {
+    "model_id": "B2d_tfidf_delta",
+    "note": "ROW-2A delta-TF-IDF: each long-form filing represented as the difference of consecutive TF-IDF vectors within the firm's same-form (10-K / 10-Q) sequence ordered by effective_trading_day; vectoriser (B2 recipe: 1-2gram, 5k features, sublinear tf) fit on train-split docs only; one ridge per horizon on log RV (B2 alpha CV grid); retransform exp(raw)*Duan-smear clipped to [0.02, 5.0]. First filing of each (cik, form) sequence excluded (no predecessor) from training AND predictions. Splits: pinned chronological convention from scripts/train.py.",
+    "training": {
+      "alpha_grid": [
+        0.1,
+        1.0,
+        10.0,
+        100.0,
+        1000.0,
+        10000.0
+      ],
+      "clip": [
+        0.02,
+        5.0
+      ],
+      "duan_smear": {
+        "10": 1.1290476856549612,
+        "20": 1.1045450900160791,
+        "5": 1.17594863271257
+      },
+      "log_target": true,
+      "ridge_alpha": null,
+      "selected_alphas": {
+        "10": 1.0,
+        "20": 1.0,
+        "5": 1.0
+      }
+    },
+    "vectoriser": {
+      "fit_on": "train-split unique docs",
+      "kind": "tfidf",
+      "max_features": 5000,
+      "ngram_range": [
+        1,
+        2
+      ],
+      "sublinear_tf": true
+    }
+  },
+  "sample_docs": null,
+  "seed": 2026,
+  "sequencing": {
+    "excluded_by_split": {
+      "test": 117,
+      "train": 1393,
+      "val": 72
+    },
+    "gap_days_median": 98.0,
+    "gap_days_p95": 367.0,
+    "n_excluded_first_of_sequence": 1582,
+    "n_kept_docs": 30019,
+    "n_unique_docs": 31601,
+    "no_gap_cap": "consecutive same-form filings regardless of gap (disclosed)",
+    "order_by": "effective_trading_day within (cik, form)"
+  }
+}

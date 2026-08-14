@@ -1,0 +1,14 @@
+aligned_path= /Volumes/Z/sp500vol-data/processed/full/aligned_filings.parquet
+cache_path= /Volumes/Z/sp500vol-data/processed/_text_cache/filing_texts.parquet
+aligned_size_gb= 0.892
+cache_size_gb= 3.323
+event_driven_aligned_rows= 336603
+event_driven_unique_text_paths= 112528
+cache_rows= 144129
+event_driven_MISSING= 0
+random_readback_n= 20
+random_readback_found= 20
+random_readback_nonempty= 20
+random_readback_min_len= 1936
+random_readback_lengths= [3164, 2186, 2801, 6532, 2573, 3631, 3543, 3470, 2943, 2550, 2556, 2863, 6078, 3526, 2026, 4481, 2174, 1936, 4070, 4561]
+VALIDATION_OK= True

@@ -1,0 +1,29 @@
+
+=== Diebold-Mariano vs A2_har_rv (dataset=full, disclosure=long_form, split=test) ===
+Positive DM = challenger WORSE than baseline. p<0.05 = significant.
+
+--- B1_bow_ridge vs A2_har_rv ---
+  h= 5: DM=+5.120 p=0.0000  ** p<0.01  -> B1_bow_ridge WORSE   MAE(C/B)=0.1332/0.1071
+  h=10: DM=+4.377 p=0.0000  ** p<0.01  -> B1_bow_ridge WORSE   MAE(C/B)=0.1176/0.0927
+  h=20: DM=+4.296 p=0.0000  ** p<0.01  -> B1_bow_ridge WORSE   MAE(C/B)=0.1021/0.0778
+
+--- B2_tfidf_ridge vs A2_har_rv ---
+  h= 5: DM=+13.016 p=0.0000  ** p<0.01  -> B2_tfidf_ridge WORSE   MAE(C/B)=0.1177/0.1071
+  h=10: DM=+13.320 p=0.0000  ** p<0.01  -> B2_tfidf_ridge WORSE   MAE(C/B)=0.1061/0.0927
+  h=20: DM=+12.114 p=0.0000  ** p<0.01  -> B2_tfidf_ridge WORSE   MAE(C/B)=0.0934/0.0778
+
+--- B3_lm_linear vs A2_har_rv ---
+  h= 5: DM=+15.517 p=0.0000  ** p<0.01  -> B3_lm_linear WORSE   MAE(C/B)=0.1202/0.1071
+  h=10: DM=+15.902 p=0.0000  ** p<0.01  -> B3_lm_linear WORSE   MAE(C/B)=0.1084/0.0927
+  h=20: DM=+13.853 p=0.0000  ** p<0.01  -> B3_lm_linear WORSE   MAE(C/B)=0.0939/0.0778
+
+--- B4_lm_features vs A2_har_rv ---
+  h= 5: DM=+17.107 p=0.0000  ** p<0.01  -> B4_lm_features WORSE   MAE(C/B)=0.1227/0.1071
+  h=10: DM=+16.421 p=0.0000  ** p<0.01  -> B4_lm_features WORSE   MAE(C/B)=0.1097/0.0927
+  h=20: DM=+14.559 p=0.0000  ** p<0.01  -> B4_lm_features WORSE   MAE(C/B)=0.0952/0.0778
+
+--- C4_longformer vs A2_har_rv ---
+  h= 5: DM=+12.222 p=0.0000  ** p<0.01  -> C4_longformer WORSE   MAE(C/B)=0.1169/0.1071
+  h=10: DM=+12.683 p=0.0000  ** p<0.01  -> C4_longformer WORSE   MAE(C/B)=0.1044/0.0927
+  h=20: DM=+13.988 p=0.0000  ** p<0.01  -> C4_longformer WORSE   MAE(C/B)=0.0962/0.0778
+

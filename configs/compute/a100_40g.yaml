@@ -1,0 +1,20 @@
+# 4xA100-40G compute profile for cloud rental — REFERENCE/DOCUMENTATION ONLY.
+#
+# NOTE: no code reads this file. Per-model mixed_precision / checkpointing come
+# from each configs/models/*.yaml; run_matrix.py drives the 4 GPUs via
+# CUDA_VISIBLE_DEVICES (one run per GPU in parallel, not DDP). Kept as a record
+# of the target box and the cost assumption behind design/02_compute_plan.md.
+
+gpu:
+  name: A100
+  memory_gb: 40
+  count: 4                          # run_matrix runs one run per GPU in parallel
+
+provider: gpuhome                   # or runpod / vast.ai / lambda
+hourly_rate_usd: 1.80               # set HOURLY_RATE_USD in .env so CostTracker records it
+
+# Reference tuning — actually applied per-model in configs/models/*.yaml:
+training:
+  mixed_precision: bf16
+  pin_memory: true
+  dataloader_num_workers: 4

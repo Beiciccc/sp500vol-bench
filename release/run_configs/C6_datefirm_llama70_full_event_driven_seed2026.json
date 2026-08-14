@@ -1,0 +1,28 @@
+{
+  "clip_range": [
+    0.03,
+    3.0
+  ],
+  "llm": "hf/hub/models--hugging-quants--Meta-Llama-3.1-70B-Instruct-AWQ-INT4/snapshots/2123003760781134cfc31124aa6560a45b491fdf",
+  "model_id": "C6_datefirm_llama70",
+  "note": "Prereg B2 rider (prereg-rfa v1.3): zero-content date+ticker probe through Llama-3.1-70B AWQ-INT4 \u2014 the C6 contamination arm's c6_datefirm prompt VERBATIM (no filing text), same precision as the committed llama70 fulltext runs, single seed 2026.",
+  "on_missing": "rv22",
+  "sampling": {
+    "guided_json": true,
+    "max_model_len": 8192,
+    "max_tokens": 120,
+    "retry_temperature": 0.2,
+    "seed": 2026,
+    "temperature": 0.0,
+    "tp": 2
+  },
+  "stats": {
+    "clipped_rate": 0.0,
+    "clipped_rows": 0,
+    "n_filings": 39322,
+    "n_rows": 117407,
+    "parse_fail_rate": 0.0,
+    "parse_fail_rows": 0
+  },
+  "variant": "c6_datefirm"
+}

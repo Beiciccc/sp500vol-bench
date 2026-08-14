@@ -1,0 +1,855 @@
+{
+  "schema": "ef_pilot/v1",
+  "prereg": "configs/prereg_elicitation_fairness.md (tag prereg-ef-v1.0)",
+  "prereg_amendment": "prereg-ef v1.1 amendment PENDING: single A100-80GB -> TP=1 (the v1.0 text says TP=2, written for 2xA100-40GB); G-E1 runs as a TP-invariance diagnostic, not a bit-exact gate",
+  "stage": "pilot (val only; no increment statistic; no test row read)",
+  "gate": "healthy <=> max variance-unit QLIKE < 4 AND max modal share of round(pred,2) < 60% (Yi/Phi criteria, verbatim the crossfamily_mistral24.py / crossfamily_llama70.py health formula)",
+  "selection_rule": "每家族选 val modal share 最低的变体(并列取 V0 → V1 → V2 序);该变体若健康 → 放行全量;三变体全部不健康 → 该家族登记为 elicitation-robust instrument-dead",
+  "pilot_n": 2000,
+  "pilot_docs": "the registered v1.3 pilot set: FIRST 2,000 event_driven VALIDATION filings by the canonical sort (filing_time_utc, ticker, accession)",
+  "sidecar": "results/e1_llm_forecast/ef_pilot_sidecar.json",
+  "sidecar_docs_sha256": "b3b573fab39dbc3b9feccfc38388626d8f34d80136ddf3f4d96a96dc287f5b1f",
+  "tp_effective": 1,
+  "tp_committed": 2,
+  "tp_matches_committed": false,
+  "tp_note": "prereg-ef v1.1 amendment PENDING: single A100-80GB -> TP=1 (the v1.0 text says TP=2, written for 2xA100-40GB); G-E1 runs as a TP-invariance diagnostic, not a bit-exact gate",
+  "hashes": {
+    "V0": {
+      "render_sha256": "576972ec99b157eb106d5a137e53565d3e9ecd7bbb19cec90d4bee3582871cd3",
+      "static_sha256": "e493a9feb86a33c348b228c3f0e6956ab2284fd9b75bf9cf87382f33db094896",
+      "doc": "committed C6 prompt, verbatim (imported from prompt.build_messages, c6_text)"
+    },
+    "V1": {
+      "render_sha256": "00c6c1734a925f0e6ac34f369d8a62384de77b8a2994b7ea258c4b3b84bfed5f",
+      "static_sha256": "cdca597c16ac72e5f83a078bb24f2c332744059a8c48663218c7baa3a816b31e",
+      "doc": "V0 + two few-shot validation examples (first two val docs by canonical sort, with true RV labels; exemplar excerpt head-capped at 3000 chars)"
+    },
+    "V2": {
+      "render_sha256": "f483191ac62d56034803739bf0e2fe6f7168641dc8ffda6a9ff71e74db6cf76d",
+      "static_sha256": "dae593f3a1f594d3de950f9c8f8e9c459006f1e9ce5dc27545df6e61aacb4c1c",
+      "doc": "V0 + numeric-range hint (\"annualised RV, typically 0.05--1.50\") + restated committed JSON schema + one re-ask on parse failure (committed retry)"
+    },
+    "_fewshot_block": {
+      "sha256": "be7e5704b8e04ca5a02dd6cbe2c678335a8523dea25481f09f986be8016f2bb6",
+      "chars": 6804
+    }
+  },
+  "families": {
+    "mistral24": {
+      "model_id": "mistralai/Mistral-Small-24B-Instruct-2501",
+      "model_desc": "Mistral-Small-24B-Instruct-2501 (bf16)",
+      "per_variant": {
+        "V0": {
+          "healthy": false,
+          "max_qlike_var": 4.340916351359399,
+          "max_mode_share_pct": 57.65946760421899,
+          "per_h": {
+            "5": {
+              "qlike_vol": 0.3321598520769519,
+              "qlike_var": 2.053207993939763,
+              "r2": 0.06919740464687907,
+              "pred_sd": 0.13660625671981502,
+              "n_unique_2dp": 9,
+              "mode_val_2dp": 0.35,
+              "mode_share_pct": 49.05,
+              "n": 2000
+            },
+            "10": {
+              "qlike_vol": 0.39554628379121554,
+              "qlike_var": 2.6824951680259552,
+              "r2": -0.11031660465169746,
+              "pred_sd": 0.11762894466750677,
+              "n_unique_2dp": 16,
+              "mode_val_2dp": 0.32,
+              "mode_share_pct": 46.31947921882824,
+              "n": 1997
+            },
+            "20": {
+              "qlike_vol": 0.5799922505457036,
+              "qlike_var": 4.340916351359399,
+              "r2": -0.6053452864726159,
+              "pred_sd": 0.10159684295109316,
+              "n_unique_2dp": 15,
+              "mode_val_2dp": 0.3,
+              "mode_share_pct": 57.65946760421899,
+              "n": 1991
+            }
+          },
+          "parse_fail_rate": 0.0,
+          "clipped_rate": 0.0,
+          "n_docs": 2000
+        },
+        "V1": {
+          "healthy": false,
+          "max_qlike_var": 49.80913811989306,
+          "max_mode_share_pct": 51.55,
+          "per_h": {
+            "5": {
+              "qlike_vol": 3.3490424246281156,
+              "qlike_var": 49.80913811989306,
+              "r2": -0.8061464930240501,
+              "pred_sd": 0.036839960854485175,
+              "n_unique_2dp": 7,
+              "mode_val_2dp": 0.12,
+              "mode_share_pct": 51.55,
+              "n": 2000
+            },
+            "10": {
+              "qlike_vol": 3.0113273050089147,
+              "qlike_var": 40.82809374704958,
+              "r2": -1.0144733075504155,
+              "pred_sd": 0.04174199139482524,
+              "n_unique_2dp": 11,
+              "mode_val_2dp": 0.08,
+              "mode_share_pct": 43.86579869804707,
+              "n": 1997
+            },
+            "20": {
+              "qlike_vol": 3.0125571830038687,
+              "qlike_var": 39.084981666856656,
+              "r2": -1.6020622136406422,
+              "pred_sd": 0.04448095472943757,
+              "n_unique_2dp": 13,
+              "mode_val_2dp": 0.1,
+              "mode_share_pct": 43.34505273731793,
+              "n": 1991
+            }
+          },
+          "parse_fail_rate": 0.0,
+          "clipped_rate": 0.0,
+          "n_docs": 2000
+        },
+        "V2": {
+          "healthy": false,
+          "max_qlike_var": 5.030754649742228,
+          "max_mode_share_pct": 34.20130195292939,
+          "per_h": {
+            "5": {
+              "qlike_vol": 0.3486160738909081,
+              "qlike_var": 2.2537978319988623,
+              "r2": 0.0869484669874453,
+              "pred_sd": 0.18741731510188703,
+              "n_unique_2dp": 11,
+              "mode_val_2dp": 0.35,
+              "mode_share_pct": 34.2,
+              "n": 2000
+            },
+            "10": {
+              "qlike_vol": 0.4340154376566541,
+              "qlike_var": 3.1355422556425383,
+              "r2": -0.10803616218206846,
+              "pred_sd": 0.16649980685312704,
+              "n_unique_2dp": 12,
+              "mode_val_2dp": 0.32,
+              "mode_share_pct": 34.20130195292939,
+              "n": 1997
+            },
+            "20": {
+              "qlike_vol": 0.6446425604110066,
+              "qlike_var": 5.030754649742228,
+              "r2": -0.6277291692732254,
+              "pred_sd": 0.14472255171283685,
+              "n_unique_2dp": 11,
+              "mode_val_2dp": 0.3,
+              "mode_share_pct": 33.09894525364139,
+              "n": 1991
+            }
+          },
+          "parse_fail_rate": 0.0,
+          "clipped_rate": 0.0,
+          "n_docs": 2000
+        }
+      },
+      "selection": {
+        "selected_variant": "V2",
+        "selected_max_mode_share_pct": 34.20130195292939,
+        "healthy": false,
+        "rule": "lowest val modal share (max over horizons); ties V0 -> V1 -> V2 (prereg §选择规则)",
+        "ranking": [
+          {
+            "variant": "V2",
+            "max_mode_share_pct": 34.20130195292939,
+            "healthy": false
+          },
+          {
+            "variant": "V1",
+            "max_mode_share_pct": 51.55,
+            "healthy": false
+          },
+          {
+            "variant": "V0",
+            "max_mode_share_pct": 57.65946760421899,
+            "healthy": false
+          }
+        ],
+        "tie": false,
+        "tied_variants": [],
+        "released_to_full": false,
+        "registered_consequence": "三变体全部不健康 → 该家族登记为 elicitation-robust instrument-dead,不进全量"
+      },
+      "healthy": false,
+      "tp_invariance": {
+        "status": "compared",
+        "tp_effective": 1,
+        "tp_committed": 2,
+        "anchor_tier": "B",
+        "anchor_source": "results/runs/C6_llmtext_mistral24_full_event_driven_seed2026/predictions.parquet [frozen in ef_pilot_sidecar.json]",
+        "anchor_comparability": "strict",
+        "anchor_note": "no committed val-side pilot json for this family; the comparable committed val-side reading is the VAL block of the committed seed-2026 run dir (identical V0/c6_text protocol, TP=2), restricted to the same 2,000 pilot docs",
+        "committed": {
+          "healthy": false,
+          "max_qlike_var": 4.329445784499523,
+          "max_mode_share_pct": 57.60924158714214
+        },
+        "v0_at_tp_effective": {
+          "healthy": false,
+          "max_qlike_var": 4.340916351359399,
+          "max_mode_share_pct": 57.65946760421899
+        },
+        "delta_max_qlike_var": 0.011470566859876463,
+        "delta_max_mode_share_pct": 0.05022601707685226,
+        "per_h_deltas": {
+          "5": {
+            "qlike_vol": {
+              "committed_tp2": 0.33105859601550164,
+              "v0_tp_eff": 0.3321598520769519,
+              "delta": 0.0011012560614502842
+            },
+            "qlike_var": {
+              "committed_tp2": 2.04396093577209,
+              "v0_tp_eff": 2.053207993939763,
+              "delta": 0.009247058167673128
+            },
+            "r2": {
+              "committed_tp2": 0.07472024032329805,
+              "v0_tp_eff": 0.06919740464687907,
+              "delta": -0.00552283567641898
+            },
+            "pred_sd": {
+              "committed_tp2": 0.1385611688028071,
+              "v0_tp_eff": 0.13660625671981502,
+              "delta": -0.0019549120829920885
+            },
+            "n_unique_2dp": {
+              "committed_tp2": 9.0,
+              "v0_tp_eff": 9.0,
+              "delta": 0.0
+            },
+            "mode_val_2dp": {
+              "committed_tp2": 0.35,
+              "v0_tp_eff": 0.35,
+              "delta": 0.0
+            },
+            "mode_share_pct": {
+              "committed_tp2": 49.0,
+              "v0_tp_eff": 49.05,
+              "delta": 0.04999999999999716
+            },
+            "n": {
+              "committed_tp2": 2000.0,
+              "v0_tp_eff": 2000.0,
+              "delta": 0.0
+            }
+          },
+          "10": {
+            "qlike_vol": {
+              "committed_tp2": 0.39269199240467717,
+              "v0_tp_eff": 0.39554628379121554,
+              "delta": 0.0028542913865383657
+            },
+            "qlike_var": {
+              "committed_tp2": 2.6615246351877753,
+              "v0_tp_eff": 2.6824951680259552,
+              "delta": 0.020970532838179956
+            },
+            "r2": {
+              "committed_tp2": -0.10441406711828738,
+              "v0_tp_eff": -0.11031660465169746,
+              "delta": -0.005902537533410079
+            },
+            "pred_sd": {
+              "committed_tp2": 0.11934584909987775,
+              "v0_tp_eff": 0.11762894466750677,
+              "delta": -0.0017169044323709776
+            },
+            "n_unique_2dp": {
+              "committed_tp2": 16.0,
+              "v0_tp_eff": 16.0,
+              "delta": 0.0
+            },
+            "mode_val_2dp": {
+              "committed_tp2": 0.32,
+              "v0_tp_eff": 0.32,
+              "delta": 0.0
+            },
+            "mode_share_pct": {
+              "committed_tp2": 46.36955433149725,
+              "v0_tp_eff": 46.31947921882824,
+              "delta": -0.050075112669006216
+            },
+            "n": {
+              "committed_tp2": 1997.0,
+              "v0_tp_eff": 1997.0,
+              "delta": 0.0
+            }
+          },
+          "20": {
+            "qlike_vol": {
+              "committed_tp2": 0.5778219269101633,
+              "v0_tp_eff": 0.5799922505457036,
+              "delta": 0.002170323635540261
+            },
+            "qlike_var": {
+              "committed_tp2": 4.329445784499523,
+              "v0_tp_eff": 4.340916351359399,
+              "delta": 0.011470566859876463
+            },
+            "r2": {
+              "committed_tp2": -0.600404307051136,
+              "v0_tp_eff": -0.6053452864726159,
+              "delta": -0.004940979421479863
+            },
+            "pred_sd": {
+              "committed_tp2": 0.10311539970830487,
+              "v0_tp_eff": 0.10159684295109316,
+              "delta": -0.0015185567572117142
+            },
+            "n_unique_2dp": {
+              "committed_tp2": 15.0,
+              "v0_tp_eff": 15.0,
+              "delta": 0.0
+            },
+            "mode_val_2dp": {
+              "committed_tp2": 0.3,
+              "v0_tp_eff": 0.3,
+              "delta": 0.0
+            },
+            "mode_share_pct": {
+              "committed_tp2": 57.60924158714214,
+              "v0_tp_eff": 57.65946760421899,
+              "delta": 0.05022601707685226
+            },
+            "n": {
+              "committed_tp2": 1991.0,
+              "v0_tp_eff": 1991.0,
+              "delta": 0.0
+            }
+          }
+        },
+        "verdict_flip": false,
+        "bitexact": false
+      },
+      "tp_invariance_vs_committed_test_side": {
+        "status": "compared",
+        "tp_effective": 1,
+        "tp_committed": 2,
+        "anchor_tier": "T",
+        "anchor_source": "results/tables/crossfamily_mistral24.csv",
+        "anchor_comparability": "cross-split",
+        "anchor_note": "committed TEST-side full-run table (the published instrument-dead verdict). Reported for context: the pilot is val-side, so a delta against this object mixes split with TP.",
+        "committed": {
+          "healthy": false,
+          "max_qlike_var": 0.6908900091740661,
+          "max_mode_share_pct": 88.6220281416788
+        },
+        "v0_at_tp_effective": {
+          "healthy": false,
+          "max_qlike_var": 4.340916351359399,
+          "max_mode_share_pct": 57.65946760421899
+        },
+        "delta_max_qlike_var": 3.6500263421853334,
+        "delta_max_mode_share_pct": -30.962560537459808,
+        "per_h_deltas": {
+          "5": {
+            "qlike_var": {
+              "committed_tp2": 0.6908900091740661,
+              "v0_tp_eff": 2.053207993939763,
+              "delta": 1.362317984765697
+            },
+            "mode_val_2dp": {
+              "committed_tp2": 0.35,
+              "v0_tp_eff": 0.35,
+              "delta": 0.0
+            },
+            "mode_share_pct": {
+              "committed_tp2": 71.49229359990441,
+              "v0_tp_eff": 49.05,
+              "delta": -22.442293599904417
+            },
+            "n": {
+              "committed_tp2": 25109.0,
+              "v0_tp_eff": 2000.0,
+              "delta": -23109.0
+            }
+          },
+          "10": {
+            "qlike_var": {
+              "committed_tp2": 0.5372937319535471,
+              "v0_tp_eff": 2.6824951680259552,
+              "delta": 2.145201436072408
+            },
+            "mode_val_2dp": {
+              "committed_tp2": 0.32,
+              "v0_tp_eff": 0.32,
+              "delta": 0.0
+            },
+            "mode_share_pct": {
+              "committed_tp2": 70.58517659293628,
+              "v0_tp_eff": 46.31947921882824,
+              "delta": -24.265697374108036
+            },
+            "n": {
+              "committed_tp2": 25001.0,
+              "v0_tp_eff": 1997.0,
+              "delta": -23004.0
+            }
+          },
+          "20": {
+            "qlike_var": {
+              "committed_tp2": 0.4216451363202244,
+              "v0_tp_eff": 4.340916351359399,
+              "delta": 3.919271215039175
+            },
+            "mode_val_2dp": {
+              "committed_tp2": 0.3,
+              "v0_tp_eff": 0.3,
+              "delta": 0.0
+            },
+            "mode_share_pct": {
+              "committed_tp2": 88.6220281416788,
+              "v0_tp_eff": 57.65946760421899,
+              "delta": -30.962560537459808
+            },
+            "n": {
+              "committed_tp2": 24732.0,
+              "v0_tp_eff": 1991.0,
+              "delta": -22741.0
+            }
+          }
+        },
+        "verdict_flip": false,
+        "bitexact": false
+      },
+      "shards": {
+        "V0": "results/e1_llm_forecast/ef_pilot_shards/mistral24_V0.json",
+        "V1": "results/e1_llm_forecast/ef_pilot_shards/mistral24_V1.json",
+        "V2": "results/e1_llm_forecast/ef_pilot_shards/mistral24_V2.json"
+      }
+    },
+    "gemma27": {
+      "model_id": "unsloth/gemma-3-27b-it",
+      "model_desc": "Gemma-3-27B-it (bf16)",
+      "per_variant": {
+        "V0": {
+          "healthy": true,
+          "max_qlike_var": 3.6874980330223135,
+          "max_mode_share_pct": 45.41812719078618,
+          "per_h": {
+            "5": {
+              "qlike_vol": 0.499250959496079,
+              "qlike_var": 3.6874980330223135,
+              "r2": -0.11104671644089148,
+              "pred_sd": 0.11683710615639195,
+              "n_unique_2dp": 12,
+              "mode_val_2dp": 0.22,
+              "mode_share_pct": 45.35,
+              "n": 2000
+            },
+            "10": {
+              "qlike_vol": 0.4230191077871552,
+              "qlike_var": 2.9950583630838086,
+              "r2": -0.10763722892832939,
+              "pred_sd": 0.14255931184977397,
+              "n_unique_2dp": 16,
+              "mode_val_2dp": 0.25,
+              "mode_share_pct": 45.41812719078618,
+              "n": 1997
+            },
+            "20": {
+              "qlike_vol": 0.47891626011841687,
+              "qlike_var": 3.4948226228144867,
+              "r2": -0.39085192305091176,
+              "pred_sd": 0.16852879607463642,
+              "n_unique_2dp": 15,
+              "mode_val_2dp": 0.28,
+              "mode_share_pct": 45.40431943746861,
+              "n": 1991
+            }
+          },
+          "parse_fail_rate": 0.0,
+          "clipped_rate": 0.0,
+          "n_docs": 2000
+        },
+        "V1": {
+          "healthy": false,
+          "max_qlike_var": 10.339145000727807,
+          "max_mode_share_pct": 41.65,
+          "per_h": {
+            "5": {
+              "qlike_vol": 0.9882985648842911,
+              "qlike_var": 8.674352563187757,
+              "r2": -0.1873972830523678,
+              "pred_sd": 0.16234242397226303,
+              "n_unique_2dp": 27,
+              "mode_val_2dp": 0.11,
+              "mode_share_pct": 41.65,
+              "n": 2000
+            },
+            "10": {
+              "qlike_vol": 0.8392012021127053,
+              "qlike_var": 7.7748501001413075,
+              "r2": -0.17463139081197898,
+              "pred_sd": 0.20405578741925703,
+              "n_unique_2dp": 43,
+              "mode_val_2dp": 0.14,
+              "mode_share_pct": 38.758137205808715,
+              "n": 1997
+            },
+            "20": {
+              "qlike_vol": 1.036059075577834,
+              "qlike_var": 10.339145000727807,
+              "r2": -0.5850447611207916,
+              "pred_sd": 0.233971465772946,
+              "n_unique_2dp": 53,
+              "mode_val_2dp": 0.17,
+              "mode_share_pct": 23.907584128578605,
+              "n": 1991
+            }
+          },
+          "parse_fail_rate": 0.0,
+          "clipped_rate": 0.0,
+          "n_docs": 2000
+        },
+        "V2": {
+          "healthy": false,
+          "max_qlike_var": 6.034538661148409,
+          "max_mode_share_pct": 40.75,
+          "per_h": {
+            "5": {
+              "qlike_vol": 0.70952326308988,
+              "qlike_var": 6.034538661148409,
+              "r2": -0.24000167222974356,
+              "pred_sd": 0.10570686815434464,
+              "n_unique_2dp": 14,
+              "mode_val_2dp": 0.2,
+              "mode_share_pct": 40.75,
+              "n": 2000
+            },
+            "10": {
+              "qlike_vol": 0.6312152525421675,
+              "qlike_var": 5.150763852845986,
+              "r2": -0.2743279350165617,
+              "pred_sd": 0.1347087838256748,
+              "n_unique_2dp": 19,
+              "mode_val_2dp": 0.22,
+              "mode_share_pct": 38.85828743114672,
+              "n": 1997
+            },
+            "20": {
+              "qlike_vol": 0.6791520452761296,
+              "qlike_var": 5.451254106400711,
+              "r2": -0.5953113397638108,
+              "pred_sd": 0.16210344014820743,
+              "n_unique_2dp": 23,
+              "mode_val_2dp": 0.25,
+              "mode_share_pct": 38.9251632345555,
+              "n": 1991
+            }
+          },
+          "parse_fail_rate": 0.0,
+          "clipped_rate": 0.0,
+          "n_docs": 2000
+        }
+      },
+      "selection": {
+        "selected_variant": "V2",
+        "selected_max_mode_share_pct": 40.75,
+        "healthy": false,
+        "rule": "lowest val modal share (max over horizons); ties V0 -> V1 -> V2 (prereg §选择规则)",
+        "ranking": [
+          {
+            "variant": "V2",
+            "max_mode_share_pct": 40.75,
+            "healthy": false
+          },
+          {
+            "variant": "V1",
+            "max_mode_share_pct": 41.65,
+            "healthy": false
+          },
+          {
+            "variant": "V0",
+            "max_mode_share_pct": 45.41812719078618,
+            "healthy": true
+          }
+        ],
+        "tie": false,
+        "tied_variants": [],
+        "released_to_full": false,
+        "registered_consequence": "三变体全部不健康 → 该家族登记为 elicitation-robust instrument-dead,不进全量"
+      },
+      "healthy": false,
+      "tp_invariance": {
+        "status": "compared",
+        "tp_effective": 1,
+        "tp_committed": 2,
+        "anchor_tier": "A",
+        "anchor_source": "results/tables/crossfamily_gemma27_pilot.json",
+        "anchor_comparability": "strict",
+        "anchor_note": "committed val-side pilot json (2000 val docs, V0/c6_text, TP=2)",
+        "committed": {
+          "healthy": true,
+          "max_qlike_var": 3.659550867432509,
+          "max_mode_share_pct": 45.21782674011016
+        },
+        "v0_at_tp_effective": {
+          "healthy": true,
+          "max_qlike_var": 3.6874980330223135,
+          "max_mode_share_pct": 45.41812719078618
+        },
+        "delta_max_qlike_var": 0.0279471655898047,
+        "delta_max_mode_share_pct": 0.20030045067601776,
+        "per_h_deltas": {
+          "5": {
+            "qlike_vol": {
+              "committed_tp2": 0.49665701843144155,
+              "v0_tp_eff": 0.499250959496079,
+              "delta": 0.0025939410646374506
+            },
+            "qlike_var": {
+              "committed_tp2": 3.659550867432509,
+              "v0_tp_eff": 3.6874980330223135,
+              "delta": 0.0279471655898047
+            },
+            "r2": {
+              "committed_tp2": -0.10909081938095211,
+              "v0_tp_eff": -0.11104671644089148,
+              "delta": -0.001955897059939371
+            },
+            "pred_sd": {
+              "committed_tp2": 0.11662420835744182,
+              "v0_tp_eff": 0.11683710615639195,
+              "delta": 0.00021289779895013183
+            },
+            "n_unique_2dp": {
+              "committed_tp2": 12.0,
+              "v0_tp_eff": 12.0,
+              "delta": 0.0
+            },
+            "mode_val_2dp": {
+              "committed_tp2": 0.22,
+              "v0_tp_eff": 0.22,
+              "delta": 0.0
+            },
+            "mode_share_pct": {
+              "committed_tp2": 45.15,
+              "v0_tp_eff": 45.35,
+              "delta": 0.20000000000000284
+            },
+            "n": {
+              "committed_tp2": 2000.0,
+              "v0_tp_eff": 2000.0,
+              "delta": 0.0
+            }
+          },
+          "10": {
+            "qlike_vol": {
+              "committed_tp2": 0.421378906439563,
+              "v0_tp_eff": 0.4230191077871552,
+              "delta": 0.001640201347592185
+            },
+            "qlike_var": {
+              "committed_tp2": 2.97915881249666,
+              "v0_tp_eff": 2.9950583630838086,
+              "delta": 0.015899550587148426
+            },
+            "r2": {
+              "committed_tp2": -0.1056471862342796,
+              "v0_tp_eff": -0.10763722892832939,
+              "delta": -0.0019900426940497873
+            },
+            "pred_sd": {
+              "committed_tp2": 0.14270454913810687,
+              "v0_tp_eff": 0.14255931184977397,
+              "delta": -0.0001452372883329056
+            },
+            "n_unique_2dp": {
+              "committed_tp2": 16.0,
+              "v0_tp_eff": 16.0,
+              "delta": 0.0
+            },
+            "mode_val_2dp": {
+              "committed_tp2": 0.25,
+              "v0_tp_eff": 0.25,
+              "delta": 0.0
+            },
+            "mode_share_pct": {
+              "committed_tp2": 45.21782674011016,
+              "v0_tp_eff": 45.41812719078618,
+              "delta": 0.20030045067601776
+            },
+            "n": {
+              "committed_tp2": 1997.0,
+              "v0_tp_eff": 1997.0,
+              "delta": 0.0
+            }
+          },
+          "20": {
+            "qlike_vol": {
+              "committed_tp2": 0.4776896612642189,
+              "v0_tp_eff": 0.47891626011841687,
+              "delta": 0.0012265988541979578
+            },
+            "qlike_var": {
+              "committed_tp2": 3.484032582098974,
+              "v0_tp_eff": 3.4948226228144867,
+              "delta": 0.010790040715512816
+            },
+            "r2": {
+              "committed_tp2": -0.3885088269633896,
+              "v0_tp_eff": -0.39085192305091176,
+              "delta": -0.002343096087522145
+            },
+            "pred_sd": {
+              "committed_tp2": 0.16869295212994181,
+              "v0_tp_eff": 0.16852879607463642,
+              "delta": -0.00016415605530539779
+            },
+            "n_unique_2dp": {
+              "committed_tp2": 15.0,
+              "v0_tp_eff": 15.0,
+              "delta": 0.0
+            },
+            "mode_val_2dp": {
+              "committed_tp2": 0.28,
+              "v0_tp_eff": 0.28,
+              "delta": 0.0
+            },
+            "mode_share_pct": {
+              "committed_tp2": 45.20341536916123,
+              "v0_tp_eff": 45.40431943746861,
+              "delta": 0.2009040683073806
+            },
+            "n": {
+              "committed_tp2": 1991.0,
+              "v0_tp_eff": 1991.0,
+              "delta": 0.0
+            }
+          }
+        },
+        "verdict_flip": false,
+        "bitexact": false
+      },
+      "tp_invariance_vs_committed_test_side": {
+        "status": "compared",
+        "tp_effective": 1,
+        "tp_committed": 2,
+        "anchor_tier": "T",
+        "anchor_source": "results/tables/crossfamily_gemma27.csv",
+        "anchor_comparability": "cross-split",
+        "anchor_note": "committed TEST-side full-run table (the published instrument-dead verdict). Reported for context: the pilot is val-side, so a delta against this object mixes split with TP.",
+        "committed": {
+          "healthy": false,
+          "max_qlike_var": 0.900476340219393,
+          "max_mode_share_pct": 71.53610259269584
+        },
+        "v0_at_tp_effective": {
+          "healthy": true,
+          "max_qlike_var": 3.6874980330223135,
+          "max_mode_share_pct": 45.41812719078618
+        },
+        "delta_max_qlike_var": 2.7870216928029206,
+        "delta_max_mode_share_pct": -26.11797540190966,
+        "per_h_deltas": {
+          "5": {
+            "qlike_var": {
+              "committed_tp2": 0.900476340219393,
+              "v0_tp_eff": 3.6874980330223135,
+              "delta": 2.7870216928029206
+            },
+            "mode_val_2dp": {
+              "committed_tp2": 0.22,
+              "v0_tp_eff": 0.22,
+              "delta": 0.0
+            },
+            "mode_share_pct": {
+              "committed_tp2": 71.53610259269584,
+              "v0_tp_eff": 45.35,
+              "delta": -26.18610259269584
+            },
+            "n": {
+              "committed_tp2": 25109.0,
+              "v0_tp_eff": 2000.0,
+              "delta": -23109.0
+            }
+          },
+          "10": {
+            "qlike_var": {
+              "committed_tp2": 0.572029065480544,
+              "v0_tp_eff": 2.9950583630838086,
+              "delta": 2.4230292976032644
+            },
+            "mode_val_2dp": {
+              "committed_tp2": 0.25,
+              "v0_tp_eff": 0.25,
+              "delta": 0.0
+            },
+            "mode_share_pct": {
+              "committed_tp2": 71.34514619415224,
+              "v0_tp_eff": 45.41812719078618,
+              "delta": -25.927019003366055
+            },
+            "n": {
+              "committed_tp2": 25001.0,
+              "v0_tp_eff": 1997.0,
+              "delta": -23004.0
+            }
+          },
+          "20": {
+            "qlike_var": {
+              "committed_tp2": 0.3775589738505019,
+              "v0_tp_eff": 3.4948226228144867,
+              "delta": 3.1172636489639847
+            },
+            "mode_val_2dp": {
+              "committed_tp2": 0.28,
+              "v0_tp_eff": 0.28,
+              "delta": 0.0
+            },
+            "mode_share_pct": {
+              "committed_tp2": 71.31651301956978,
+              "v0_tp_eff": 45.40431943746861,
+              "delta": -25.912193582101175
+            },
+            "n": {
+              "committed_tp2": 24732.0,
+              "v0_tp_eff": 1991.0,
+              "delta": -22741.0
+            }
+          }
+        },
+        "verdict_flip": true,
+        "bitexact": false
+      },
+      "shards": {
+        "V0": "results/e1_llm_forecast/ef_pilot_shards/gemma27_V0.json",
+        "V1": "results/e1_llm_forecast/ef_pilot_shards/gemma27_V1.json",
+        "V2": "results/e1_llm_forecast/ef_pilot_shards/gemma27_V2.json"
+      }
+    }
+  },
+  "released_to_full": [],
+  "all_families_dead": true,
+  "tp_verdict_flips": [],
+  "branch_pending": "(d) — 两家族三变体全不健康:AC 的混杂被证伪",
+  "branch_text": {
+    "a": "**(a) 适配后健康且 Holm-robust 复制**(≥2/3 horizon,vs firm-identity,clustered DM<0 且 Holm(3)<.05)→ **AC 的混杂被证实**。",
+    "b": "**(b) 适配后健康、方向性复制**(3/3 DM<0,Holm<2)→ 与 llama70 同级并表;混杂部分成立(健康可由 prompt 恢复)。",
+    "c": "**(c) 适配后健康但不复制** → **残差降级为 Qwen-conditional**;混杂成立且对本文不利——如实报告。",
+    "d": "**(d) 三变体全不健康(两家族均)** → **AC 的混杂被证伪**:公平的 prompt 适配无法救活它们,故健康筛并非在选 elicitation-protocol fit,而是在量能力地板。",
+    "mixed": "混合(一家族 (a)/(b)/(c),另一 (d))→ 逐家族如实,措辞取**较保守**的那支。"
+  },
+  "seed": 2026,
+  "git_commit": "",
+  "timestamp_utc": "2026-07-17T21:00:55.984116+00:00"
+}

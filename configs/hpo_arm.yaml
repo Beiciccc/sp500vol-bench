@@ -1,0 +1,122 @@
+# =============================================================================
+# PRE-REGISTERED HPO CHALLENGER ARM — SP500Vol-Bench (spec: results/HPO_ARM_SPEC.md)
+# Frozen at git-tag time; NO field may change after the tag except via the
+# wall-clock-only degradation ladder below. Search never touches test rows:
+# the harness drops split=="test" physically (manifest hash per trial).
+# =============================================================================
+version: 1.0
+sampler:
+  algo: sobol            # deterministic; NO adaptive search (BO/TPE banned)
+  seed: 2026
+asha:
+  rungs_epochs: [2, 5, 15]        # longformer: [2, 5, 10]
+  eta: 3                          # keep top 1/3 per rung, ceil
+  promote_metric: val_fit_qlike_volunit_pooled   # vol-unit ONLY; variance-unit recorded, never selects
+val_split:
+  val_fit_end: "2021-06-30"       # early stopping + rung promotion
+  val_select_start: "2021-07-01"  # final config ranking (out-of-sample to search)
+selection:
+  track_a: argmin val_select standalone vol-unit QLIKE (pooled across horizons)
+  track_b:                         # combination steel-man; FinBERT-levels both panels + D2 only
+    objective: val_select QLIKE(f_U_firm) - QLIKE(f_R_firm), weights fit on val_fit
+    design: "[1, log f_A2, log firm_mean_val_RV, log f_text]"
+  top_k_seed_validation: 2         # top-2 by val_select -> full 3-seed retrain, winner = lower
+                                   # 3-seed-ensemble val_select QLIKE (longformer & demeaned: top-1)
+  tiebreak: [lower_lr, higher_weight_decay]
+  final_seeds: [2026, 2027, 2028]  # search itself: seed 2026 only (pre-registered)
+tasks:
+  T1a: {model: C2_finbert_s1, panel: long_form,   stratum: levels,   n_trials: 32}
+  T1b: {model: C2_finbert_s1, panel: long_form,   stratum: demeaned, n_trials: 16, warm_start: T1a_winner}
+  T1c: {model: C2_finbert_s1, panel: event_driven, stratum: levels,  n_trials: 24, rung0_subsample: 0.30}
+  T1d: {model: C2_finbert_s1, panel: event_driven, stratum: demeaned, n_trials: 12}
+  T2:  {model: C5_heads_x3_embedders, panel: both, stratum: levels, ridge_grid: exhaustive, mlp_trials: 48}
+  T3:  {model: [D2_gated_fusion, D1_concat_mlp], panel: both, stratum: levels, n_trials: [48, 32]}
+  T4:  {model: C4_longformer, panel: long_form, stratum: levels, n_trials: 16,
+        horizons_searched: [5, 20], h10_inherits: 5, rungs_epochs: [2, 5, 10]}
+  T5:  {model: [B1_bow_ridge, B2_tfidf_ridge, delta_tfidf], panel: both, grid: exhaustive_cpu}
+space:                              # T1/T4 8-dim; T3 drops freeze; T2-MLP its own block
+  lr:              {dist: log_uniform, lo: 5.0e-6, hi: 1.0e-4}
+  head_lr_mult:    {dist: choice, values: [1, 10]}
+  weight_decay:    {dist: log_uniform, lo: 1.0e-4, hi: 0.3}
+  head_hidden_dim: {dist: choice, values: [128, 256]}
+  head_dropout:    {dist: choice, values: [0.0, 0.1, 0.3]}
+  freeze_mode:     {dist: choice, values: [none, top4, encoder]}
+  effective_batch: {dist: choice, values: [32, 128]}   # longformer via grad accumulation
+  objective:       {dist: choice, values: [mse, qlike]} # qlike = log-space, unit-tested
+  # epochs is NOT a dimension: <=rung cap, val-fit early stopping patience 3 (as fixed recipe)
+space_t2_mlp:
+  depth: {dist: choice, values: [1, 2]}
+  width: {dist: choice, values: [128, 256, 512]}
+  dropout: {dist: choice, values: [0.0, 0.1, 0.3]}
+  lr: {dist: log_uniform, lo: 1.0e-4, hi: 1.0e-2}
+  weight_decay: {dist: choice, values: [0.0, 1.0e-4, 1.0e-2]}
+  objective: {dist: choice, values: [mse, qlike]}
+space_t5_ridge:
+  alpha: {dist: log_grid, lo: 1.0e-3, hi: 1.0e5, points: 13}
+  ngram: {dist: choice, values: ["1", "1-2"]}
+  min_df: {dist: choice, values: [5, 20, 100]}
+  sublinear_tf: {dist: choice, values: [true, false]}
+# -----------------------------------------------------------------------------
+# AMENDMENT 1 — 2026-07-14, BEFORE ANY TEST EVALUATION (search stage ~40% done:
+# T1a/T1c selected; T4/T3 in flight; zero test rows ever scored).
+# Defect: v1.0 omitted D3 (price + frozen C5 embedding) and the C5 head family
+# ENTIRELY — neither in `tasks:` nor in `exclusions:`. That is an omission, not a
+# reasoned exclusion, and it is the wrong one to make: on the archived runs D3
+# with gte-Qwen2 embeddings is the strongest text-side challenger on the
+# long-form panel, i.e. v1.0 spent its budget tuning weak challengers while
+# leaving the strong one untuned. Remedy: add both below at ~2-5 GPU-h (the
+# embeddings are cached; only the heads train). Also adds a shrinkage-to-HAR
+# head, absent from the v1.0 space. No result from these arms informed this
+# amendment: the search-stage selections that exist (T1a, T1c) are on val-select
+# only, and no test evaluation has been run.
+# -----------------------------------------------------------------------------
+amendments:
+  - id: 1
+    date: "2026-07-14"
+    before_any_test_evaluation: true
+    tasks_added: [T6d3, T6c5]
+    space_added: [shrinkage_to_har_head]
+    reason: >
+      D3 and the C5 head family were omitted from v1.0 (absent from both tasks and
+      exclusions). D3/gte-Qwen2 is the strongest archived long-form text challenger,
+      so the omission biased the arm toward tuning weak challengers only. Added
+      before any test row was scored; cost 2-5 GPU-h (embeddings cached).
+tasks_amendment_1:
+  T6d3: {model: D3_price_c5_embed, panel: both, stratum: levels, embedders: [gte-qwen2, e5-mistral, qwen3-emb],
+         head_grid: exhaustive_ridge_plus_48_mlp, note: "strongest archived long-form challenger; embeddings cached"}
+  T6c5: {model: C5_frozen_embed_head, panel: both, stratum: levels, embedders: [gte-qwen2],
+         head_grid: exhaustive_ridge_plus_48_mlp, note: "carries the prompting-vs-pooling contrast"}
+space_amendment_1:
+  shrinkage_to_har_head:
+    dist: choice
+    values: [off, on]
+    note: >
+      Head predicts a shrinkage weight toward the HAR forecast rather than the level;
+      requested by the finance-side reading that an unshrunk head is a strawman.
+
+exclusions:                         # pre-registered, one reason each
+  C1_bert: dominated by FinBERT same-stratum same-input in every cell (C3 fallback pre-declared)
+  C3_roberta: as C1; conditional re-run ONLY if leading on D9
+  B3_B4_dictionaries: no substantive hyperparameters; linear head folded into T5 grids
+  C6_prompted: no gradient-trained parameters; prompt space unbounded (existing elicitation arm cited)
+  D4: trainable parts covered by D1/D2
+s_strategy_recheck:                 # input strategies are benchmark dims, not hyperparameters
+  rule: winner config frozen, single-seed val recheck of S2/S3/S4 on long_form (~14 A100-h);
+        if any S* beats S1 on val, it replaces S1 for the 3-seed retrain (val-only switch);
+        event_driven recheck conditional on a long_form flip
+placebo_gate:
+  rule: every Track-B winner seed-ensemble must pass label-shuffle AND within-date placebos
+        before entering any win count; failure recorded as artefact
+holm_families:                      # tuned arm is its own family; original 180/69 frozen
+  tuned_standalone: one cell per (task x panel x stratum x horizon) final winner, ~51
+  tuned_cascade: same winners through recalibrated-HAR / firm-identity / maximal-pool, ~51
+  tuned_track_b: "<=12"
+  sensitivity: joint primary+tuned Holm reported as sensitivity only
+degradation_ladder:                 # wall-clock ONLY, never results-based
+  - drop T4 h=20 search; migrate h=5 winner
+  - drop T1d (ED demeaned); demeaned kept on long_form only
+  - drop D1; fusion represented by D2
+pilot_disclosure: >
+  The single-seed validation-tuned arm (lr + early stopping; results/tables/row3_tuning_grid.csv)
+  test was touched before pre-registration and the result was null; deviation-direction argument: a prior null only lowers the incentive to run a larger HPO, it does not shape the
+  space toward null. The new space strictly contains the pilot space and adds every reviewer-named dimension.

@@ -1,0 +1,44 @@
+
+=== Diebold-Mariano vs A2_har_rv (dataset=full, disclosure=combined, split=test) ===
+Positive DM = challenger WORSE than baseline. p<0.05 = significant.
+
+--- A1_hv vs A2_har_rv ---
+  h= 5: DM=+17.398 p=0.0000  ** p<0.01  -> A1_hv WORSE   MAE(C/B)=0.1372/0.1043
+  h=10: DM=+14.772 p=0.0000  ** p<0.01  -> A1_hv WORSE   MAE(C/B)=0.1127/0.0906
+  h=20: DM=+9.400 p=0.0000  ** p<0.01  -> A1_hv WORSE   MAE(C/B)=0.0935/0.0789
+
+--- A3_garch vs A2_har_rv ---
+  h= 5: DM=+4.298 p=0.0000  ** p<0.01  -> A3_garch WORSE   MAE(C/B)=0.1160/0.1043
+  h=10: DM=+4.149 p=0.0000  ** p<0.01  -> A3_garch WORSE   MAE(C/B)=0.1014/0.0906
+  h=20: DM=+5.247 p=0.0000  ** p<0.01  -> A3_garch WORSE   MAE(C/B)=0.0888/0.0789
+
+--- A4_egarch vs A2_har_rv ---
+  h= 5: DM=+4.895 p=0.0000  ** p<0.01  -> A4_egarch WORSE   MAE(C/B)=0.1162/0.1043
+  h=10: DM=+4.401 p=0.0000  ** p<0.01  -> A4_egarch WORSE   MAE(C/B)=0.1016/0.0906
+  h=20: DM=+4.652 p=0.0000  ** p<0.01  -> A4_egarch WORSE   MAE(C/B)=0.0902/0.0789
+
+--- A5_arima vs A2_har_rv ---
+  h= 5: DM=+5.609 p=0.0000  ** p<0.01  -> A5_arima WORSE   MAE(C/B)=0.1159/0.1043
+  h=10: DM=+3.943 p=0.0001  ** p<0.01  -> A5_arima WORSE   MAE(C/B)=0.0991/0.0906
+  h=20: DM=+2.744 p=0.0061  ** p<0.01  -> A5_arima WORSE   MAE(C/B)=0.0837/0.0789
+
+--- B1_bow_ridge vs A2_har_rv ---
+  h= 5: DM=+10.444 p=0.0000  ** p<0.01  -> B1_bow_ridge WORSE   MAE(C/B)=0.1225/0.1043
+  h=10: DM=+12.779 p=0.0000  ** p<0.01  -> B1_bow_ridge WORSE   MAE(C/B)=0.1110/0.0906
+  h=20: DM=+10.999 p=0.0000  ** p<0.01  -> B1_bow_ridge WORSE   MAE(C/B)=0.1018/0.0789
+
+--- B2_tfidf_ridge vs A2_har_rv ---
+  h= 5: DM=+34.558 p=0.0000  ** p<0.01  -> B2_tfidf_ridge WORSE   MAE(C/B)=0.1216/0.1043
+  h=10: DM=+32.980 p=0.0000  ** p<0.01  -> B2_tfidf_ridge WORSE   MAE(C/B)=0.1116/0.0906
+  h=20: DM=+30.671 p=0.0000  ** p<0.01  -> B2_tfidf_ridge WORSE   MAE(C/B)=0.1033/0.0789
+
+--- B3_lm_linear vs A2_har_rv ---
+  h= 5: DM=+34.471 p=0.0000  ** p<0.01  -> B3_lm_linear WORSE   MAE(C/B)=0.1209/0.1043
+  h=10: DM=+32.173 p=0.0000  ** p<0.01  -> B3_lm_linear WORSE   MAE(C/B)=0.1098/0.0906
+  h=20: DM=+30.119 p=0.0000  ** p<0.01  -> B3_lm_linear WORSE   MAE(C/B)=0.0999/0.0789
+
+--- B4_lm_features vs A2_har_rv ---
+  h= 5: DM=+33.787 p=0.0000  ** p<0.01  -> B4_lm_features WORSE   MAE(C/B)=0.1203/0.1043
+  h=10: DM=+31.448 p=0.0000  ** p<0.01  -> B4_lm_features WORSE   MAE(C/B)=0.1090/0.0906
+  h=20: DM=+29.485 p=0.0000  ** p<0.01  -> B4_lm_features WORSE   MAE(C/B)=0.0988/0.0789
+

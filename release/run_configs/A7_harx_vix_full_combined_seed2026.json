@@ -1,0 +1,47 @@
+{
+  "created_by": "scripts/analysis/vix_control.py (P1-b remediation)",
+  "dataset": "full",
+  "disclosure": "combined",
+  "model": "A7_harx_vix",
+  "model_config": {
+    "coefficients": {
+      "10": {
+        "intercept": -1.4757427720595486,
+        "log_rv1": 0.002716363262860399,
+        "log_rv22": 0.43111334002911517,
+        "log_rv5": 0.12946621809963244,
+        "log_vix": 0.27168636586374983,
+        "n_train": 91505,
+        "smear": 1.097346239764827
+      },
+      "20": {
+        "intercept": -1.2836805449215851,
+        "log_rv1": 0.0018689706696476324,
+        "log_rv22": 0.4429184679034138,
+        "log_rv5": 0.11205249449595131,
+        "log_vix": 0.21027092109380022,
+        "n_train": 91256,
+        "smear": 1.0744785378622972
+      },
+      "5": {
+        "intercept": -1.6283202827415797,
+        "log_rv1": 0.0030371304005673773,
+        "log_rv22": 0.4195428219279795,
+        "log_rv5": 0.1505383968229005,
+        "log_vix": 0.31463711330097704,
+        "n_train": 91626,
+        "smear": 1.1390139209600503
+      }
+    },
+    "description": "HAR-X(VIX): pooled per-horizon log-OLS [1, log rv1, log rv5, log rv22, log VIX_pit] with Duan smearing; har_rv.py conventions (eps=1e-12). VIX_pit = last close STRICTLY BEFORE effective_trading_day (PIT).",
+    "model_id": "A7_harx_vix",
+    "training": {
+      "fit_per_horizon": true,
+      "fit_split": "train",
+      "log_target": true,
+      "smearing": true
+    },
+    "vix_source": "FRED VIXCLS (results/tables/_vix_daily.csv)"
+  },
+  "seed": 2026
+}

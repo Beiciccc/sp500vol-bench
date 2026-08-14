@@ -1,0 +1,47 @@
+# C4 Longformer-base — native long-context encoder with CLS global attention.
+# Also serves as the AB1 S5 Longformer-style long-document slot.
+
+defaults:
+  - /base
+  - _self_
+
+model_id: C4_longformer
+model_class: sp500vol.models.neural_text.longformer.LongformerModel
+strategy: S5
+
+encoder:
+  pretrained: allenai/longformer-base-4096
+  max_length: 4096
+
+head:
+  hidden_dim: 128
+  dropout: 0.1
+
+training:
+  optimizer: adamw
+  lr: 8.0e-5                     # linear-scaled to effective batch 128 (1e-5 x 8)
+  weight_decay: 0.01
+  batch_size: 4                  # 4096-token; A100-40G bf16 — confirm at probe (target 36G)
+  grad_accumulation_steps: 32    # effective batch = 128 (unified across C1-C4/D1-D2)
+  mixed_precision: bf16
+  warmup_ratio: 0.06             # linear warmup then decay — required at lr 8e-5
+  pretokenize: true
+  tokenization_batch_size: 128
+  tokenizer_threads: 24
+  max_epochs: 15
+  early_stopping: true           # val-based; restore best-val epoch (COVID-2020/21 val)
+  es_patience: 3
+  es_min_delta: 0.0
+  log_target: true
+  # DataLoader workers — Longformer pretok path uses a picklable collate (safe for
+  # multi-worker). 4096-tok tokenisation is one-off (cross-horizon cache), so few workers
+  # cost little throughput (GPU-bound at batch 4 x 4096); kept at 4 (not 8) to bound the
+  # worst-case COW of the ~5.7G 4096-tok train dataset well under the per-card share.
+  dataloader_num_workers: 4
+  dataloader_persistent_workers: true
+  dataloader_pin_memory: true
+  dataloader_prefetch_factor: 2
+
+compute:
+  required_gpu: A100_40G         # unified rerun hardware (4xA100 40G)
+  estimated_hours_per_seed: 8    # refine at the A100 smoke

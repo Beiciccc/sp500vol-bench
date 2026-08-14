@@ -9,7 +9,76 @@ behind that question. The headline answer is a negative with a small, bounded
 exception, and the apparatus is built so that the negative can be checked rather
 than taken on trust.
 
+[![License: MIT](https://img.shields.io/badge/code-MIT-green.svg)](LICENSE)
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](pyproject.toml)
+[![Tests](https://img.shields.io/badge/tests-184%20across%2033%20modules-blue.svg)](tests/)
+[![Data](https://img.shields.io/badge/data-licence--safe%20release%20layer-orange.svg)](release/)
+
 ---
+
+## What was built
+
+A single-author, end-to-end forecasting benchmark: ingestion, point-in-time
+alignment, four model families, and an audit layer that tries to kill its own
+positive results.
+
+| | |
+|---|---|
+| **Package** | 60 modules · ~8.9k lines under `src/sp500vol/` |
+| **Tests** | 184 tests across 33 modules; CI on every push (Python 3.11) |
+| **Corpus** | 144,129 SEC filings (10-K / 10-Q / 8-K), point-in-time aligned |
+| **Universe** | 914 survivorship-free S&P 500 membership intervals; 30,100 PERMNO→CIK link windows |
+| **Model matrix** | 4 blocks — price, classical text, neural text, fusion — ~20 arms |
+| **Long documents** | 5 representation strategies compared head-to-head, not one arbitrary choice |
+| **Runs** | 240 production configurations, hash-chained (SHA-256) so the fingerprint check is executable |
+| **Generations** | 608,221 prompted-model outputs released with their prompt templates and decoding config |
+| **Evaluation** | Clustered Diebold–Mariano (HLN-adjusted), Holm within 15 pre-declared families, placebo gate |
+
+## Run it in two minutes — no data licence needed
+
+```bash
+uv sync
+uv run pytest tests/ -m "not slow"      # 184 tests; the alignment suite is the one that matters
+```
+
+The test suite is the fastest way to see what the repository is guarding: the
+point-in-time alignment tests (`tests/data/test_alignment.py`,
+`test_build_dataset_safety.py`, `test_trading_calendar.py`) encode the
+look-ahead rules that the whole benchmark rests on.
+
+For the full pipeline: `make help` lists the targets
+(`setup · test · lint · data · train · eval · ablation · tables · figures`).
+
+## The engineering problems this repository actually solves
+
+**1. Look-ahead is easy to introduce and hard to see.** A filing's information is
+usable only after it is public, and "after" depends on filing timestamp, market
+hours and the exchange calendar. The alignment layer maps every filing to an
+*effective trading day* and refuses to emit a row that would let a model see the
+future; the safety tests exist to make that refusal falsifiable.
+
+**2. The S&P 500 is not a fixed list.** Selecting today's constituents and
+back-testing them is survivorship bias. The universe is reconstructed as 914
+point-in-time membership intervals, so each date sees only the index as it stood.
+
+**3. Identifiers drift.** Firms change CIK, tickers get reused. 30,100 PERMNO→CIK
+link windows are resolved point-in-time, including 31 audited successor-CIK
+overrides.
+
+**4. Half the data cannot be redistributed.** CRSP is licensed. The repository is
+split so that everything derived from it is excluded, while a third party can
+still reconstruct the exact sample and audit every test — see the licence section.
+
+**5. Long documents do not fit the model.** A 10-K is far past any encoder's
+context window, so "use BERT" is under-specified. Five strategies — truncation,
+chunk-mean pooling, learned chunk attention, a hierarchical encoder, and native
+4,096-token context — are implemented and compared, so the finding is about
+representation rather than about one arbitrary choice.
+
+**6. A benchmark that only reports its wins is not evidence.** The audit layer
+(`scripts/analysis/`) re-tests every surviving positive against a recalibrated
+reference, a firm-identity control, an anonymisation arm, a five-model pool, and
+a permuted-text placebo. Most positives do not survive it — see below.
 
 ## What the study finds
 
@@ -74,9 +143,11 @@ To rebuild the licensed layer you need a WRDS/CRSP subscription and
 ```
 ├── src/sp500vol/          the importable package
 │   ├── data/              EDGAR fetch, iXBRL parse, point-in-time alignment
+│   ├── features/          engineered text and price features
 │   ├── models/            price (A), classical text (B), neural text (C), fusion (D)
 │   ├── training/          trainer, checkpoint resume, losses
-│   └── evaluation/        QLIKE, Diebold-Mariano, block bootstrap
+│   ├── evaluation/        QLIKE, Diebold-Mariano, block bootstrap
+│   └── pipelines/         end-to-end orchestration
 ├── scripts/
 │   ├── ingest_wrds.py     CRSP export -> membership, PIT links, returns store
 │   ├── build_dataset.py   EDGAR fetch and parse -> aligned filing-horizon rows
@@ -96,11 +167,6 @@ To rebuild the licensed layer you need a WRDS/CRSP subscription and
 | B — classical text | bag-of-words and TF–IDF ridge, Loughran–McDonald dictionary and engineered features |
 | C — neural text | BERT, FinBERT, RoBERTa, Longformer-4096, three frozen 7–8B embedders, a prompted 32B decoder |
 | D — fusion | concatenation MLP, gated fusion, price-plus-embedding, price-plus-prompted-forecast |
-
-Long documents are handled five ways — truncation, chunk-mean pooling, learned
-chunk attention, a hierarchical encoder, and native 4,096-token context — so the
-comparison is between representation strategies rather than between one arbitrary
-choice and a baseline.
 
 ## Reproducing
 

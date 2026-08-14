@@ -60,7 +60,10 @@ class GARCH(VolatilityForecaster):
         # serial single-core MLE loop over every ticker; set SP500VOL_PRICE_FIT_DIAGNOSTICS=1 to
         # populate it. Results are unaffected either way.
         if os.environ.get("SP500VOL_PRICE_FIT_DIAGNOSTICS", "0").strip().lower() not in {
-            "1", "true", "yes", "on",
+            "1",
+            "true",
+            "yes",
+            "on",
         }:
             return
         df = _require_dataframe(X_train, name="X_train")

@@ -123,9 +123,9 @@ def test_classify_run_worst_horizon(tmp_path):
     run = tmp_path / "C4_longformer_full_long_form_seed2026"
     run.mkdir()
     curves = {
-        "5": _curve([1.0, 0.6, 0.5, 0.45, 0.46, 0.47]),          # CONVERGED
-        "10": _curve([1.0 - 0.05 * i for i in range(15)]),        # UNDERFIT_HIT_CAP
-        "20": _curve([1.0, 0.4, 1.3, 1.6], best_idx=2),           # DIVERGED (>=3x persistent rebound)
+        "5": _curve([1.0, 0.6, 0.5, 0.45, 0.46, 0.47]),  # CONVERGED
+        "10": _curve([1.0 - 0.05 * i for i in range(15)]),  # UNDERFIT_HIT_CAP
+        "20": _curve([1.0, 0.4, 1.3, 1.6], best_idx=2),  # DIVERGED (>=3x persistent rebound)
     }
     (run / "val_curves.json").write_text(json.dumps(curves), encoding="utf-8")
     (run / "config.json").write_text(

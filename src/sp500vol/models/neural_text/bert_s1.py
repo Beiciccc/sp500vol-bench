@@ -44,7 +44,8 @@ def _transformer_blocks(encoder):
     top-4 freeze (HPO arm). CLSEncoder holds the HF model at `.encoder`; BERT/RoBERTa/
     Longformer expose their block list at `<hf>.encoder.layer`. Returns None if unfound."""
     import torch.nn as _nn
-    hf = getattr(encoder, "encoder", encoder)          # unwrap CLSEncoder -> HF AutoModel
+
+    hf = getattr(encoder, "encoder", encoder)  # unwrap CLSEncoder -> HF AutoModel
     for path in (("encoder", "layer"), ("transformer", "layer"), ("layers",), ("h",)):
         obj = hf
         for attr in path:
@@ -170,9 +171,7 @@ class BertS1(VolatilityForecaster):
         self.strategy = strategy or _infer_strategy(self.name)
         # DataLoader worker knobs (default 0 => legacy single-process loading).
         self.dl_num_workers = max(0, int(dataloader_num_workers))
-        self.dl_persistent_workers = (
-            bool(dataloader_persistent_workers) and self.dl_num_workers > 0
-        )
+        self.dl_persistent_workers = bool(dataloader_persistent_workers) and self.dl_num_workers > 0
         self._dl_pin_cfg = dataloader_pin_memory
         self.dl_prefetch_factor = (
             int(dataloader_prefetch_factor)
@@ -216,7 +215,10 @@ class BertS1(VolatilityForecaster):
         val_texts, val_target, val_horizons, val_text_paths = self._prepare_val(X_val, y_val)
         # Tokenise each unique filing once across the horizon loop (and across val epochs);
         # scoped to this fit() call so the (large) cache never reaches model.pkl.
-        if not (getattr(self, "_tok_cache_pinned", False) and getattr(self, "_tok_cache", None) is not None):
+        if not (
+            getattr(self, "_tok_cache_pinned", False)
+            and getattr(self, "_tok_cache", None) is not None
+        ):
             self._tok_cache = (
                 self._new_token_cache()
                 if self._use_pretokenize() and _pretok_reuse_enabled()
@@ -265,7 +267,10 @@ class BertS1(VolatilityForecaster):
         # explicit pins in BertS2._predict_one and GatedFusion.predict.
         self._configure_tokenizer_runtime()
         # Tokenise each unique test filing once across horizons; scoped to this call.
-        if not (getattr(self, "_tok_cache_pinned", False) and getattr(self, "_tok_cache", None) is not None):
+        if not (
+            getattr(self, "_tok_cache_pinned", False)
+            and getattr(self, "_tok_cache", None) is not None
+        ):
             self._tok_cache = (
                 self._new_token_cache()
                 if self._use_pretokenize() and _pretok_reuse_enabled()
@@ -460,6 +465,7 @@ class BertS1(VolatilityForecaster):
             loss_fn = nn.MSELoss()
         else:  # pre-registered HPO objective grid; log-space QLIKE requires log targets
             from sp500vol.models.neural_text.hpo_objectives import make_objective
+
             if not self.log_target:
                 raise ValueError("objective='qlike' requires log_target=True")
             loss_fn = make_objective(self.objective)
@@ -483,9 +489,7 @@ class BertS1(VolatilityForecaster):
                 "encoder_state": {
                     k: v.detach().cpu().clone() for k, v in encoder.state_dict().items()
                 },
-                "head_state": {
-                    k: v.detach().cpu().clone() for k, v in head.state_dict().items()
-                },
+                "head_state": {k: v.detach().cpu().clone() for k, v in head.state_dict().items()},
             }
 
         val_eval = None

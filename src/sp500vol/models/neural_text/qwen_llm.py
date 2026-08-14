@@ -719,8 +719,8 @@ class C5LLMProbe(_FrozenLLMForecaster):
             seed=state.get("seed"),
             strategy=state.get("strategy"),
         )
-        model.embedding_dim_ = None if state.get("embedding_dim") is None else int(
-            state["embedding_dim"]
+        model.embedding_dim_ = (
+            None if state.get("embedding_dim") is None else int(state["embedding_dim"])
         )
         model.models_ = state["models"]
         return model

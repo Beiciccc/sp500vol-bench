@@ -123,9 +123,9 @@ class D3LLMFusion(_FrozenLLMForecaster):
     def _build_modules(self) -> tuple[_GatedFusion, VolatilityHead]:
         if self.embedding_dim_ is None:
             raise RuntimeError("embedding_dim_ unknown; encode texts before building the fusion")
-        fusion = _GatedFusion(
-            text_dim=self.embedding_dim_, price_dim=3, proj_dim=self.proj_dim
-        ).to(self.device)
+        fusion = _GatedFusion(text_dim=self.embedding_dim_, price_dim=3, proj_dim=self.proj_dim).to(
+            self.device
+        )
         head = VolatilityHead(
             self.proj_dim,
             hidden_dim=self.hidden_dim,
@@ -201,6 +201,7 @@ class D3LLMFusion(_FrozenLLMForecaster):
             loss_fn = nn.MSELoss()
         else:
             from sp500vol.models.neural_text.hpo_objectives import make_objective
+
             loss_fn = make_objective(self.objective)
         scheduler = train_utils.make_scheduler(
             optimiser,
@@ -355,8 +356,8 @@ class D3LLMFusion(_FrozenLLMForecaster):
             seed=state.get("seed"),
             strategy=state.get("strategy"),
         )
-        model.embedding_dim_ = None if state.get("embedding_dim") is None else int(
-            state["embedding_dim"]
+        model.embedding_dim_ = (
+            None if state.get("embedding_dim") is None else int(state["embedding_dim"])
         )
         model.price_mean_ = state["price_mean"]
         model.price_std_ = state["price_std"]

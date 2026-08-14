@@ -22,7 +22,9 @@ import aiohttp
 
 EDGAR_BASE = "https://www.sec.gov"
 SUBMISSIONS_BASE = "https://data.sec.gov/submissions/CIK{cik:010d}.json"
-DEFAULT_USER_AGENT = "SP500Vol-Bench/0.0.1 (set EDGAR_USER_AGENT to your name and email; SEC requires it)"
+DEFAULT_USER_AGENT = (
+    "SP500Vol-Bench/0.0.1 (set EDGAR_USER_AGENT to your name and email; SEC requires it)"
+)
 
 
 @dataclass(frozen=True)

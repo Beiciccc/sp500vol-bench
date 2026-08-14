@@ -257,9 +257,7 @@ def _flatten_chunk_item(item: dict[str, torch.Tensor]) -> tuple[bytes, bytes, in
     )
 
 
-def _persist_tok_store(
-    cache_path: Path, new_items: dict[str, dict[str, torch.Tensor]]
-) -> None:
+def _persist_tok_store(cache_path: Path, new_items: dict[str, dict[str, torch.Tensor]]) -> None:
     """Persist freshly-tokenised filings, merging with the on-disk store INSIDE a FileLock
     so parallel seeds/models sharing this cache never drop each other's items (overlapping
     keys are identical, so disk values are kept harmlessly). Mirrors qwen_llm._persist_emb_store."""

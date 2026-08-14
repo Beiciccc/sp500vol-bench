@@ -56,7 +56,7 @@ def dm_test(
     hln_factor = (n + 1 - 2 * h + h * (h - 1) / n) / n
     if hln_factor <= 0:
         return float("nan"), float("nan")
-    dm_stat = (mean_d / np.sqrt(var_d / n)) * (hln_factor ** 0.5)
+    dm_stat = (mean_d / np.sqrt(var_d / n)) * (hln_factor**0.5)
     p = 2 * float(stats.t.sf(abs(dm_stat), df=n - 1))
     return float(dm_stat), float(p)
 

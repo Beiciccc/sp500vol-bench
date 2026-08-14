@@ -158,9 +158,7 @@ class GatedFusion(VolatilityForecaster):
         self.tokenizer_threads = None if tokenizer_threads is None else int(tokenizer_threads)
         # DataLoader worker knobs (default 0 => legacy single-process loading).
         self.dl_num_workers = max(0, int(dataloader_num_workers))
-        self.dl_persistent_workers = (
-            bool(dataloader_persistent_workers) and self.dl_num_workers > 0
-        )
+        self.dl_persistent_workers = bool(dataloader_persistent_workers) and self.dl_num_workers > 0
         self._dl_pin_cfg = dataloader_pin_memory
         self.dl_prefetch_factor = (
             int(dataloader_prefetch_factor)
@@ -451,6 +449,7 @@ class GatedFusion(VolatilityForecaster):
             loss_fn = nn.MSELoss()
         else:
             from sp500vol.models.neural_text.hpo_objectives import make_objective
+
             loss_fn = make_objective(self.objective)
         scheduler = train_utils.make_scheduler(
             optimiser,

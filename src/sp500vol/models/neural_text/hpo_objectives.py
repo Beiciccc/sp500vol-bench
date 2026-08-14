@@ -15,6 +15,7 @@ level is still recommended (the spec mandates clip_grad_norm).
 `qlike_loss` is the torch training objective; `qlike_np` the numpy reference
 used by the unit tests and any CPU-side audit.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -32,6 +33,7 @@ def qlike_np(log_y: np.ndarray, z: np.ndarray) -> np.ndarray:
 def qlike_loss(z, log_y):
     """Torch QLIKE loss (mean). z: model output = log RV-hat; log_y: log label."""
     import torch
+
     u = torch.clamp(log_y - z, min=-U_CLAMP, max=U_CLAMP)
     return (torch.exp(u) - u - 1.0).mean()
 

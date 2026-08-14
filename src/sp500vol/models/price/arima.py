@@ -51,7 +51,10 @@ class ARIMAVol(VolatilityForecaster):
         # Diagnostics-only per-ticker MLE summary (predict() refits per filing; no metric reads
         # fit_summary_). Skipped by default; SP500VOL_PRICE_FIT_DIAGNOSTICS=1 re-enables it.
         if os.environ.get("SP500VOL_PRICE_FIT_DIAGNOSTICS", "0").strip().lower() not in {
-            "1", "true", "yes", "on",
+            "1",
+            "true",
+            "yes",
+            "on",
         }:
             return
         df = _require_dataframe(X_train, name="X_train")

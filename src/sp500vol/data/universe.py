@@ -19,7 +19,9 @@ from pathlib import Path
 import pandas as pd
 
 SEC_TICKER_URL = "https://www.sec.gov/files/company_tickers.json"
-DEFAULT_USER_AGENT = "SP500Vol-Bench/0.0.1 (set EDGAR_USER_AGENT to your name and email; SEC requires it)"
+DEFAULT_USER_AGENT = (
+    "SP500Vol-Bench/0.0.1 (set EDGAR_USER_AGENT to your name and email; SEC requires it)"
+)
 MEMBERSHIP_REQUIRED_COLUMNS = ("ticker", "cik", "member_from", "member_to")
 CIK_WIDTH = 10
 

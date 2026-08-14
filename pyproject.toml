@@ -52,7 +52,7 @@ dev = [
   "pytest-cov>=5.0",
   "pytest-asyncio>=0.23",
   "hypothesis>=6.108",
-  "ruff>=0.5",
+  "ruff>=0.5,<0.15",
   "mypy>=1.10",
   "pre-commit>=3.7",
   "jupyterlab>=4.2",
@@ -71,7 +71,7 @@ dev = [
   "pytest-cov>=5.0",
   "pytest-asyncio>=0.23",
   "hypothesis>=6.108",
-  "ruff>=0.5",
+  "ruff>=0.5,<0.15",
   "mypy>=1.10",
   "pre-commit>=3.7",
   "jupyterlab>=4.2",
@@ -109,6 +109,8 @@ ignore = [
   "PLW2901",   # rebinding a loop variable is idiomatic in the cleaning passes
   "N802",      # statistical function names (HAR_RV, DM_test) follow the literature
   "E741",      # `l` is the standard index in the lag/horizon formulae
+  "RUF059",    # `vals, _ = np.unique(...)`-style partial unpacking is pervasive and readable
+  "PLC1802",   # `len(x)` in a truth test is explicit about the container being sized
 ]
 
 

@@ -33,7 +33,7 @@ labelling code; they are reproducible but not redistributable.
 statistics, p-values, Holm/BH-corrected values, stratified breakdowns and the
 gate-cushioning table underlying every claim in the paper. These are **summary
 statistics only (no per-row CRSP-derived value**) and are releasable as
-research results, consistent with AEA/RFS restricted-data policy. A reviewer can
+research results, consistent with AEA/RFS restricted-data policy. A third party can
 check every reported test value against them.
 
 ## Withheld under the CRSP/WRDS licence
@@ -57,8 +57,8 @@ check every reported test value against them.
   service and the data available thereon constitute valuable intellectual
   property and trade secrets of WRDS and/or its third-party suppliers."
 
-## Artefact availability (for submission)
-For the anonymised submission this bundle ships in full inside the uploaded
+## Bundle scope
+This bundle is self-contained: `release/` together with
 code-and-data package, together with `scripts/`, `src/`, `configs/`, `tests/`
-and the seven frozen analysis records (`configs/prereg_*.md`). No external repository is referenced during review; the public
-repository follows upon acceptance.
+`scripts/`, `src/`, `configs/` and `tests/` reproduce every reported number,
+including the seven frozen analysis records (`configs/prereg_*.md`).

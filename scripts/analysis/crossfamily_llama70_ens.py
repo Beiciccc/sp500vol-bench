@@ -30,15 +30,15 @@ for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
            "VECLIB_MAXIMUM_THREADS"):
     os.environ[_v] = "2"
 
-import sys  # noqa: E402
-from pathlib import Path  # noqa: E402
+import sys
+from pathlib import Path
 
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
+import numpy as np
+import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
-import clustered_dm as cdm  # noqa: E402
+import clustered_dm as cdm
+import forecast_combination as fc
 
 KEY = ["ticker", "accession", "horizon_days"]
 EPS = 1e-8
@@ -104,7 +104,7 @@ def m1_rows(fam, preds, a2):
         gmean = v.label_realised_vol.mean()
         fid_v = v.ticker.map(fm).fillna(gmean).values
         fid_t = te.ticker.map(fm).fillna(gmean).values
-        L = lambda x: np.log(np.clip(x, EPS, None))  # noqa: E731
+        L = lambda x: np.log(np.clip(x, EPS, None))
         ly = L(v.label_realised_vol.values)
         bR = ols(ly, np.column_stack([np.ones(len(v)), L(v.fh.values), L(fid_v)]))
         bU = ols(ly, np.column_stack([np.ones(len(v)), L(v.fh.values), L(fid_v),

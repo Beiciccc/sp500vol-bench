@@ -41,12 +41,16 @@ Multiplicity: Holm WITHIN each family (CW one-sided, DM two-sided — not pooled
 
 Run from the repo root:  python scripts/analysis/forecast_combination.py
 """
-import sys, json
+import json
+import sys
 from pathlib import Path
-import numpy as np, pandas as pd
+
+import numpy as np
+import pandas as pd
 from scipy import stats
+
 sys.path.insert(0, "src")
-from sp500vol.evaluation.dm_test import dm_test, _hac_variance
+from sp500vol.evaluation.dm_test import _hac_variance, dm_test
 
 KEY = ["ticker", "accession", "horizon_days"]
 SORT = ["filing_time_utc", "ticker", "accession"]
@@ -301,7 +305,7 @@ def main():
     df.to_csv("results/tables/forecast_combination_grid.csv", index=False)
     consdf.to_csv("results/tables/forecast_combination_consistency.csv", index=False)
     summary = {
-        "n_cells": int(len(df)), "n_genuine_increment": n_gen,
+        "n_cells": len(df), "n_genuine_increment": n_gen,
         "n_dmq_helps": n_help_dmq, "n_dmq_worse": n_worse_dmq, "n_cw_adds": n_cw,
         "n_recal_only_beats_raw": n_recal, "mean_recal_b": float(df.recal_b.mean()),
         "n_level_catastrophic": n_cat,

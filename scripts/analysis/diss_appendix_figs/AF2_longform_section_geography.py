@@ -32,13 +32,25 @@ import pandas as pd
 
 ANALYSIS = "scripts/analysis"
 sys.path.insert(0, ANALYSIS)
-from supp_style import (BLUE, GREEN, GREY, INK2, LIGHT, RULE,  # noqa: E402
-                        SKY, TAB, VERM, VERM_TXT, annot, apply_style, gate)
-import diss_style as ds  # noqa: E402
-
-import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib.lines import Line2D  # noqa: E402
-from matplotlib.patches import Patch  # noqa: E402
+import diss_style as ds
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    INK2,
+    LIGHT,
+    RULE,
+    SKY,
+    TAB,
+    VERM,
+    VERM_TXT,
+    annot,
+    apply_style,
+    gate,
+)
 
 # --------------------------------------------------------------- evidence
 D = pd.read_csv(os.path.join(TAB, "section_ablation.csv"))
@@ -132,7 +144,7 @@ for j, mid in enumerate(order):
     x = np.arange(3) + (j - (nb - 1) / 2) * bw
     axA.bar(x, v, width=bw * 0.92, color=COL[mid], edgecolor=GREY, lw=0.5,
             hatch=HATCH[mid], zorder=3)
-    for xi, vi in zip(x, v):
+    for xi, vi in zip(x, v, strict=False):
         axA.text(xi, vi + (0.16 if vi >= 0 else -0.16), f"{vi:+.2f}",
                  ha="center", va="bottom" if vi >= 0 else "top", fontsize=8.6,
                  color=VERM_TXT if vi < 0 else GREY, rotation=90, zorder=6)

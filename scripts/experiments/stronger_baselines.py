@@ -66,8 +66,9 @@ import pandas as pd
 
 sys.path.insert(0, "src")
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402  (log_combo, qlike vol-unit)
-from sp500vol.evaluation.dm_test import dm_test  # noqa: E402
+import forecast_combination as fc
+
+from sp500vol.evaluation.dm_test import dm_test
 
 EPS = 1e-12  # HARRV epsilon (log-space), matching src/sp500vol/models/price/har_rv.py
 ANN = 252.0
@@ -127,7 +128,7 @@ def metrics_rows(pred: pd.DataFrame, disclosure: str) -> list[dict]:
             f = d.prediction_realised_vol.to_numpy(float)
             rows.append({
                 "split": split, "disclosure_subset": disclosure, "horizon_days": int(h),
-                "n": int(len(d)),
+                "n": len(d),
                 "mae": float(np.mean(np.abs(f - y))),
                 "rmse": float(np.sqrt(np.mean((f - y) ** 2))),
                 "r2": float(1.0 - ((f - y) ** 2).sum() / ((y - y.mean()) ** 2).sum()),

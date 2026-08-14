@@ -156,7 +156,7 @@ for r in rows:
           "{raw} | {lfneg} | {zt} | {rel} |".format(**r))
 print()
 print("| zero-text term's own mean rel% vs plain f_R (LF / ED) |")
-for r, v in zip(rows, ORDER):
+for r, v in zip(rows, ORDER, strict=False):
     print("| {}: {} |".format(NAME[v], r["ztrel"]))
 print()
 print("| specifications cleared | cells | which |")

@@ -339,10 +339,10 @@ def main():
     md.append(f"| published_readings.json | {pub['generated']} | — | — |")
     r0 = runs[("tfidf", "primary")]
     hl = r0["hac_lags_L"]
-    md.append(f"\n- All 8 protocol jsons: tag=REAL, placebo seeds 1000–1019 (20, "
-              f"label-shuffle), swap seeds 2000–2004 (5, within-date), embargo_val=False, "
-              f"merge_dropped_rows=0 (incl. shifted: text arms fitted once on primary, §2.3, "
-              f"complete row set handed over).")
+    md.append("\n- All 8 protocol jsons: tag=REAL, placebo seeds 1000–1019 (20, "
+              "label-shuffle), swap seeds 2000–2004 (5, within-date), embargo_val=False, "
+              "merge_dropped_rows=0 (incl. shifted: text arms fitted once on primary, §2.3, "
+              "complete row set handed over).")
     md.append(f"- Per horizon: n_test=672, 143 call-date clusters, 461 entities, n_val=333; "
               f"HAC lag L_n = {hl['3']}/{hl['7']}/{hl['15']}/{hl['30']} (h=3/7/15/30); "
               f"STPEV (expanding) test prior coverage "

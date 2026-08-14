@@ -86,7 +86,7 @@ def metrics_rows(pred: pd.DataFrame, disc: str) -> list[dict]:
             f = g["prediction_realised_vol"].to_numpy()
             rows.append({
                 "split": split, "disclosure_subset": disc, "horizon_days": int(h),
-                "n": int(len(g)),
+                "n": len(g),
                 "mae": float(np.abs(y - f).mean()),
                 "rmse": float(np.sqrt(((y - f) ** 2).mean())),
                 "r2": float(1 - ((y - f) ** 2).sum() / ((y - y.mean()) ** 2).sum()),
@@ -155,7 +155,7 @@ def build_runs(args) -> None:
                 "clip_range": [CLIP_LO, CLIP_HI],
                 "on_missing": args.on_missing,
                 "stats": {
-                    "n_rows": int(len(out)),
+                    "n_rows": len(out),
                     "n_filings": int(out["text_path"].nunique()),
                     "parse_fail_rows": n_miss,
                     "parse_fail_rate": round(n_miss / n_all, 4),
@@ -199,7 +199,7 @@ def pilot_eval(args) -> None:
             "spearman>0.15": rho > 0.15,
         }
         report[variant] = {
-            "n_joined_rows": int(len(j)), "parse_rate": round(parse_rate, 4),
+            "n_joined_rows": len(j), "parse_rate": round(parse_rate, 4),
             "clip_rate": round(clip_rate, 4),
             "qlike_vol_llm": round(ql_llm, 4), "qlike_vol_A1_hv": round(ql_a1, 4),
             "spearman_pred_label": round(rho, 4),

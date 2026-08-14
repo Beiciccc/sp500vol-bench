@@ -39,7 +39,7 @@ for _k in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
 import argparse
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
@@ -50,8 +50,8 @@ os.chdir(REPO)
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
 
-import forecast_combination as fc  # noqa: E402
-import clustered_dm as cdm  # noqa: E402
+import clustered_dm as cdm
+import forecast_combination as fc
 
 KEY = ["ticker", "accession", "horizon_days"]
 EPS = 1e-8
@@ -101,7 +101,7 @@ def m1_cells_from_preds(pred_pq: Path, disc: str) -> dict[int, dict]:
         gmean = v.label_realised_vol.mean()
         fid_v = v.ticker.map(fm).fillna(gmean).values
         fid_t = te.ticker.map(fm).fillna(gmean).values
-        L = lambda x: np.log(np.clip(x, EPS, None))  # noqa: E731
+        L = lambda x: np.log(np.clip(x, EPS, None))
         ly = L(v.label_realised_vol.values)
         bR = ols(ly, np.column_stack([np.ones(len(v)), L(v.fh.values), L(fid_v)]))
         bU = ols(ly, np.column_stack([np.ones(len(v)), L(v.fh.values), L(fid_v),
@@ -217,7 +217,7 @@ def write_outputs(df: pd.DataFrame) -> None:
         "- File hygiene: regenerated on each run (channels are merged by "
         "row replacement); no single-shot discipline applies to this annex.",
         "",
-        f"Generated {datetime.now(timezone.utc).isoformat(timespec='seconds')} "
+        f"Generated {datetime.now(UTC).isoformat(timespec='seconds')} "
         f"by scripts/analysis/anon_annex_samelineage.py.",
     ]
     OUT_MD.write_text("\n".join(md) + "\n")

@@ -39,15 +39,29 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from supp_style import (apply_style, finish, gate, note, panel,  # noqa: E402
-                        BLUE, SKY, VERM, VERM_TXT, GREEN, YELLOW, PURPLE,
-                        GREY, INK, INK2, LIGHT, RULE, TAB, AGG, REPO)
-
-import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib.gridspec import GridSpec  # noqa: E402
-from matplotlib.lines import Line2D  # noqa: E402
-from matplotlib.patches import Rectangle  # noqa: E402
-import matplotlib.transforms as mtransforms  # noqa: E402
+import matplotlib.pyplot as plt
+import matplotlib.transforms as mtransforms
+from matplotlib.gridspec import GridSpec
+from matplotlib.lines import Line2D
+from matplotlib.patches import Rectangle
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    INK,
+    INK2,
+    LIGHT,
+    PURPLE,
+    RULE,
+    TAB,
+    VERM_TXT,
+    YELLOW,
+    apply_style,
+    finish,
+    gate,
+    note,
+    panel,
+)
 
 # --------------------------------------------------------------- load evidence
 CI = pd.read_csv(os.path.join(TAB, "anon_share_ci.csv"))
@@ -145,7 +159,7 @@ gate(
         "c2_h20_firm_dm": 3.07,
     },
     {
-        "n_share_readouts": int(len(CI)),
+        "n_share_readouts": len(CI),
         "ci_triples": tuple((round(float(r.share_point), 2), round(float(r.ci_lo), 2),
                              round(float(r.ci_hi), 2)) for _, r in CI.iterrows()),
         "har_pairs": tuple((round(float(arm_row(a, h).rel_har_unmasked), 2),
@@ -463,7 +477,7 @@ for ref, (x0, x1) in BLK.items():
     # without ever nicking the axis frame; no plotted line reaches this gutter.
     lab_bg = dict(facecolor=("white" if ref == "har" else "#F3F3F3"),
                   edgecolor="none", pad=1.0)
-    for d, yy in zip(grp, ys):
+    for d, yy in zip(grp, ys, strict=False):
         # leader drawn in the line's own colour so a label can always be traced
         # back to its horizon, even where two labels read the same ("51%").
         axb.plot([x1 + 0.02, x1 + 0.11, x1 + 0.22, x1 + 0.28],
@@ -552,7 +566,7 @@ for _, r in ANNEX_LF.iterrows():
              mec="white", mew=0.6, zorder=3)
     ends.append((h, float(r.rel_har_masked), float(r.share_har)))
 lab_y = nudge([v for _, v, _ in ends], 0.62)
-for (h, yv, sh), yy in zip(ends, lab_y):
+for (h, yv, sh), yy in zip(ends, lab_y, strict=False):
     # Leader in its own line's colour and weight, as in panel (b): the grey
     # hairline it used to be belonged to no series in particular.
     axc.plot([1.03, 1.10], [yv, yy], lw=0.7, color=H_COL[h], zorder=2)

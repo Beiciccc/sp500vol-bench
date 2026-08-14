@@ -88,24 +88,24 @@ if os.path.isdir("/root/rivermind-data"):  # box defaults (launch.sh convention)
     os.environ.setdefault("HF_HUB_OFFLINE", "1")
     os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 
-import argparse  # noqa: E402
-import datetime as _dt  # noqa: E402
-import json  # noqa: E402
-import subprocess  # noqa: E402
-import sys  # noqa: E402
-from pathlib import Path  # noqa: E402
+import argparse
+import datetime as _dt
+import json
+import subprocess
+import sys
+from pathlib import Path
 
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
+import numpy as np
+import pandas as pd
 
 _REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(_REPO / "scripts" / "analysis"))
 sys.path.insert(0, str(_REPO / "scripts" / "experiments" / "e1_llm_forecast"))
-import forecast_combination as fc  # noqa: E402
-import clustered_dm as cdm  # noqa: E402
-import prompt as prompt_mod  # noqa: E402
-import run_inference as ri  # noqa: E402
-import postprocess as pp  # noqa: E402
+import clustered_dm as cdm
+import forecast_combination as fc
+import postprocess as pp
+import prompt as prompt_mod
+import run_inference as ri
 
 KEY = ["ticker", "accession", "horizon_days"]
 EPS = 1e-8
@@ -216,7 +216,7 @@ def standalone_stats(y, f):  # verbatim from crossfamily_standalone.py
         "qlike_var": float(fc.qlike(y ** 2, f ** 2).mean()),
         "r2": float(1.0 - ((y - f) ** 2).sum() / ((y - y.mean()) ** 2).sum()),
         "pred_sd": float(f.std()),
-        "n_unique_2dp": int(len(vals)),
+        "n_unique_2dp": len(vals),
         "mode_val_2dp": float(vals[i]),
         "mode_share_pct": float(100.0 * counts[i] / len(f)),
     }
@@ -241,7 +241,7 @@ def m1_rows(fam, preds, a2):
         gmean = v.label_realised_vol.mean()
         fid_v = v.ticker.map(fm).fillna(gmean).values
         fid_t = te.ticker.map(fm).fillna(gmean).values
-        L = lambda x: np.log(np.clip(x, EPS, None))  # noqa: E731
+        L = lambda x: np.log(np.clip(x, EPS, None))
         ly = L(v.label_realised_vol.values)
         bR = ols(ly, np.column_stack([np.ones(len(v)), L(v.fh.values), L(fid_v)]))
         bU = ols(ly, np.column_stack([np.ones(len(v)), L(v.fh.values), L(fid_v),
@@ -518,7 +518,7 @@ def build_run_dir(raw_dir, run_dir, model_label, extra_cfg):
         "clip_range": [pp.CLIP_LO, pp.CLIP_HI],
         "on_missing": "rv22",
         "stats": {
-            "n_rows": int(len(out)),
+            "n_rows": len(out),
             "n_filings": int(out["text_path"].nunique()),
             "parse_fail_rows": n_miss,
             "parse_fail_rate": round(n_miss / n_all, 4) if n_all else float("nan"),
@@ -577,7 +577,7 @@ def build_ensemble(tag, model_id):
         "llm": model_id,
         "seeds_used": list(SEEDS),
         "clip_range": [pp.CLIP_LO, pp.CLIP_HI],
-        "stats": {"n_rows": int(len(out)),
+        "stats": {"n_rows": len(out),
                   "n_filings": int(out["text_path"].nunique()),
                   "n_seeds": len(SEEDS)},
     }, indent=2))
@@ -594,7 +594,7 @@ def pilot_health(preds_long):
         d = preds_long[preds_long.horizon_days == h]
         st = standalone_stats(d.label_realised_vol.to_numpy(),
                               d.prediction_realised_vol.to_numpy())
-        st["n"] = int(len(d))
+        st["n"] = len(d)
         per_h[str(h)] = st
     mx_q = max(v["qlike_var"] for v in per_h.values())
     mx_m = max(v["mode_share_pct"] for v in per_h.values())
@@ -661,7 +661,7 @@ def run_pilot(args, gen=None, n=PILOT_N):
                      "max_tokens": MAX_TOKENS, "max_model_len": MAX_MODEL_LEN,
                      "tp": TP, "guided_json": True, "variant": VARIANT,
                      "system_fold": bool(getattr(gen, "system_fold", False))},
-        "timestamp_utc": _dt.datetime.now(_dt.timezone.utc).isoformat(),
+        "timestamp_utc": _dt.datetime.now(_dt.UTC).isoformat(),
     }
     Path(pj).parent.mkdir(parents=True, exist_ok=True)
     Path(pj).write_text(json.dumps(out, indent=2))

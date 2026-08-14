@@ -96,7 +96,7 @@ import importlib.util
 import json
 import sys
 import tempfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
@@ -106,7 +106,7 @@ REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "src"))
 sys.path.insert(0, str(REPO / "scripts" / "analysis"))
 
-from sp500vol.utils.paths import data_path  # noqa: E402
+from sp500vol.utils.paths import data_path
 
 SEED = 2026
 DISC = "long_form"
@@ -236,7 +236,7 @@ def _patch_masked_text_source(masked: dict[str, str]) -> None:
     """Replace qwen_llm._missing_texts (the ORIGINAL-cache parquet streamer)
     with a coverage-asserted masked-store reader. embed_dataframe resolves the
     name at qwen_llm module scope, so this patch covers every encode path."""
-    import sp500vol.models.neural_text.qwen_llm as qwen_llm
+    from sp500vol.models.neural_text import qwen_llm
 
     def masked_missing_texts(df, missing):
         out = {tp: masked[tp] for tp in missing if tp in masked}
@@ -254,7 +254,7 @@ def _patch_masked_text_source(masked: dict[str, str]) -> None:
 def _chunked_masked_encode(model, uniq_paths: list[str], chunk: int) -> None:
     """Encode masked docs `chunk` at a time; embed_dataframe persists the
     masked cache after every call, so a crash resumes at chunk granularity."""
-    import sp500vol.models.neural_text.qwen_llm as qwen_llm
+    from sp500vol.models.neural_text import qwen_llm
 
     cache = model._cache_path()
     store = qwen_llm._load_emb_store(cache) if cache is not None else {}
@@ -374,7 +374,7 @@ def run_c5(args) -> None:
     g3 = {"gate": "G3-lf: rebuilt-head + original-cache hash invariance "
                   "through masked inference",
           "pass": True, "post": {},
-          "generated_utc": datetime.now(timezone.utc).isoformat(timespec="seconds")}
+          "generated_utc": datetime.now(UTC).isoformat(timespec="seconds")}
     for name, rec in artefacts.items():
         p = Path(rec["path"]) if rec.get("path") else None
         pre = rec.get("sha256") or rec.get("sha256_pre")
@@ -426,7 +426,7 @@ def _write_c5_config(run_dir: Path, tag: str, artefacts: dict, args,
                  "masked_store": str(args.masked_store) if tag == "anonmask"
                  else None,
                  "artefacts": artefacts, **extra},
-        "generated_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "generated_utc": datetime.now(UTC).isoformat(timespec="seconds"),
     }, indent=2, default=str))
 
 
@@ -463,7 +463,7 @@ def _selftest() -> int:
       4. g1 rename wrapper writes g1_control_b2_lf.json (scratch ANON dir);
       5. placeholder sanity guard fires on an unmasked store.
     """
-    import sp500vol.models.neural_text.qwen_llm as qwen_llm
+    from sp500vol.models.neural_text import qwen_llm
     from sp500vol.models.neural_text.qwen_llm import C5LLMProbe
 
     calls = {"n_encoded": 0}
@@ -545,7 +545,7 @@ def _selftest() -> int:
                 (td / d).mkdir()
                 df.to_parquet(td / d / "predictions.parquet", index=False)
             orig_g1 = ed.g1_compare
-            wrapped = lambda arm, new_run, committed: orig_g1(  # noqa: E731
+            wrapped = lambda arm, new_run, committed: orig_g1(
                 f"{arm}_lf", new_run, committed)
             v = wrapped("b2", td / "new", td / "ref")
             assert v["pass"] and (td / "anon" / "g1_control_b2_lf.json").exists()

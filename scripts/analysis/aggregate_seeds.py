@@ -19,7 +19,6 @@ Usage:
     python scripts/analysis/aggregate_seeds.py --dataset full \
         --disclosures long_form event_driven combined --seeds 2026 2027 2028
 """
-# ruff: noqa: E402
 
 from __future__ import annotations
 

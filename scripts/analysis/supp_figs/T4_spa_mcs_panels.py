@@ -39,7 +39,7 @@ import sys
 import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from supp_style import TAB, gate  # noqa: E402
+from supp_style import TAB, gate
 
 p = pd.read_csv(os.path.join(TAB, "row13_spa_mcs_panels.csv"))
 m = pd.read_csv(os.path.join(TAB, "row13_spa_mcs.csv"))

@@ -48,17 +48,31 @@ import os
 import re
 import sys
 
-import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from supp_style import (apply_style, finish, gate, note, BLUE, SKY, VERM,  # noqa: E402
-                        VERM_TXT, GREEN, YELLOW, PURPLE, GREY, LIGHT, INK,
-                        INK2, RULE, TAB, AGG, REPO)
-
-import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib.lines import Line2D  # noqa: E402
-from matplotlib.patches import Rectangle  # noqa: E402
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from matplotlib.patches import Rectangle
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    INK,
+    INK2,
+    LIGHT,
+    PURPLE,
+    REPO,
+    RULE,
+    SKY,
+    TAB,
+    VERM,
+    VERM_TXT,
+    apply_style,
+    finish,
+    gate,
+    note,
+)
 
 # --------------------------------------------------------------- load evidence
 MD = open(os.path.join(TAB, "maec_audit.md")).read()
@@ -118,7 +132,7 @@ gate(
         "n_calls": 3443, "panel_shape": (672, 143, 461, 333),
     },
     {
-        "n_published_cells": int(len(PUB)),
+        "n_published_cells": len(PUB),
         "tfidf_pct_of_raw": tuple(
             round(float(v), 1) for v in
             PUB[PUB.arm == "tfidf"].sort_values("h", key=lambda s:
@@ -129,14 +143,14 @@ gate(
             PUB[PUB.arm == "prompted_qwen"].sort_values(
                 "h", key=lambda s: s.map({3: 0, 7: 1, 15: 2, 30: 3})).pct_of_raw),
         "g1_tfidf": G1_TFIDF, "g1_prompt": G1_PROMPT,
-        "n_primary_cells": int(len(R5)),
+        "n_primary_cells": len(R5),
         "n_clear_holm": int((R5.p_holm < .05).sum()),
         "n_inside_mde": int(R5.inside_mde.sum()),
         "mde_lo_hi": (round(float(R5.mde_ent_pct.min()), 2),
                       round(float(R5.mde_ent_pct.max()), 2)),
         "n_dirty_gate": int(R5.dirty.sum()),
         "n_ci_excludes_zero": int(R5.ci_excludes_zero.sum()),
-        "n_shifted_neg_sig": int(len(SH)),
+        "n_shifted_neg_sig": len(SH),
         "shifted_neg_sig_h": tuple(int(v) for v in SH.horizon),
         "n_calls": N_CALLS,
         "panel_shape": (N_TEST, N_CLUST, N_ENT, N_VAL),
@@ -350,10 +364,10 @@ note(fig, X_BODY, frac(7.98),
      + ", ".join(p_(v) for v in ring.p_raw)
      + "; Holm "
      + ", ".join(p_(v) for v in ring.p_holm)
-     + f"). The prompted arm is negative at three of four horizons;\n"
-       f"under the shifted alignment its two $h$="
+     + "). The prompted arm is negative at three of four horizons;\n"
+       "under the shifted alignment its two $h$="
      + "/".join(str(int(v)) for v in sorted(set(SH.horizon)))
-     + f" cells are significantly harmful (Holm "
+     + " cells are significantly harmful (Holm "
      + ", ".join(p_(v, 4) for v in SH.p_holm) + ").",
      rule=False)
 

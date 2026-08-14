@@ -73,7 +73,7 @@ import argparse
 import importlib.util
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -83,7 +83,7 @@ import pandas as pd
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "src"))
 
-from sp500vol.utils.paths import data_path  # noqa: E402
+from sp500vol.utils.paths import data_path
 
 KEY = ["ticker", "accession", "horizon_days"]
 SEED = 2026
@@ -190,13 +190,13 @@ def g1_compare(arm: str, new_run: Path, committed: Path) -> dict:
     out = {
         "arm": arm, "gate": "G1 unmasked control vs committed, bit-identical",
         "new_run": str(new_run), "committed": str(committed),
-        "n_new": int(len(a)), "n_committed": int(len(b)), "n_joined": int(len(m)),
+        "n_new": len(a), "n_committed": len(b), "n_joined": len(m),
         "n_exact": int(same.sum()),
         "exact_match_rate": float(same.mean()) if len(m) else float("nan"),
         "max_abs_diff": float(diffs.max()) if len(diffs) else 0.0,
         "rows_align": bool(len(a) == len(b) == len(m)),
         "pass": bool(len(a) == len(b) == len(m) and same.all()),
-        "generated_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "generated_utc": datetime.now(UTC).isoformat(timespec="seconds"),
     }
     ANON_DIR.mkdir(parents=True, exist_ok=True)
     (ANON_DIR / f"g1_control_{arm}.json").write_text(json.dumps(out, indent=2))
@@ -307,7 +307,7 @@ def write_g3(masked_raw: Path, need: set[str]) -> None:
 
     def stats(d: pd.DataFrame) -> dict:
         return {
-            "n": int(len(d)),
+            "n": len(d),
             "prompt_chars_mean": float(d.prompt_chars.mean()),
             "prompt_chars_median": float(d.prompt_chars.median()),
             "prompt_chars_p95": float(d.prompt_chars.quantile(0.95)),
@@ -319,7 +319,7 @@ def write_g3(masked_raw: Path, need: set[str]) -> None:
 
     out = {"gate": "G3 excerpt truncation comparable, masked vs committed",
            "masked": stats(m), "committed": stats(c),
-           "generated_utc": datetime.now(timezone.utc).isoformat(timespec="seconds")}
+           "generated_utc": datetime.now(UTC).isoformat(timespec="seconds")}
     ANON_DIR.mkdir(parents=True, exist_ok=True)
     (ANON_DIR / "g3_truncation_stats.json").write_text(json.dumps(out, indent=2))
     print(f"[G3] masked prompt_chars median "

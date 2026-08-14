@@ -141,4 +141,4 @@ probe rel% 与 fulltext rel% 并列 + text-beyond-identity(f_datefirm 联合参�
 产物:`results/tables/crossfamily_llama70_probe.{csv,md}`,单发。
 
 **边界**:不重训任何模型;prompt 零改动;C6/llama70 的 committed 读数不重算(锚定门
-照 G1'' 惯例);时间戳 = 本 tag(建议投稿前由作者将本文件存证 OSF,双盲版)。
+照 G1'' 惯例);时间戳 = 本 tag(建议同步 OSF 存证)。

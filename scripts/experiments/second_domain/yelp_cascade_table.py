@@ -301,8 +301,8 @@ def main() -> None:
     synthetic = bool(prot.get("synthetic")) or tag == "SYNTHETIC"
     if synthetic:
         tag = "SYNTHETIC"
-    banner = (f"SYNTHETIC FIXTURE — MACHINERY VALIDATION ONLY (known injected DGP; "
-              f"never citable as a Yelp result)" if synthetic
+    banner = ("SYNTHETIC FIXTURE — MACHINERY VALIDATION ONLY (known injected DGP; "
+              "never citable as a Yelp result)" if synthetic
               else "Yelp Open Dataset — business-month rating forecasting")
 
     rows = build_rows(hs, res, metrics, naive)

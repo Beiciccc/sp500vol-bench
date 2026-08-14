@@ -9,12 +9,14 @@ Source: results/tables/var_backtest.csv
 Out:    results/figures/fig_var_backtest.{png,pdf}
 """
 import os
+
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
 import numpy as np
 import pandas as pd
+from matplotlib.patches import Patch
 
 ROOT = "."
 SRC = os.path.join(ROOT, "results/tables/var_backtest.csv")
@@ -72,7 +74,7 @@ for ai, alpha in enumerate(ALPHAS):
             bars = ax.bar(xpos, vals, w, color=FC_COLOR[fc], label=FC_LABEL[fc],
                           edgecolor="black", linewidth=0.5, zorder=3)
             # Kupiec significance star above each bar (rejects nominal coverage)
-            for xp, v, s in zip(xpos, vals, sig):
+            for xp, v, s in zip(xpos, vals, sig, strict=False):
                 if s and not np.isnan(v):
                     ax.text(xp, v + 0.0015, "*", ha="center", va="bottom",
                             fontsize=12, color="black", zorder=4)

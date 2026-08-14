@@ -45,14 +45,31 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
-from matplotlib.colors import LinearSegmentedColormap  # noqa: E402
-
-from supp_style import (AGG, BLUE, GREEN, GREY, INK, INK2, LIGHT, PURPLE,  # noqa: E402,F401
-                        REPO, RULE, SKY, TAB, VERM, VERM_TXT, YELLOW, annot,
-                        apply_style, finish, gate)
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from matplotlib.colors import LinearSegmentedColormap
+from supp_style import (  # noqa: F401
+    AGG,
+    BLUE,
+    GREEN,
+    GREY,
+    INK,
+    INK2,
+    LIGHT,
+    PURPLE,
+    REPO,
+    RULE,
+    SKY,
+    TAB,
+    VERM,
+    VERM_TXT,
+    YELLOW,
+    annot,
+    apply_style,
+    finish,
+    gate,
+)
 
 # ------------------------------------------------------------------ evidence
 sa = pd.read_csv(os.path.join(TAB, "variance_unit_standalone180.csv"))
@@ -76,7 +93,7 @@ for line in open(os.path.join(TAB, "dm_weak_vs_strong_baseline.md")):
         continue
     cells = [c.strip() for c in line.strip().strip("|").split("|")]
     model, ref = cells[0], cells[1]
-    for h, cell in zip((5, 10, 20), cells[2:5]):
+    for h, cell in zip((5, 10, 20), cells[2:5], strict=False):
         m = re.match(r"([+-][\d.]+)(\*| ns)", cell)
         weak.append({"model": model, "ref": ref, "horizon": h,
                      "dm": float(m.group(1)), "sig": m.group(2) == "*"})
@@ -91,7 +108,7 @@ for line in open(os.path.join(TAB, "dm_stratified.md")):
         facet = line[3:].strip()
     elif line.startswith("| C") or line.startswith("| D"):
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        for h, cell in zip((5, 10, 20), cells[2:5]):
+        for h, cell in zip((5, 10, 20), cells[2:5], strict=False):
             m = re.match(r"([+-][\d.]+)(\*| ns)", cell)
             strat.append({"facet": facet, "model": cells[0], "period": cells[1],
                           "horizon": h, "dm": float(m.group(1)),
@@ -115,7 +132,7 @@ gate(
      "strat_n_negative_cells": 0,
      "strat_models_long_form": ["C2_finbert_s1", "C4_longformer", "D2_gated_fusion"],
      "strat_models_event_driven": ["C2_finbert_s1", "D2_gated_fusion"]},
-    {"n_comparisons": int(len(sa)),
+    {"n_comparisons": len(sa),
      "n_price_rows": int(sa.is_price.sum()),
      "n_text_fusion_rows": int((~sa.is_price).sum()),
      "better_holm_se_vol_var": tuple(int(sa[c].sum()) for _, _, c, _, _ in LOSSES),
@@ -124,7 +141,7 @@ gate(
      "n_text_fusion_variance_unit_winners": int((~winners.is_price).sum()),
      "naive_dm_range": (float(naive.dm.min()), float(naive.dm.max())),
      "har_dm_range": (float(strong.dm.min()), float(strong.dm.max())),
-     "n_weak_strong_cells": int(len(strong)),
+     "n_weak_strong_cells": len(strong),
      "strat_cells_long_form": int((strat.facet == "long_form").sum()),
      "strat_cells_event_driven": int((strat.facet == "event_driven").sum()),
      "strat_n_negative_cells": int((strat.dm <= 0).sum()),

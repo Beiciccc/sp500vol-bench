@@ -90,17 +90,27 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-import diss_style as ds  # noqa: E402
+import diss_style as ds
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import _inclusion_floor  # noqa: E402
-from supp_style import (BLUE, GREEN, GREY, INK, INK2, LIGHT, PURPLE, REPO,
-                        RULE, SKY, TAB, VERM, VERM_TXT, YELLOW, apply_style,
-                        gate)
-
+import _inclusion_floor
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
+from supp_style import (
+    BLUE,
+    GREY,
+    INK,
+    INK2,
+    LIGHT,
+    PURPLE,
+    RULE,
+    TAB,
+    VERM_TXT,
+    YELLOW,
+    apply_style,
+    gate,
+)
 
 # W, H are the LAYOUT GRID, in inches, and are the supplement's own: every
 # `rect()` and every `fig.text` offset below is an absolute inch position on
@@ -289,7 +299,7 @@ for i, (lab, s, col, hh) in enumerate(SER_A):
     v = s.rel_impr_pct.to_numpy()
     ax_a.bar(xa + (i - 1) * BW, v, width=BW, color=col, edgecolor="white",
              lw=0.7, hatch=hh, zorder=3)
-    for xi, vi in zip(xa + (i - 1) * BW, v):
+    for xi, vi in zip(xa + (i - 1) * BW, v, strict=False):
         ax_a.annotate(f"{vi:+.2f}", (xi, vi), textcoords="offset points",
                       xytext=(0, 3 if vi >= 0 else -11), ha="center",
                       fontsize=9, color=GREY, zorder=6)
@@ -346,7 +356,7 @@ ax_b.bar(xb, df_v, width=BW, color=YELLOW, edgecolor="white", lw=0.7,
 ax_b.bar(xb + BW, ft_v, width=BW, color=BLUE, edgecolor="white", lw=0.7,
          zorder=3)
 ax_b.axhline(0, color=GREY, lw=0.7, zorder=4)
-for xi, v, r, w in zip(xb, df_v, rp_v, well_flat):
+for xi, v, r, w in zip(xb, df_v, rp_v, well_flat, strict=False):
     ax_b.annotate(f"{r:.0f}%", (xi, v), textcoords="offset points",
                   xytext=(0, 3), ha="center", fontsize=9,
                   color=VERM_TXT if not w else GREY, zorder=6)

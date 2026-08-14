@@ -2,7 +2,7 @@
 
 8 generation(s) were dropped because their `raw_output`
 contains non-English text. The model emitted it inside its own
-chain of thought; the submission package is English-only, and
+chain of thought; this release is English-only, and
 rewriting the string would mean the column is no longer the raw
 output. The rows are therefore removed rather than edited, and
 listed here.

@@ -159,7 +159,7 @@ def dm_test_month(loss_a, loss_b, months, h):
     ma, _ = monthly_mean(loss_a, months)
     mb, _ = monthly_mean(loss_b, months)
     stat, p = dm_test(ma, mb, h=int(h))
-    return float(stat), float(p), int(len(ma))
+    return float(stat), float(p), len(ma)
 
 
 def dm_test_2way(d, entities, months, h):
@@ -171,7 +171,7 @@ def dm_test_2way(d, entities, months, h):
     assert len(d) == len(ent) == len(mon)
     df = pd.DataFrame({"d": d, "ent": ent, "mon": np.asarray(mon)})
     mon_means = df.groupby("mon", sort=True)["d"].mean()
-    T, G = int(len(mon_means)), int(df.ent.nunique())
+    T, G = len(mon_means), int(df.ent.nunique())
     dbar = float(mon_means.mean())
     n_t = df.groupby("mon")["d"].transform("size").to_numpy(float)
     df["u"] = (d - dbar) / (T * n_t)
@@ -259,7 +259,7 @@ def mde_rel_pct(l_new, l_ref, months, h):
     v = _hac_variance(dd, lag=max(int(h) - 1, 0))
     se_m = float(np.sqrt(v / len(dd))) if v > 0 else float("nan")
     mse_ref = float(np.mean(l_ref))
-    return Z_POWER * se_m / mse_ref * 100.0, int(len(dd))
+    return Z_POWER * se_m / mse_ref * 100.0, len(dd)
 
 
 def run_injection(yt, months_t, ents_t, fR, lR, fU0, g_ar, lRe, fUe0, g_ent,
@@ -412,7 +412,7 @@ def run_horizon(d, h, ent_map, g_tv_mean, truth_delta, embargo_val):
         oracle_dmse = cov ** 2 / float(np.var(delta))
 
     return {
-        "n_val": int(len(dv)), "n_test": int(len(dt)), "n_test_months": int(n_months),
+        "n_val": len(dv), "n_test": len(dt), "n_test_months": int(n_months),
         "n_entities_test": int(pd.Series(ents_t).nunique()),
         "boundary_overlap_val_rows": n_overlap, "embargo_val": bool(embargo_val),
         "recal_b": float(bR[1]), "coverage_entity_mean": coverage,

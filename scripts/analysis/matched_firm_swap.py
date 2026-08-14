@@ -35,10 +35,10 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
-from clustered_dm import dm_test_clustered  # noqa: E402
-from firm_identity_control import fit_apply_log, firm_means  # noqa: E402
-from withindate_placebo import day_key, rel_pct  # noqa: E402
+import forecast_combination as fc
+from clustered_dm import dm_test_clustered
+from firm_identity_control import firm_means, fit_apply_log
+from withindate_placebo import day_key, rel_pct
 
 KEY, SORT, HORIZONS = fc.KEY, fc.SORT, fc.HORIZONS
 GRID_PATH = "results/tables/forecast_combination_grid.csv"
@@ -58,7 +58,7 @@ def matched_swap(ftext, tickers, days, rv_map, g_mean):
     for _, g in df.groupby("day"):
         firms = (g.drop_duplicates("ticker").sort_values(["rv", "ticker"])
                  .ticker.tolist())
-        for a, b in zip(firms[0::2], firms[1::2]):
+        for a, b in zip(firms[0::2], firms[1::2], strict=False):
             ia = g.index[g.ticker == a].to_numpy()
             ib = g.index[g.ticker == b].to_numpy()
             k = min(len(ia), len(ib))
@@ -150,7 +150,7 @@ def main():
     gen = df[df.genuine & (df.real_rel_pct > 0)]
     med_ret = float(gen.retention_vs_real.median()) if len(gen) else float("nan")
     lf = gen[gen.disc == "long_form"]; ed = gen[gen.disc == "event_driven"]
-    res = df[[c in RESIDUAL_CELLS for c in zip(df.disc, df.model)]]
+    res = df[[c in RESIDUAL_CELLS for c in zip(df.disc, df.model, strict=False)]]
 
     md = ["# Matched-firm text swap — separating identity from content\n",
           "Within each day, firms are paired by nearest validation-period mean RV and "

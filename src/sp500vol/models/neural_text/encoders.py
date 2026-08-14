@@ -95,7 +95,7 @@ class LongformerEncoder(CLSEncoder):
         window; padding to that multiple lets the model skip its internal re-padding and
         keeps the CLS global-attention mask aligned. (longformer-base-4096 → 512.)"""
         window = self.encoder.config.attention_window
-        return int(max(window)) if isinstance(window, (list, tuple)) else int(window)
+        return int(max(window)) if isinstance(window, list | tuple) else int(window)
 
     def forward(self, input_ids: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
         global_attention_mask = torch.zeros_like(attention_mask)

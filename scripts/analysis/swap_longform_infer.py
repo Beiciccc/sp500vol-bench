@@ -66,7 +66,7 @@ import importlib.util
 import json
 import sys
 import tempfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
@@ -74,8 +74,8 @@ os.chdir(REPO)
 sys.path.insert(0, str(REPO / "src"))
 sys.path.insert(0, str(REPO / "scripts" / "analysis"))
 
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
+import numpy as np
+import pandas as pd
 
 DISC = "long_form"
 SPLITS = ("val", "test")
@@ -156,7 +156,7 @@ def apply_swap(panel: pd.DataFrame, manifest: pd.DataFrame) -> pd.DataFrame:
     if m.partner_accession.isna().any():
         _fatal("unmatched rows after manifest merge")
     lookup = m.set_index(["split", "horizon_days", "accession"])["text_path"]
-    part_keys = list(zip(m["split"], m["horizon_days"], m["partner_accession"]))
+    part_keys = list(zip(m["split"], m["horizon_days"], m["partner_accession"], strict=False))
     m["text_path_orig"] = m["text_path"]
     m["text_path"] = lookup.loc[part_keys].to_numpy()
     # partner ticker sanity (manifest built from the same universe)
@@ -324,13 +324,13 @@ def prepare_arm(arm, train_mod, panel, seed, *, dry_run=False, b2_tol=1e-8,
             n_hit = sum(tp in keys for tp in uniq)
             artefacts["emb_cache"] = {"path": str(cache_path),
                                       "sha256_pre": _sha256(cache_path),
-                                      "n_unique_docs": int(len(uniq)),
+                                      "n_unique_docs": len(uniq),
                                       "n_cached": int(n_hit)}
             print(f"[infer] C5 embedding cache: {n_hit}/{len(uniq)} unique val+test "
                   f"docs cached at {cache_path.name} (device={model.device.type})")
         else:
             artefacts["emb_cache"] = {"path": str(cache_path), "sha256_pre": None,
-                                      "n_unique_docs": int(len(uniq)), "n_cached": 0}
+                                      "n_unique_docs": len(uniq), "n_cached": 0}
             # WARNING, not a problem: the frozen encoder re-encode is deterministic
             # and pre-registered as acceptable (full GPU pass on a cold cache).
             tag = "dry-run" if dry_run else "infer"
@@ -392,7 +392,7 @@ def _prepare_c5_rebuild(arm, model, panel, run_dir, seed, *, out_dir, tol,
               f"predictions (max rel diff {tol:.1e}, all splits) -> swapped-document "
               f"inference")
         artefacts = {"rebuild": {"mode": "recipe_rebuild_planned", "tol": tol,
-                                 "n_union_docs": int(len(union)),
+                                 "n_union_docs": len(union),
                                  "n_cached": int(n_cached)}}
         return model, artefacts, problems
 
@@ -490,7 +490,7 @@ def _prepare_c5_rebuild(arm, model, panel, run_dir, seed, *, out_dir, tol,
             "path": str(p), "sha256": _sha256(p), "mode": "recipe_rebuild"}
     artefacts["rebuild_gate"] = {"mode": "recipe_rebuild",
                                  "reproduction_max_rel_diff": max_rel, "tol": tol,
-                                 "n_rows_compared": int(len(j))}
+                                 "n_rows_compared": len(j)}
     if cache_path is not None and cache_path.exists():
         keys = set(pd.read_parquet(cache_path, columns=["text_path"])
                    ["text_path"].astype(str))
@@ -500,7 +500,7 @@ def _prepare_c5_rebuild(arm, model, panel, run_dir, seed, *, out_dir, tol,
                    f"({n_after}/{len(union)}) — swapped inference would re-encode")
         artefacts["emb_cache"] = {"path": str(cache_path),
                                   "sha256_pre": _sha256(cache_path),
-                                  "n_unique_docs": int(len(union)),
+                                  "n_unique_docs": len(union),
                                   "n_cached": int(n_after)}
     print(f"[infer] {arm}: recipe rebuild PASSED the reproduction gate — heads staged "
           f"at {staging}; proceeding to swapped-document inference")
@@ -673,7 +673,7 @@ def run_arm(arm, train_mod, panel, swapped, manifest_sha, args):
         "artefacts": artefacts,
         "g3_hash_invariance": g3,
         "output": str(out_path),
-        "generated_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "generated_utc": datetime.now(UTC).isoformat(timespec="seconds"),
     }
     (out_dir / fname.replace(".parquet", "_meta.json")).write_text(
         json.dumps(meta, indent=2, default=str))
@@ -689,6 +689,7 @@ def run_arm(arm, train_mod, panel, swapped, manifest_sha, args):
 def _selftest() -> int:
     print("[selftest] synthetic end-to-end validation (B2 flow + strict-fingerprint logic)")
     from swap_longform_build import build_manifest
+
     from sp500vol.models.classical_text import TfidfRidge
 
     rng = np.random.default_rng(2026)
@@ -760,6 +761,7 @@ def _selftest() -> int:
 
         # --- strict fingerprint logic on a dummy checkpoint (no HF/GPU)
         import torch
+
         from sp500vol.models.neural_text import _train_utils as train_utils
         from sp500vol.models.neural_text.encoders import EncoderConfig
 

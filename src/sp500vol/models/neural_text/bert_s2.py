@@ -362,7 +362,7 @@ def _collate_chunks(
     the batch so filings with few chunks don't drag in empty slots. Bit-identical to padding to
     max_chunks: every pooling variant masks chunk slots beyond chunk_counts[i]."""
     b = len(batch)
-    k_max = max(1, max(int(item["n_chunks"]) for item in batch))
+    k_max = max(1, *(int(item["n_chunks"]) for item in batch))
     out_ids = torch.full((b, k_max, max_length), pad_id, dtype=torch.long)
     out_mask = torch.zeros((b, k_max, max_length), dtype=torch.long)
     chunk_counts = torch.zeros(b, dtype=torch.long)

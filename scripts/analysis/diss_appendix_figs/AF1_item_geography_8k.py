@@ -34,12 +34,21 @@ import pandas as pd
 
 ANALYSIS = "scripts/analysis"
 sys.path.insert(0, ANALYSIS)
-from supp_style import (BLUE, GREY, INK, INK2, LIGHT, RULE,  # noqa: E402
-                        TAB, VERM, apply_style, gate)
-import diss_style as ds  # noqa: E402  (finish() writes into the dissertation dir)
-
-import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib.lines import Line2D  # noqa: E402
+import diss_style as ds
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from supp_style import (
+    BLUE,
+    GREY,
+    INK,
+    INK2,
+    LIGHT,
+    RULE,
+    TAB,
+    VERM,
+    apply_style,
+    gate,
+)
 
 # --------------------------------------------------------------- evidence
 D = pd.read_csv(os.path.join(TAB, "row11_item_stratified.csv"))
@@ -374,7 +383,5 @@ for k, t in enumerate(foot):
              fontsize=8.6, color=INK2)
 
 ds.finish(fig, "AF1_item_geography_8k",
-          note=("qwen narrative_ALL sig {}/3; llama {}/3; Holm survivors "
-                "{} and {} of 18".format(narrative_sig(QW), narrative_sig(LL),
-                                         holm_survivors(QW),
-                                         holm_survivors(LL))))
+          note=(f"qwen narrative_ALL sig {narrative_sig(QW)}/3; llama {narrative_sig(LL)}/3; Holm survivors "
+                f"{holm_survivors(QW)} and {holm_survivors(LL)} of 18"))

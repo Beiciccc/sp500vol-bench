@@ -84,18 +84,26 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-import diss_style as ds  # noqa: E402
+import diss_style as ds
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import _inclusion_floor  # noqa: E402
-from supp_style import (AGG, BLUE, GREEN, GREY, INK2, LIGHT, PURPLE, REPO,
-                        RULE, SKY, TAB, VERM, VERM_TXT, YELLOW, apply_style,
-                        gate)
-
+import _inclusion_floor
 import matplotlib.patheffects as pe
 import matplotlib.pyplot as plt
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import LinearSegmentedColormap, Normalize
+from supp_style import (
+    BLUE,
+    GREY,
+    INK2,
+    RULE,
+    SKY,
+    TAB,
+    VERM,
+    VERM_TXT,
+    apply_style,
+    gate,
+)
 
 # W, H are the LAYOUT GRID in inches -- the supplement's own -- and every
 # `rect()` and `fig.text` offset below is an absolute inch position on it.
@@ -221,7 +229,7 @@ for ax, dat, ttl in ((ax_lf, lf, f"long-form 10-K/Q, {len(lf)} tests"),
     ax.barh(y, dat.g, height=0.66, color=cmap(norm(dat.t.to_numpy())),
             edgecolor=GREY, lw=0.25, zorder=3)
     ax.set_yticks(y)
-    ax.set_yticklabels([f"{m} h={h}" for m, h in zip(dat.model, dat.h)],
+    ax.set_yticklabels([f"{m} h={h}" for m, h in zip(dat.model, dat.h, strict=False)],
                        fontsize=9)
     ax.tick_params(axis="y", length=0, pad=2)
     ax.set_ylim(-0.66, len(dat) - 0.34)
@@ -232,7 +240,7 @@ for ax, dat, ttl in ((ax_lf, lf, f"long-form 10-K/Q, {len(lf)} tests"),
     ax.axvline(0, color=GREY, lw=0.6, zorder=4)
     # g and the HAC t printed for every row, so nothing is read off colour
     tr = ax.get_yaxis_transform()
-    for yi, gv, tv in zip(y, dat.g, dat.t):
+    for yi, gv, tv in zip(y, dat.g, dat.t, strict=False):
         ax.text(GX, yi, f"{gv:+.3f}", transform=tr, ha="right", va="center",
                 fontsize=9, color=GREY, clip_on=False)
         ax.text(TX, yi, f"{tv:+.2f}", transform=tr, ha="right", va="center",
@@ -302,7 +310,7 @@ ax_b.plot(lev, rate, color=BLUE, lw=1.3, marker="o", ms=4.6, mfc=BLUE,
           mec="white", mew=0.6, zorder=5)
 ax_b.plot([mde_emp], [0.80], marker="D", ms=5.2, mfc=VERM, mec="white",
           mew=0.7, ls="none", zorder=6)
-for xi, yi in zip(lev, rate):
+for xi, yi in zip(lev, rate, strict=False):
     # A white HALO, not a filled white bbox.  The opaque patches punched
     # visible gaps in the data they sat on: the 0.68 label erased the segment
     # of the 80% power rule it straddled, and 0.10/0.46/0.68 each cut a notch

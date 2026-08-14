@@ -46,7 +46,7 @@ def convert_reviews(src: Path, dst: Path) -> None:
     writer = pq.ParquetWriter(dst, REVIEW_SCHEMA, compression="zstd")
     buf = {k: [] for k in ("business_id", "date", "stars", "text_len")}
     n = 0
-    with open(src, "r", encoding="utf-8") as fh:
+    with open(src, encoding="utf-8") as fh:
         for line in fh:
             try:
                 r = json.loads(line)
@@ -81,7 +81,7 @@ def convert_business(src: Path, dst: Path) -> None:
         "is_open",
         "categories",
     )
-    with open(src, "r", encoding="utf-8") as fh:
+    with open(src, encoding="utf-8") as fh:
         for line in fh:
             try:
                 b = json.loads(line)

@@ -7,7 +7,7 @@ Membership tables use columns `(ticker, cik, member_from, member_to, source)`
 plus a `permno` column carried for provenance. `member_to` is empty/NaT for
 current members.
 
-## Artifacts (in-repo)
+## Artifacts (local only — git-ignored)
 
 - `sp500_membership.parquet` — point-in-time S&P 500 membership intervals.
 - `crsp_cik_links.parquet` — point-in-time PERMNO→CIK link table (from CCM).
@@ -38,7 +38,7 @@ python scripts/ingest_wrds.py \
 
 Reads the WRDS zips (CRSP constituents, CCM, CRSP names, Compustat company,
 CRSP daily) and emits `sp500_membership.parquet` + `crsp_cik_links.parquet`
-(in-repo) and the daily-returns store (off-repo under `$SP500VOL_DATA_ROOT`).
+(local only, git-ignored) and the daily-returns store (off-repo under `$SP500VOL_DATA_ROOT`).
 
 ## Coverage (2010-2025)
 

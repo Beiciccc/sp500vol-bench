@@ -9,12 +9,13 @@ Reading: if the second family does not replicate the Qwen increment, the
 prompted-LLM residual is family-specific — further evidence for the near-null.
 """
 import sys
+
 import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
-import clustered_dm as cdm  # noqa: E402
+import clustered_dm as cdm
+import forecast_combination as fc
 
 KEY = ["ticker", "accession", "horizon_days"]
 EPS = 1e-8
@@ -55,7 +56,7 @@ def main():
                 gmean = v.label_realised_vol.mean()
                 fid_v = v.ticker.map(fm).fillna(gmean).values
                 fid_t = te.ticker.map(fm).fillna(gmean).values
-                L = lambda x: np.log(np.clip(x, EPS, None))  # noqa: E731
+                L = lambda x: np.log(np.clip(x, EPS, None))
                 ly = L(v.label_realised_vol.values)
                 bR = ols(ly, np.column_stack([np.ones(len(v)), L(v.fh.values), L(fid_v)]))
                 bU = ols(ly, np.column_stack([np.ones(len(v)), L(v.fh.values), L(fid_v),

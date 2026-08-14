@@ -43,13 +43,23 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from supp_style import (INK2, apply_style, finish, gate, BLUE, SKY, VERM, VERM_TXT,  # noqa: E402
-                        GREEN, YELLOW, PURPLE, GREY, LIGHT, TAB, AGG, REPO)
-
-import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib.gridspec import GridSpec  # noqa: E402
-from matplotlib.lines import Line2D  # noqa: E402
-from matplotlib.patches import Rectangle  # noqa: E402
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
+from matplotlib.lines import Line2D
+from matplotlib.patches import Rectangle
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    INK2,
+    PURPLE,
+    TAB,
+    VERM,
+    VERM_TXT,
+    apply_style,
+    finish,
+    gate,
+)
 
 # --------------------------------------------------------------- load evidence
 D = pd.read_csv(os.path.join(TAB, "matched_firm_swap.csv"))
@@ -117,7 +127,7 @@ gate(
         "ens_n_lf": 30, "ens_n_ed": 8,
     },
     {
-        "n_cells": int(len(D)), "n_genuine": int(D.genuine.sum()),
+        "n_cells": len(D), "n_genuine": int(D.genuine.sum()),
         "n_genuine_lf": int((GEN.disc == "long_form").sum()),
         "n_genuine_ed": int((GEN.disc == "event_driven").sum()),
         "retention_median_all": round(RET_ALL, 2),

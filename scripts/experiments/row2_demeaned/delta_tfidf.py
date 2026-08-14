@@ -51,15 +51,15 @@ import pandas as pd
 REPO_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
-from sp500vol.models.classical_text._fit_utils import (  # noqa: E402
+from sp500vol.models.classical_text._fit_utils import (
     fit_ridge_cv,
     maybe_log,
 )
-from sp500vol.models.classical_text._text_dataset import load_texts  # noqa: E402
-from sp500vol.utils import configure_logging, get_logger, seed_everything  # noqa: E402
+from sp500vol.models.classical_text._text_dataset import load_texts
+from sp500vol.utils import configure_logging, get_logger, seed_everything
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _textcache import ensure_texts_available  # noqa: E402
+from _textcache import ensure_texts_available
 
 # reuse the canonical data pipeline from scripts/train.py (single source of truth
 # for dataset loading, disclosure filtering, split assignment, row validation,
@@ -281,9 +281,9 @@ def main() -> int:
                 },
                 "sequencing": {
                     "order_by": "effective_trading_day within (cik, form)",
-                    "n_unique_docs": int(len(docs)),
-                    "n_kept_docs": int(len(kept)),
-                    "n_excluded_first_of_sequence": int(len(excluded)),
+                    "n_unique_docs": len(docs),
+                    "n_kept_docs": len(kept),
+                    "n_excluded_first_of_sequence": len(excluded),
                     "excluded_by_split": {str(k): int(v) for k, v in excl_by_split.items()},
                     "gap_days_median": float(kept["gap_days"].median()),
                     "gap_days_p95": float(kept["gap_days"].quantile(0.95)),

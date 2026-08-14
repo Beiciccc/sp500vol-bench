@@ -9,12 +9,14 @@ Source: results/tables/rolling_robustness.csv
 Out:    results/figures/fig_rolling_robustness.{png,pdf}
 """
 import matplotlib
+
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
-import pandas as pd
-import numpy as np
 from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from matplotlib.lines import Line2D
 
 ROOT = Path(".")
 SRC = ROOT / "results/tables/rolling_robustness.csv"
@@ -54,7 +56,7 @@ quarters = (df[df["scheme"] == "expanding"]
             .sort_values("quarter_idx")["quarter"].drop_duplicates().tolist())
 x = np.arange(len(quarters))
 
-for ax, (disc, model, h, title) in zip(axes, CELLS):
+for ax, (disc, model, h, title) in zip(axes, CELLS, strict=False):
     exp = (df[(df.disc == disc) & (df.model == model) & (df.h == h)
               & (df.scheme == "expanding")].sort_values("quarter_idx"))
     fix = (df[(df.disc == disc) & (df.model == model) & (df.h == h)

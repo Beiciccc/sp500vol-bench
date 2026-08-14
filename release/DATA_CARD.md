@@ -7,7 +7,7 @@ realised volatility under a survivorship-free, point-in-time design.
 ## Motivation
 Created to test, under leakage-free and survivorship-free conditions, whether
 regulatory disclosure text adds incremental predictive value for equity
-volatility beyond a strong price-history baseline (HAR-RV). Built for a peer-reviewed conference submission.
+volatility beyond a strong price-history baseline (HAR-RV). Built as the public index for a survivorship-free, point-in-time disclosure-to-volatility benchmark.
 
 ## Composition (this public release)
 - **`accession_index.csv`**: 144,129 filings with `accession`, `cik`, `ticker`,

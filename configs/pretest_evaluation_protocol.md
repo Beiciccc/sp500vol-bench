@@ -42,7 +42,7 @@ For each task (disc = long_form / event_driven), on the **real test split**:
 ## 4. Deviation disclosures (relative to hpo_arm.yaml; all recorded before evaluation)
 
 - **(i) Scope trimming**: amendment_1's T6d3/T6c5, Track-B, T4/T3/T2/T1d and the ~51-cell Holm family
-  were not executed (ROI adjudication after an internal adversarial dry-run: the ceiling is set by venue fit, so the HPO queue retains only the
+  were not executed (ROI adjudication after an internal adversarial dry-run: the ceiling is set by project scope, so the HPO queue retains only the
   correctness obligations; degradation_ladder extended in the spirit of wall-clock). **Consequence**: the paper's rewritten sentence narrows in scope to
   "an ASHA-tuned FinBERT (both channels)", and must not use the general phrase "validation-tuned challengers".
 - **(ii) s_strategy_recheck not executed**: S1 was frozen into retraining; no val recheck of S2/S3/S4. Disclosure:

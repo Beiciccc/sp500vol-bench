@@ -124,8 +124,8 @@ def main():
             return "text adds" if dm < 0 else "text HURTS"
         return "null"
 
-    df["verdict_a2"] = [verdict(a, b) for a, b in zip(df.dmclu_a2, df.pclu_a2_holm)]
-    df["verdict_firm"] = [verdict(a, b) for a, b in zip(df.dmclu_firm, df.pclu_firm_holm)]
+    df["verdict_a2"] = [verdict(a, b) for a, b in zip(df.dmclu_a2, df.pclu_a2_holm, strict=False)]
+    df["verdict_firm"] = [verdict(a, b) for a, b in zip(df.dmclu_firm, df.pclu_firm_holm, strict=False)]
     zdf = pd.DataFrame(zero_rows)
     zdf["p_holm"] = fc.holm(zdf.p_clustered.fillna(1.0).values)
 

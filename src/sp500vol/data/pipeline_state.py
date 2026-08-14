@@ -519,7 +519,7 @@ def _json_default(value: Any) -> Any:
 def _normalise_json(value: Any) -> Any:
     if isinstance(value, Mapping):
         return {str(key): _normalise_json(val) for key, val in value.items()}
-    if isinstance(value, (list, tuple)):
+    if isinstance(value, list | tuple):
         return [_normalise_json(item) for item in value]
     if isinstance(value, Path):
         return str(value)

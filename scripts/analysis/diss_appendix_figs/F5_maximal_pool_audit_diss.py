@@ -130,11 +130,24 @@ from matplotlib.patches import Rectangle
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-import diss_style as ds  # noqa: E402
-import _inclusion_floor  # noqa: E402
-from supp_style import (BLUE, GREEN, GREY, INK, INK2, LIGHT, PURPLE, RULE, SKY,
-                        TAB, VERM, VERM_TXT, YELLOW, apply_style, gate)
+import _inclusion_floor
+import diss_style as ds
 import matplotlib.pyplot as plt
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    INK,
+    INK2,
+    PURPLE,
+    RULE,
+    TAB,
+    VERM,
+    VERM_TXT,
+    YELLOW,
+    apply_style,
+    gate,
+)
 
 rob = pd.read_csv(os.path.join(TAB, "maximal_pool_robustness.csv"))
 pan = pd.read_csv(os.path.join(TAB, "maximal_pool_robustness_panels.csv"))
@@ -188,9 +201,9 @@ gate(
      "reversal_p_lt_1e15": bool(rev.p_pool_vs_valbest < 1e-15),
      "reversal_pool_is_worst": bool(float(rev.pool_test_qlike)
                                     == max(float(rev[c]) for c in REV_COLS)),
-     "single_ref_cells": int(len(sng[["disc", "model", "h"]]
-                                 .drop_duplicates())),
-     "stronger_cells": int(len(stronger)),
+     "single_ref_cells": len(sng[["disc", "model", "h"]]
+                                 .drop_duplicates()),
+     "stronger_cells": len(stronger),
      "a2_rank1_panels": int(sum(r["a2_rank"] == 1
                                 for r in g1["single_ref_a2_rank_orig"])),
      "frontier_pool5_qlike": round(float(frontier_q["pool5 (paper)"]), 4),
@@ -349,7 +362,7 @@ ax_a.bar(xs, s26_v, width=0.70, color="white", edgecolor=GREY, linewidth=0.6,
          hatch="////", zorder=1, label="seed-2026")
 ax_a.bar(xs, ens_v, width=0.44, color=BLUE, edgecolor="none", zorder=2,
          label="seed-ensemble")
-for x, ve, vs in zip(xs, ens_v, s26_v):
+for x, ve, vs in zip(xs, ens_v, s26_v, strict=False):
     # Inside the bar, not above it.  On the shorter panel a label sitting 0.7
     # units above a 34-high bar has its cap height carried past the y=38
     # primary-rung rule, which then strikes the digits through; the ghost-bar
@@ -390,7 +403,7 @@ A_LINES = ["(a) survivors by reference specification",
 A_YS = baselines(fy(0.14), A_LINES, 1.35)
 fig.text(fx(0.10), fy(0.14), A_LINES[0],
          ha="left", va="top", fontsize=9, color=INK)
-for y, line in zip(A_YS[1:], A_LINES[1:]):
+for y, line in zip(A_YS[1:], A_LINES[1:], strict=False):
     fig.text(fx(0.10), y, line,
              ha="left", va="baseline", fontsize=9, color=INK2)
 

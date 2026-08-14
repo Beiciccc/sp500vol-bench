@@ -18,19 +18,33 @@ import os
 import sys
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.lines import Line2D
-from matplotlib.path import Path
 from matplotlib.patches import PathPatch
+from matplotlib.path import Path
 
 sys.path.insert(0, "scripts/analysis")
-import supp_style  # noqa: E402
-from supp_style import (apply_style, finish, gate, annot, BLUE, SKY,  # noqa: E402
-                        VERM, VERM_TXT, GREEN, YELLOW, PURPLE, GREY, LIGHT,
-                        INK2, RULE, TAB, REPO)
+import supp_style
+from supp_style import (
+    GREEN,
+    GREY,
+    INK2,
+    LIGHT,
+    PURPLE,
+    REPO,
+    RULE,
+    TAB,
+    VERM,
+    VERM_TXT,
+    annot,
+    apply_style,
+    finish,
+    gate,
+)
 
 supp_style.OUTDIR = os.path.join(REPO, "writing", "dissertation", "figures")
 
@@ -205,7 +219,7 @@ bars = [("38", 38, GREEN, True, "primary rung,\n69-cell Holm family"),
         ("36", 36, GREEN, False, "same evidence,\n75-cell Holm family"),
         ("6", 6, PURPLE, True, "weights refit\nquarter by quarter")]
 ypos = [2, 1, 0]
-for y, (txt, v, col, solid, blurb) in zip(ypos, bars):
+for y, (txt, v, col, solid, blurb) in zip(ypos, bars, strict=False):
     ax_c.barh(y, v, height=0.36, color=col if solid else "none",
               edgecolor="none" if solid else col,
               linewidth=0.0 if solid else 0.9)

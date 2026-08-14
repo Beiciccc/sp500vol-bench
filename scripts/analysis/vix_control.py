@@ -28,7 +28,7 @@ Run from the repo root:  .venv/bin/python scripts/analysis/vix_control.py
 import json
 import platform
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
@@ -36,9 +36,10 @@ import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
-from clustered_dm import dm_test_clustered, mbb_ci_daily  # noqa: E402
-import forecast_combination as fc  # noqa: E402
-from sp500vol.evaluation.metrics import all_metrics  # noqa: E402
+import forecast_combination as fc
+from clustered_dm import dm_test_clustered, mbb_ci_daily
+
+from sp500vol.evaluation.metrics import all_metrics
 
 ROOT = Path(".")
 TABLES = ROOT / "results/tables"
@@ -235,7 +236,7 @@ def fit_harx_vix(disc, vix):
         for h in fc.HORIZONS:
             m = out[(out.split == split) & (out.horizon_days == h)]
             metrics.append({"split": split, "disclosure_subset": disc, "horizon_days": int(h),
-                            "n": int(len(m)),
+                            "n": len(m),
                             **all_metrics(m.label_realised_vol.to_numpy(),
                                           m.prediction_realised_vol.to_numpy())})
     json.dump(metrics, open(rd / "metrics.json", "w"), indent=2)
@@ -255,7 +256,7 @@ def fit_harx_vix(disc, vix):
     json.dump({"segments": [{"label": "training", "seconds": 1.0}], "total_seconds": 1.0,
                "total_gpu_hours": 0.0, "hourly_rate_usd": 0.0, "total_cost_usd": 0.0},
               open(rd / "cost.json", "w"), indent=2)
-    json.dump({"timestamp_utc": datetime.now(timezone.utc).isoformat(),
+    json.dump({"timestamp_utc": datetime.now(UTC).isoformat(),
                "git_sha": None, "git_dirty": None,
                "python_version": platform.python_version(), "platform": platform.platform(),
                "gpu": [], "pip_freeze_hash": None, "cloud_provider": "local-cpu",

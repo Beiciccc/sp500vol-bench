@@ -70,22 +70,22 @@ if os.path.isdir("/root/rivermind-data"):  # box defaults (launch.sh convention)
     os.environ.setdefault("HF_HUB_OFFLINE", "1")
     os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 
-import argparse  # noqa: E402
-import json  # noqa: E402
-import sys  # noqa: E402
-from pathlib import Path  # noqa: E402
+import argparse
+import json
+import sys
+from pathlib import Path
 
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
+import numpy as np
+import pandas as pd
 
 _REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(_REPO / "scripts" / "analysis"))
 sys.path.insert(0, str(_REPO / "scripts" / "experiments" / "e1_llm_forecast"))
-import forecast_combination as fc  # noqa: E402
-import clustered_dm as cdm  # noqa: E402
-import prompt as prompt_mod  # noqa: E402
-import run_inference as ri  # noqa: E402
-import postprocess as pp  # noqa: E402
+import clustered_dm as cdm
+import forecast_combination as fc
+import postprocess as pp
+import prompt as prompt_mod
+import run_inference as ri
 
 KEY = ["ticker", "accession", "horizon_days"]
 EPS = 1e-8
@@ -294,7 +294,7 @@ def build_run_dir(raw_dir, run_id, llm_note_extra=None):
         "clip_range": [pp.CLIP_LO, pp.CLIP_HI],
         "on_missing": "rv22",
         "stats": {
-            "n_rows": int(len(out)),
+            "n_rows": len(out),
             "n_filings": int(out["text_path"].nunique()),
             "parse_fail_rows": n_miss,
             "parse_fail_rate": round(n_miss / n_all, 4) if n_all else float("nan"),
@@ -359,7 +359,7 @@ def score(model_id):
 
     # ---- GP2: identical test panel (n_test per horizon must match committed) ----
     gp2_bad = [(int(h), int(a), int(b)) for h, a, b in
-               zip(pr.h, pr.n_test, ens_ref.n_test) if int(a) != int(b)]
+               zip(pr.h, pr.n_test, ens_ref.n_test, strict=False) if int(a) != int(b)]
     if gp2_bad:
         print("SANITY GP2 FAIL: probe test panel differs from the committed llama70 "
               f"panel (h, n_probe, n_committed): {gp2_bad}")
@@ -427,7 +427,7 @@ def score(model_id):
     n_beyond_holm = int(((joint.dm_clu < 0) & (joint.p_holm < .05)).sum())
     n_probe_pos_har = int((pr.rel_har > 0).sum())
     retain = [100.0 * j / e if abs(e) > 1e-12 else float("nan")
-              for j, e in zip(joint.rel_pct, ens_ref.rel_har)]
+              for j, e in zip(joint.rel_pct, ens_ref.rel_har, strict=False)]
 
     def sig(dm, p):
         return "**" if (dm < 0 and p < 0.05) else ""
@@ -782,7 +782,7 @@ def _selftest():
                 for h in HORIZONS:
                     sub = pan[pan.horizon_days == h].set_index("text_path")
                     fp = f_probe_by_h[h]
-                    for tp_, v_ in zip(sub.index, fp):
+                    for tp_, v_ in zip(sub.index, fp, strict=False):
                         self.lut.setdefault(tp_, {})[f"vol_{h}d"] = float(v_)
 
             def generate(self, records, retry=False):

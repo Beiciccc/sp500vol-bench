@@ -60,9 +60,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
-import os
 import tempfile
 import time
 from collections import Counter
@@ -78,12 +78,13 @@ REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "src"))
 sys.path.insert(0, str(REPO / "scripts" / "analysis"))
 
-import forecast_combination as fc  # noqa: E402
-from clustered_dm import dm_test_clustered  # noqa: E402
-from firm_identity_control import firm_means  # noqa: E402
-from maximal_reference import PRICE_MODELS, fit_apply_log, load_price_panel  # noqa: E402
-from sp500vol.evaluation.dm_test import dm_test  # noqa: E402
-from sp500vol.models.classical_text._fit_utils import (  # noqa: E402
+import forecast_combination as fc
+from clustered_dm import dm_test_clustered
+from firm_identity_control import firm_means
+from maximal_reference import PRICE_MODELS, fit_apply_log, load_price_panel
+
+from sp500vol.evaluation.dm_test import dm_test
+from sp500vol.models.classical_text._fit_utils import (
     fit_ridge_cv,
     maybe_exp,
     maybe_log,
@@ -160,7 +161,7 @@ def _count_chunk(texts: list[str], prune_hapax: bool) -> dict[str, int]:
     for t in texts:
         toks = TOKEN_RE.findall(t.lower())
         c.update(toks)
-        c.update(map(" ".join, zip(toks, toks[1:])))
+        c.update(map(" ".join, zip(toks, toks[1:], strict=False)))
     if prune_hapax:
         return {k: v for k, v in c.items() if v >= 2}
     return dict(c)
@@ -215,7 +216,7 @@ def stage_features(limit: int | None) -> None:
 
     def gen_count_tasks():
         for paths, texts in _iter_cache_chunks(needed, limit):
-            chunk = [t for p, t in zip(paths, texts) if p in train_paths]
+            chunk = [t for p, t in zip(paths, texts, strict=False) if p in train_paths]
             if chunk:
                 yield delayed(_count_chunk)(chunk, True)
 

@@ -23,8 +23,8 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import clustered_dm as cdm  # noqa: E402
-import forecast_combination as fc  # noqa: E402
+import clustered_dm as cdm
+import forecast_combination as fc
 
 RR_PATH = "results/tables/_realized_returns.parquet"
 KEY = ["ticker", "accession", "horizon_days"]
@@ -85,7 +85,7 @@ def main():
     for grp, s in [("ret_match_ok=True", vk), ("ret_match_ok=False", vd)]:
         rows.append(dict(part="bias_vol", metric="mean_label_vol", group=grp, value=float(s.mean())))
         rows.append(dict(part="bias_vol", metric="median_label_vol", group=grp, value=float(s.median())))
-        rows.append(dict(part="bias_vol", metric="n", group=grp, value=int(len(s))))
+        rows.append(dict(part="bias_vol", metric="n", group=grp, value=len(s)))
     rows.append(dict(part="bias_vol", metric="mean_diff_drop_minus_kept", group="drop-kept",
                      value=float(vd.mean() - vk.mean())))
     rows.append(dict(part="bias_vol", metric="median_diff_drop_minus_kept", group="drop-kept",
@@ -219,7 +219,7 @@ def main():
             genuine = bool((stat < 0) and (p < 0.05))
             cell = f"{disc}|{model}|h{h}"
             grp = f"{cell}|{label}"
-            rows.append(dict(part="impact", metric="n_obs", group=grp, value=int(len(dt))))
+            rows.append(dict(part="impact", metric="n_obs", group=grp, value=len(dt)))
             rows.append(dict(part="impact", metric="n_days", group=grp, value=int(ndays)))
             rows.append(dict(part="impact", metric="qlike_R", group=grp, value=qR))
             rows.append(dict(part="impact", metric="qlike_U", group=grp, value=qU))
@@ -259,7 +259,7 @@ def main():
                         else "contradicted (dropped rows are HIGHER-vol)")
 
     lines = []
-    lines.append(f"# G3 — return-join drop bias diagnosis\n")
+    lines.append("# G3 — return-join drop bias diagnosis\n")
     lines.append(
         f"**HEADLINE: the ~8% dropped rows ARE systematically different — the reviewer's "
         f"low-vol allegation is {reviewer_verdict} (dropped filings mean label vol "

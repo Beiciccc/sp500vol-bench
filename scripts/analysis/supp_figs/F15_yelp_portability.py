@@ -41,17 +41,28 @@ import os
 import re
 import sys
 
-import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from supp_style import (apply_style, finish, gate, annot, note, BLUE, SKY,  # noqa: E402
-                        VERM, VERM_TXT, GREEN, YELLOW, PURPLE, GREY, LIGHT,
-                        INK, INK2, RULE, TAB, AGG, REPO)
-
-import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib.lines import Line2D  # noqa: E402
-from matplotlib.patches import Patch  # noqa: E402
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
+from supp_style import (
+    BLUE,
+    GREY,
+    INK,
+    INK2,
+    LIGHT,
+    RULE,
+    TAB,
+    VERM,
+    VERM_TXT,
+    annot,
+    apply_style,
+    finish,
+    gate,
+    note,
+)
 
 # --------------------------------------------------------------- load evidence
 CAS = pd.read_csv(os.path.join(TAB, "yelp_cascade.csv"))
@@ -106,7 +117,7 @@ gate(
         "swap_h3_row5_p": 0.047,
     },
     {
-        "n_rungs": int(H1.row.nunique()), "n_arm_rows": int(len(ARM)),
+        "n_rungs": int(H1.row.nunique()), "n_arm_rows": len(ARM),
         "ladder_h1": tuple(round(float(v), 3) for v in H1.delta_rel_pct),
         "ladder_h3": tuple(round(float(v), 3) for v in H3.delta_rel_pct),
         "mde_ar": (MDE_AR[1], MDE_AR[3]), "mde_entity": (MDE_ENT[1], MDE_ENT[3]),

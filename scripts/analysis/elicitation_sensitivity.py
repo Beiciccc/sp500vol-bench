@@ -25,8 +25,8 @@ import pandas as pd
 from scipy import stats
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
-import clustered_dm as cdm  # noqa: E402
+import clustered_dm as cdm
+import forecast_combination as fc
 
 KEY = ["ticker", "accession", "horizon_days"]
 ARMS = [("base_rep1", "raw_elic_rep1", None), ("rep2", "raw_elic_rep2", None),

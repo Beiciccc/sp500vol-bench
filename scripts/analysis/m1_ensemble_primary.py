@@ -34,9 +34,10 @@ from scipy import stats
 
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
-import forecast_combination as fc  # noqa: E402
-from clustered_dm import daily_mean, dm_test_clustered, mbb_ci_daily  # noqa: E402
-from sp500vol.evaluation.dm_test import _hac_variance  # noqa: E402
+import forecast_combination as fc
+from clustered_dm import daily_mean, dm_test_clustered, mbb_ci_daily
+
+from sp500vol.evaluation.dm_test import _hac_variance
 
 KEY = fc.KEY
 SORT = fc.SORT
@@ -203,7 +204,7 @@ def main():
     # ---- SANITY (a): single-seed rows must reproduce the original grid exactly ----
     single = df[df.n_seeds == 1]
     sanity = {
-        "n_single_seed_cells": int(len(single)),
+        "n_single_seed_cells": len(single),
         "max_abs_diff_qlike_R": float((single.vol_qlike_R - single.orig_qlike_R).abs().max()),
         "max_abs_diff_qlike_U": float((single.vol_qlike_U - single.orig_qlike_U).abs().max()),
         "max_abs_diff_g_log": float((single.g_log - single.orig_g_log).abs().max()),

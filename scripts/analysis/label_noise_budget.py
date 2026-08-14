@@ -45,6 +45,7 @@ import pandas as pd
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 import os
+
 # Set SP500VOL_DATA_ROOT to your regenerated data root; the default is the
 # repo-relative layout the release package documents.
 DATA = pathlib.Path(os.environ.get("SP500VOL_DATA_ROOT",

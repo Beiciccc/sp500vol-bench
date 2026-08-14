@@ -4,9 +4,9 @@ Writes results/figures/fig_leaderboard.{png,pdf}.
 """
 import json
 import os
-import sys
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -48,7 +48,7 @@ lf["block"] = lf.model.apply(block_of)
 plt.rcParams.update({"font.size": 11, "axes.titlesize": 12, "axes.labelsize": 11})
 fig, axes = plt.subplots(3, 1, figsize=(13, 15), sharex=False)
 
-for ax, h in zip(axes, HORIZONS):
+for ax, h in zip(axes, HORIZONS, strict=False):
     sub = lf[lf.horizon == h].copy()
     # sort within block by qlike ascending (best first), block order A,B,C,D
     sub["block_rank"] = sub.block.map({"A": 0, "B": 1, "C": 2, "D": 3})

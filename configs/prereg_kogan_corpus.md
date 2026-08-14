@@ -75,7 +75,7 @@ G-K0:六文件 SHA-256 记入产物;行数与 key 空间一致性断言。
 
 `results/tables/kogan_corpus_audit.{csv,md}`(单发守卫)+ `scripts/analysis/kogan_corpus_audit.py`
 + 抓取脚本(数据不再分发,仅管线)。CPU-only,预计 2–3 小时机时。
-时间戳 = 本 tag(建议投稿前 OSF 存证,双盲版)。
+时间戳 = 本 tag(建议同步 OSF 存证)。
 
 
 ## v1.1 记录(2026-07-17,**在统计量产生之后**——故这是记录,不是修改)

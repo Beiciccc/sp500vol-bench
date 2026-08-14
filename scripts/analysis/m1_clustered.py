@@ -32,11 +32,11 @@ import pandas as pd
 from scipy import stats
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
-from clustered_dm import daily_mean, dm_test_clustered, mbb_ci_daily  # noqa: E402
+import forecast_combination as fc
+from clustered_dm import daily_mean, dm_test_clustered, mbb_ci_daily
 
 sys.path.insert(0, "src")
-from sp500vol.evaluation.dm_test import dm_test, _hac_variance  # noqa: E402
+from sp500vol.evaluation.dm_test import _hac_variance, dm_test
 
 KEY = ["ticker", "accession", "horizon_days"]
 SORT = ["filing_time_utc", "ticker", "accession"]

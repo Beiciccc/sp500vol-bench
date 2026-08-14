@@ -49,7 +49,7 @@ import argparse
 import hashlib
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
@@ -57,14 +57,13 @@ os.chdir(REPO)  # fc.load & committed tables use repo-root-relative paths
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
 
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
+import forecast_combination as fc
+import matched_firm_swap as mfs
+import numpy as np
+import pandas as pd
+from withindate_placebo import day_key
 
-import forecast_combination as fc  # noqa: E402
-import matched_firm_swap as mfs  # noqa: E402  (THE committed pairing function)
-from withindate_placebo import day_key  # noqa: E402  (THE committed day key)
-
-from sp500vol.utils.paths import data_path  # noqa: E402
+from sp500vol.utils.paths import data_path
 
 DISC = "long_form"
 SORT = fc.SORT
@@ -143,7 +142,7 @@ def build_manifest(panel: pd.DataFrame, horizons=HORIZONS,
                   - np.log(sw.rv_val_partner.clip(lower=fc.EPS))).abs()
             spread = float(rv_map.std())
             stats.append({
-                "split": split, "h": int(h), "n_rows": int(len(d)),
+                "split": split, "h": int(h), "n_rows": len(d),
                 "n_swapped": int(sw.shape[0]), "swap_frac": float(frac),
                 "pair_absdiff_rv_median": float(dd.median()),
                 "pair_absdiff_rv_mean": float(dd.mean()),
@@ -192,7 +191,7 @@ def assert_arm_coverage(panel: pd.DataFrame) -> dict:
         txt = fc.load(arm, DISC)[key]
         merged = base.merge(txt.drop_duplicates(), on=key, how="inner")
         ok = len(merged) == len(base)
-        out[arm] = {"panel_rows": int(len(base)), "merged_rows": int(len(merged)), "covers": ok}
+        out[arm] = {"panel_rows": len(base), "merged_rows": len(merged), "covers": ok}
         if not ok:
             raise SystemExit(f"[build] FATAL: arm {arm} does not cover the HAR panel "
                              f"({len(merged)}/{len(base)}) — per-arm manifests required")
@@ -227,7 +226,7 @@ def main() -> int:
     if dup:
         raise SystemExit(f"[build] FATAL: {dup} duplicate (split,h,accession) manifest rows")
 
-    print(f"\n[build] level-preservation (paired |Δ val-RV|) — the G2 material:")
+    print("\n[build] level-preservation (paired |Δ val-RV|) — the G2 material:")
     sdf = pd.DataFrame(stats)
     with pd.option_context("display.width", 200, "display.max_columns", 20):
         print(sdf.round(6).to_string(index=False))
@@ -253,13 +252,13 @@ def main() -> int:
         "prereg": "configs/prereg_swap_lf_and_anon.md §E-lf (prereg-ea-v1.0)",
         "smoke": args.smoke,
         "panel_rows_by_split": {k: int(v) for k, v in n_by_split.items()},
-        "manifest_rows": int(len(manifest)),
+        "manifest_rows": len(manifest),
         "manifest_sha256": sha,
         "pairing_source": "scripts/analysis/matched_firm_swap.matched_swap (imported verbatim)",
         "level_preservation_stats": stats,
         "gate_checks": checks,
         "arms": list(ARMS),
-        "generated_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "generated_utc": datetime.now(UTC).isoformat(timespec="seconds"),
     }
     meta_path = out_path.with_name(out_path.stem + "_meta.json")
     meta_path.write_text(json.dumps(meta, indent=2))

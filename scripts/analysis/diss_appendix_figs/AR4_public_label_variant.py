@@ -25,9 +25,20 @@ import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-import diss_style as ds  # noqa: E402
-from supp_style import (BLUE, GREEN, GREY, LIGHT, PURPLE, TAB, VERM,  # noqa: E402
-                        VERM_TXT, YELLOW, apply_style, gate)
+import diss_style as ds
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    LIGHT,
+    PURPLE,
+    TAB,
+    VERM,
+    VERM_TXT,
+    YELLOW,
+    apply_style,
+    gate,
+)
 
 
 def main():
@@ -71,7 +82,7 @@ def main():
         "genuine_A": int(combo[combo.panel == "A"].genuine.sum()),
         "genuine_C": int(combo[combo.panel == "C"].genuine.sum()),
         "leaderboard_flips": int(lb.verdict_flip_vs_A.sum()),
-        "leaderboard_cells": int(len(lb[lb.panel == "B"])),
+        "leaderboard_cells": len(lb[lb.panel == "B"]),
     }
     gate({"rows": 431245, "coverage_clean_pct": 80.19, "active_cov_pct": 97.7,
           "exit_cov_pct": 31.9, "tickers": 848, "no_public": 200,
@@ -109,11 +120,11 @@ def main():
     ax.text(0.0, got["coverage_clean_pct"] + 2.5,
             f"all benchmark rows: {got['coverage_clean_pct']:.1f}%", ha="left",
             va="bottom", fontsize=9, color=GREY)
-    for x, v in zip(xs, vals):
+    for x, v in zip(xs, vals, strict=False):
         ax.text(x, v + 1.6, f"{v:.0f}", ha="center", va="bottom", fontsize=9,
                 color=GREY)
     ax.set_xticks(xs)
-    ax.set_xticklabels([f"{a}\n{int(n) / 1000:.0f}k" for a, n in zip(labs, rows)],
+    ax.set_xticklabels([f"{a}\n{int(n) / 1000:.0f}k" for a, n in zip(labs, rows, strict=False)],
                        fontsize=9, linespacing=1.25)
     ax.set_xlim(-0.7, len(vals) - 0.3)
     ax.set_ylim(0, 112)
@@ -152,7 +163,7 @@ def main():
     # leaves 7 units of gap between them.  At the old fixed stops the third
     # entry ran into the fourth swatch.  A share large enough to carry its own
     # in-bar label does not repeat it here.
-    for x0, (lab, n, colour) in zip([0.8, 18.2, 41.7, 76.5], parts):
+    for x0, (lab, n, colour) in zip([0.8, 18.2, 41.7, 76.5], parts, strict=False):
         share = 100 * n / cov.n_rows
         key.scatter([x0], [0], marker="s", s=42, color=colour)
         key.text(x0 + 1.6, 0, lab if share > 10 else f"{lab}  {share:.1f}%",

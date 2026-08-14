@@ -6,7 +6,11 @@ figures/icons/ (then rerun: slots auto-fill, PNG or SVG).
 Targets: <=130 in-figure words; fonts >=25px (7.04pt at \textwidth); viewBox
 1800x531 (~2.08in print) — verified: body still ends on p7, References open p8.
 """
-import os, re, subprocess, tempfile, base64
+import base64
+import os
+import re
+import subprocess
+import tempfile
 
 FIG = "writing/paper/figures"
 ICO = f"{FIG}/icons"
@@ -40,8 +44,9 @@ def _norm_png(path, name):
     square-pad 6%, downsample to 256px (raw 1024px x 1.4MB each would bloat the
     PDF ~20MB). When COLORFUL_ICONS is False, additionally flatten to the family
     slate (#2F3B4C; crimson for flag_trap) — legacy line-art mode."""
-    from PIL import Image
     import io
+
+    from PIL import Image
     im=Image.open(path).convert("RGBA")
     a=im.split()[3]
     if not COLORFUL_ICONS:

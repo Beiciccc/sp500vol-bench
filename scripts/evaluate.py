@@ -3,7 +3,6 @@
 Usage:
     python scripts/evaluate.py --run-id 20260601-120000_C2_finbert_s3_combined_seed2026
 """
-# ruff: noqa: E402
 
 from __future__ import annotations
 

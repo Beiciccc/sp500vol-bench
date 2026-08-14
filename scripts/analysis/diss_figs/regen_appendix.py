@@ -37,8 +37,8 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
-import regen  # noqa: E402
-import diss_style as ds  # noqa: E402
+import diss_style as ds
+import regen
 
 # Same shape as regen.SPECS.  `w` is pinned to the generator's own width in
 # every case: these five wrap their note blocks against a character count tuned

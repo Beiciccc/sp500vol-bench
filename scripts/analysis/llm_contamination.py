@@ -33,8 +33,8 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
-import clustered_dm as cdm  # noqa: E402
+import clustered_dm as cdm
+import forecast_combination as fc
 
 KEY = fc.KEY
 EPS = 1e-8
@@ -172,7 +172,7 @@ def main():
     ftx = var_df[var_df.arm == "fulltext"][["disc", "h", "n_test", "rel_pct", "dm_clu", "p_raw"]]
     chk = cfq.merge(ftx, on=["disc", "h"], suffixes=("_cf", "_here"))
     sanity = {
-        "n_cells_compared": int(len(chk)),
+        "n_cells_compared": len(chk),
         "max_abs_diff_rel_pct": float((chk.rel_har - chk.rel_pct).abs().max()),
         "max_abs_diff_dm": float((chk.dm_har - chk.dm_clu).abs().max()),
         "max_abs_diff_p": float((chk.p_har - chk.p_raw).abs().max()),

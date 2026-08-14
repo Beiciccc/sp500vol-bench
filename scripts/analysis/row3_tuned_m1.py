@@ -54,8 +54,8 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
-from clustered_dm import dm_test_clustered  # noqa: E402
+import forecast_combination as fc
+from clustered_dm import dm_test_clustered
 
 KEY = ["ticker", "accession", "horizon_days"]
 SORT = ["filing_time_utc", "ticker", "accession"]

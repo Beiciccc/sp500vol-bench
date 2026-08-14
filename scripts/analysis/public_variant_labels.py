@@ -74,24 +74,24 @@ for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
            "VECLIB_MAXIMUM_THREADS", "NUMEXPR_NUM_THREADS"):
     os.environ.setdefault(_v, _THREADS)
 
-import json  # noqa: E402
-import sys  # noqa: E402
-import time  # noqa: E402
-from concurrent.futures import ThreadPoolExecutor, as_completed  # noqa: E402
-from pathlib import Path  # noqa: E402
+import json
+import sys
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
 
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
-from scipy import stats  # noqa: E402
+import numpy as np
+import pandas as pd
+from scipy import stats
 
 REPO = Path(__file__).resolve().parents[2]
 os.chdir(REPO)
 sys.path.insert(0, str(REPO / "src"))
 sys.path.insert(0, str(REPO / "scripts" / "analysis"))
 
-import label_parity as lp  # noqa: E402  (fetch_one, squared_series, compute_labels, ...)
-import forecast_combination as fc  # noqa: E402
-from rangebased_labels import TickerSeries, _dt  # noqa: E402
+import forecast_combination as fc
+import label_parity as lp
+from rangebased_labels import TickerSeries, _dt
 
 DATA = Path(os.environ.get("SP500VOL_DATA_ROOT", "/Volumes/Z/sp500vol-data"))
 SCRATCH = Path(os.environ.get("SP500VOL_SCRATCH", tempfile.gettempdir())) / "public_prices"
@@ -131,7 +131,7 @@ def fetch_public_prices(tickers: list[str]) -> tuple[pd.DataFrame, pd.DataFrame]
         for fut in as_completed(futs):
             tkr, st_, df = fut.result()
             status.append({"ticker": tkr, "status": st_,
-                           "n_days": 0 if df is None else int(len(df)),
+                           "n_days": 0 if df is None else len(df),
                            "first": None if df is None else str(df.date.min().date()),
                            "last": None if df is None else str(df.date.max().date())})
             if df is not None:
@@ -191,8 +191,8 @@ def gate_l1c_mask_consistency(masked: pd.DataFrame, sq_pub: dict, cal) -> None:
     if n_pat != 0 or worst != 0.0:
         raise AssertionError(f"GATE L1c FAILED: mask divergence (pattern={n_pat}, "
                              f"max|diff|={worst}) between feature and label series")
-    print(f"[L1c] mask consistency: feature-side masked set regenerates the label-side "
-          f"squared series exactly (pattern mismatches=0, max|diff|=0.0) -> PASS")
+    print("[L1c] mask consistency: feature-side masked set regenerates the label-side "
+          "squared series exactly (pattern mismatches=0, max|diff|=0.0) -> PASS")
 
 
 # --------------------------------------------------------------------------- #
@@ -363,10 +363,10 @@ def main() -> int:
     by_exit = []
     for ey, g in af.groupby("exit_year"):
         by_exit.append({"exit_year": ey, "n_firms": int(g.ticker.nunique()),
-                        "n_rows": int(len(g)),
+                        "n_rows": len(g),
                         "coverage_clean": float(g.y_pub_clean.notna().mean())})
     af["filing_year"] = pd.DatetimeIndex(af.effective_trading_day).year
-    by_fy = [{"year": int(fy), "n_rows": int(len(g)),
+    by_fy = [{"year": int(fy), "n_rows": len(g),
               "coverage_clean": float(g.y_pub_clean.notna().mean())}
              for fy, g in af.groupby("filing_year")]
     ex_rows = af[af.exit_year != "active"]
@@ -379,7 +379,7 @@ def main() -> int:
     split_cov = {}
     for split in ("train", "val", "test"):
         s = mod[mod.split == split]
-        split_cov[split] = {"n_rows": int(len(s)),
+        split_cov[split] = {"n_rows": len(s),
                             "n_covered": int(s.y_pub_clean.notna().sum()),
                             "coverage_clean": float(s.y_pub_clean.notna().mean())}
     print("    per-split clean coverage (modelled panel): " +
@@ -405,7 +405,7 @@ def main() -> int:
             ss = s[oks]
             pe = float(stats.pearsonr(np.log(ss.label_realised_vol), np.log(ss.y_pub_clean))[0]) \
                 if len(ss) >= 30 else float("nan")
-            by_split_h.append({"split": split, "h": h, "n": int(len(ss)), "pearson": pe})
+            by_split_h.append({"split": split, "h": h, "n": len(ss), "pearson": pe})
 
     # ---------------- G3: refetch drift vs committed label_parity.csv ----------------
     ref = committed_reference()
@@ -416,7 +416,7 @@ def main() -> int:
         "pearson_now": pearson, "pearson_committed": ref["pearson"],
         "pearson_drift": pearson - ref["pearson"],
         "spearman_now": spearman, "spearman_committed": ref["spearman"],
-        "parity_n_now": int(len(d)), "parity_n_committed": ref["parity_n"],
+        "parity_n_now": len(d), "parity_n_committed": ref["parity_n"],
         "n_yahoo_ok_now": n_ok, "n_yahoo_ok_committed": ref["n_yahoo_ok"],
         "n_mismatch_now": len(mm_t), "n_mismatch_committed": ref["n_mismatch"],
         "mismatch_added_vs_committed": sorted(mm_t - ref["mismatch_tickers"]),
@@ -455,7 +455,7 @@ def main() -> int:
     feat_ok = (np.isfinite(pf["f1d"]) & np.isfinite(pf["f5d"]) & np.isfinite(pf["f22d"]))
     rs_ok = np.isfinite(pf["rsn"]) & np.isfinite(pf["rsp"])
     cov_out = {
-        "panel_rows": int(len(af)),
+        "panel_rows": len(af),
         "rows_covered_label": n_cov_parquet,
         "rows_label_missing": int(len(af) - n_cov_parquet),
         "reasons": {k: int(v) for k, v in reasons.items()},
@@ -495,7 +495,7 @@ def main() -> int:
                                     "pass": True},
             "L1c_mask_consistency": "PASS (exact)",
             "L2_a2_qlike_anchor": "PASS (aborts otherwise; label_parity.gate2_qlike)",
-            "G2_parity": {"n": int(len(d)), "pearson_logRV": pearson,
+            "G2_parity": {"n": len(d), "pearson_logRV": pearson,
                           "spearman_logRV": spearman, "gate_min": G2_MIN, "pass": True},
             "G3_coverage_reconciliation": "covered rows in parquet == coverage table (assert)",
         },

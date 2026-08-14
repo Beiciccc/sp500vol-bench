@@ -69,7 +69,7 @@ import hashlib
 import json
 import sys
 import tempfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
@@ -77,12 +77,11 @@ os.chdir(REPO)  # fc.load & friends use repo-root-relative paths
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
 
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
-
-import forecast_combination as fc  # noqa: E402
-from clustered_dm import dm_test_clustered  # noqa: E402
-from withindate_placebo import day_key, permute_within_day  # noqa: E402
+import forecast_combination as fc
+import numpy as np
+import pandas as pd
+from clustered_dm import dm_test_clustered
+from withindate_placebo import day_key, permute_within_day
 
 # ---------------------------------------------------------------------------
 # Frozen constants (protocol §1-§3)
@@ -421,7 +420,7 @@ def evaluate(panels, horizons):
         df.loc[i, ["placebo_ls_dm", "placebo_wd_dm"]] = [ls_m, wd_m]
         df.loc[i, "placebo_ls_pass"] = ls_ok
         df.loc[i, "placebo_wd_pass"] = wd_ok
-    df["gate_pass"] = df.flagged & (df.placebo_ls_pass == True) & (df.placebo_wd_pass == True)  # noqa: E712
+    df["gate_pass"] = df.flagged & (df.placebo_ls_pass == True) & (df.placebo_wd_pass == True)
     return df
 
 
@@ -465,7 +464,7 @@ def write_outputs(df, branch, std_win, cas_gen, sanities, winners, out_csv, out_
     out_csv.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(out_csv, index=False)
 
-    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    now = datetime.now(UTC).isoformat(timespec="seconds")
     md = [
         "# HPO tuned-arm — the ONE-SHOT pre-registered test evaluation "
         "(hpo-pretest-v1.0)",
@@ -475,7 +474,7 @@ def write_outputs(df, branch, std_win, cas_gen, sanities, winners, out_csv, out_
         "disclosures, §5 single-shot discipline). This file is written ONCE; "
         "the script refuses a second run.",
         "",
-        f"Winners: " + ", ".join(f"{t} = trial {w}" for t, w in sorted(winners.items()))
+        "Winners: " + ", ".join(f"{t} = trial {w}" for t, w in sorted(winners.items()))
         + f"; seeds {SEEDS}, rung {RUNG} checkpoints.",
         "",
         "## Ensemble-rule disclosure (protocol §1)",
@@ -760,7 +759,7 @@ def main():
         h_csv = hashlib.sha256(OUT_CSV.read_bytes()).hexdigest() if OUT_CSV.exists() else "absent"
         h_md = hashlib.sha256(OUT_MD.read_bytes()).hexdigest() if OUT_MD.exists() else "absent"
         rerun_note = (f"- --i-know-this-violates-prereg supplied at "
-                      f"{datetime.now(timezone.utc).isoformat(timespec='seconds')}.\n"
+                      f"{datetime.now(UTC).isoformat(timespec='seconds')}.\n"
                       f"- Overwritten artifacts: csv sha256={h_csv}; md sha256={h_md}.")
 
     panels, sanities, winners = load_real_inputs()

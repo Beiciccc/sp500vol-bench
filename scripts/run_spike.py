@@ -17,7 +17,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
-from sp500vol.utils.paths import data_path  # noqa: E402
+from sp500vol.utils.paths import data_path
 
 RUN_ID = "A2_har_rv_sample_combined_seed2026"
 REPORT_PATH = REPO_ROOT / "results" / "spike_report.md"

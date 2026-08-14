@@ -230,7 +230,7 @@ def finish(fig, name, tight=True):
                     "-dNoOutputFonts", "-o", out, raw], check=True)
     os.remove(raw)
 
-    fonts = subprocess.run(["pdffonts", out], capture_output=True, text=True)
+    fonts = subprocess.run(["pdffonts", out], check=False, capture_output=True, text=True)
     n = len([ln for ln in fonts.stdout.splitlines()[2:] if ln.strip()])
     if n:
         sys.exit(f"FONT GATE FAIL — {out} still embeds {n} font(s)")

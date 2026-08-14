@@ -98,9 +98,9 @@ for tag, name in FAM:
         narr_raw=int(((narr.rel_firm_pct > 0) & (narr.dm_firm < 0)
                       & (narr.p_firm < 0.05)).sum()),
         narr_holm=int((nar_part.p_firm_holm < 0.05).sum()),
-        n_narr_cells=int(len(nar_part)),
+        n_narr_cells=len(nar_part),
         holm_all=int((part.p_firm_holm < 0.05).sum()),
-        n_part_cells=int(len(part)))
+        n_part_cells=len(part))
 
 # ------------------------------------------------------------------- gate
 gate(

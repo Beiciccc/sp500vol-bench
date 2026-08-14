@@ -31,12 +31,21 @@ import pandas as pd
 ANALYSIS = "scripts/analysis"
 sys.path.insert(0, ANALYSIS)
 
-from supp_style import (apply_style, gate, BLUE, SKY, VERM, VERM_TXT,  # noqa: E402
-                        GREEN, YELLOW, PURPLE, GREY, LIGHT, TAB, REPO,
-                        INK2, RULE)
-import diss_style as ds  # noqa: E402
-
-import matplotlib.pyplot as plt  # noqa: E402
+import diss_style as ds
+import matplotlib.pyplot as plt
+from supp_style import (
+    BLUE,
+    GREY,
+    INK2,
+    LIGHT,
+    RULE,
+    SKY,
+    TAB,
+    VERM,
+    VERM_TXT,
+    apply_style,
+    gate,
+)
 
 # ---------------------------------------------------------------- evidence
 casc = pd.read_csv(os.path.join(TAB, "yelp_cascade.csv"))
@@ -121,7 +130,7 @@ big = [
     ("4  chronological, AR + business\n     mean, zero text  vs. recal. AR", 4),
 ]
 yb = np.arange(len(big))[::-1]
-for y, (lab, row) in zip(yb, big):
+for y, (lab, row) in zip(yb, big, strict=False):
     if row == 1:                                   # the zero-text recovery
         for k, h in enumerate((1, 3)):
             v = cell(row, h) * rec[h] / 100.0
@@ -168,7 +177,7 @@ small = [
     ("5  AR + business mean + text\n     vs. AR + business mean", 5, "entity"),
 ]
 ys = np.arange(len(small))[::-1]
-for y, (lab, row, stage) in zip(ys, small):
+for y, (lab, row, stage) in zip(ys, small, strict=False):
     for k, (h, col) in enumerate(((1, H1), (3, H3))):
         v = cell(row, h)
         off = BARH / 1.9 if k == 0 else -BARH / 1.9
@@ -197,7 +206,7 @@ axB.set_xlabel("change in mean squared error vs. that row's reference, %")
 yc = np.array([6, 5, 4, 2, 1, 0])
 labels = ARMS + ARMS
 
-for y, (h, arm) in zip(yc, [(h, a) for h in (1, 3) for a in ARMS]):
+for y, (h, arm) in zip(yc, [(h, a) for h in (1, 3) for a in ARMS], strict=False):
     va = dj(SPLIT_A, arm, h, "rel_vs_recalAR")
     vb = dj(SPLIT_B, arm, h, "rel_vs_recalAR")
     pa = dj(SPLIT_A, arm, h, "p_month")

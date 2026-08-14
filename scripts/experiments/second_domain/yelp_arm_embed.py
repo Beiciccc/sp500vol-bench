@@ -125,7 +125,7 @@ def cmd_fit(args) -> None:
     ntot, d = sum(s[0] for s in shapes), shapes[0][1]
     X = np.empty((ntot, d), dtype=np.float32)          # preallocate once (no vstack doubling)
     off = 0
-    for kf, s in zip(kfs, shapes):
+    for kf, s in zip(kfs, shapes, strict=False):
         src = np.load(emb_dir / f"emb_{kf.stem.split('_')[1]}.npy")
         X[off:off + s[0]] = src
         off += s[0]

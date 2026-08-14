@@ -52,7 +52,7 @@ import sys
 import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from supp_style import TAB, gate  # noqa: E402
+from supp_style import TAB, gate
 
 dm = pd.read_csv(os.path.join(TAB, "dm_pairwise_clustered.csv"))
 tw = pd.read_csv(os.path.join(TAB, "twoway_cluster.csv"))

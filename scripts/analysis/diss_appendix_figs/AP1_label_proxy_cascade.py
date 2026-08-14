@@ -33,11 +33,22 @@ import pandas as pd
 ANALYSIS = "scripts/analysis"
 sys.path.insert(0, ANALYSIS)
 
-from supp_style import (apply_style, gate, BLUE, SKY, VERM, VERM_TXT,  # noqa: E402
-                        GREEN, YELLOW, GREY, LIGHT, TAB, INK, INK2, RULE)
-import diss_style as ds  # noqa: E402
-
-import matplotlib.pyplot as plt  # noqa: E402
+import diss_style as ds
+import matplotlib.pyplot as plt
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    INK,
+    INK2,
+    LIGHT,
+    RULE,
+    TAB,
+    VERM,
+    YELLOW,
+    apply_style,
+    gate,
+)
 
 # ---------------------------------------------------------------- evidence
 d = pd.read_csv(os.path.join(TAB, "rangebased_cascade.csv"))
@@ -107,7 +118,7 @@ for j, (name, col, hatch) in enumerate(SER):
     axA.bar(xs, counts[name], width=bw, color=col, hatch=hatch,
             edgecolor="white", linewidth=0.6, label=name.replace("--", "–"),
             zorder=3)
-    for x, v in zip(xs, counts[name]):
+    for x, v in zip(xs, counts[name], strict=False):
         axA.text(x, v + 0.9, str(v), ha="center", va="bottom", fontsize=9.7,
                  color=GREY, zorder=4)
 axA.set_xticks(range(4))
@@ -134,7 +145,7 @@ axA.annotate("the pool rung RISES\nwhile the others fall",
 dd = d.sort_values("old_rel").reset_index(drop=True)
 xs = range(len(dd))
 axB.axhline(0, color=GREY, linewidth=0.7, zorder=2)
-for x, (_, r) in zip(xs, dd.iterrows()):
+for x, (_, r) in zip(xs, dd.iterrows(), strict=False):
     axB.plot([x, x], [r.old_rel, r.pk_primary_rel], color=LIGHT,
              linewidth=0.9, zorder=1, solid_capstyle="butt")
 axB.scatter(xs, dd.old_rel, s=13, color=BLUE, zorder=3, linewidths=0,
@@ -176,7 +187,7 @@ axC.axvline(surv.pk_mde, color=GREY, linewidth=0.9, linestyle=(0, (3, 2)),
             zorder=4)
 axC.text(surv.pk_mde + 0.08, 2.62, f"MDE {surv.pk_mde:.2f} %",
          fontsize=9.7, color=GREY, ha="left", va="center")
-for y, v in zip(ys, vals):
+for y, v in zip(ys, vals, strict=False):
     inside = v > 0.9
     axC.text(v - 0.09 if inside else v + 0.075, y, f"{v:+.3f} %",
              fontsize=9.7, va="center", ha="right" if inside else "left",
@@ -195,7 +206,7 @@ axC.set_axisbelow(True)
 RANK = {"Committed": (3.67, 0), "Parkinson": (1.50, 3)}
 axD.barh([1, 0], [RANK["Committed"][0], RANK["Parkinson"][0]], height=0.46,
          color=[BLUE, VERM], zorder=3, edgecolor="white", linewidth=0.6)
-for y, k2 in zip([1, 0], ["Committed", "Parkinson"]):
+for y, k2 in zip([1, 0], ["Committed", "Parkinson"], strict=False):
     mean, first = RANK[k2]
     axD.text(mean + 0.10, y, f"{mean:.2f}", fontsize=9.7, va="center",
              color=GREY)

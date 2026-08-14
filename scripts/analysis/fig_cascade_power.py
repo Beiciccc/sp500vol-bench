@@ -71,7 +71,7 @@ recovery = {lvl: int(rec[lvl]) for lvl in (0.3, 0.5, 1.0)}
 fi = pd.read_csv(os.path.join(TAB, "firm_identity_ensemble.csv"))
 _g = fi.groupby(["disc", "h"]).firm_beats_fR.sum()
 ZEROTEXT_GROUPS = int((_g > 0).sum())      # 4
-ZEROTEXT_TOTAL_GROUPS = int(len(_g))       # 6
+ZEROTEXT_TOTAL_GROUPS = len(_g)       # 6
 ZEROTEXT_CELLS = int(fi.firm_beats_fR.sum())  # 53, kept for the gate only
 
 # ------------------------------------------------------- gates (paper-bound)
@@ -126,7 +126,7 @@ ax.axvspan(3.58, 4.92, color="#F2F2F2", zorder=0)
 # the money number "0" is the largest glyph in the chart — typographic
 # emphasis, no color (warm hues stay reserved for the injected-signal system)
 INK = "#1A1A1A"
-for x, v in zip(xs[:4], vals[:4]):
+for x, v in zip(xs[:4], vals[:4], strict=False):
     if x == 1:
         ax.text(x - 0.06, v + 1.5, str(v), ha="right", va="bottom",
                 fontsize=10, fontweight="bold", color=INK)

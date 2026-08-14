@@ -41,7 +41,7 @@ Run:  .venv/bin/python scripts/experiments/second_domain/yelp_entity_disjoint.py
 from __future__ import annotations
 
 import hashlib
-import json
+import importlib.util as _ilu
 from pathlib import Path
 
 import numpy as np
@@ -50,7 +50,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import Ridge
 from sklearn.preprocessing import StandardScaler
 
-import importlib.util as _ilu
 _spec = _ilu.spec_from_file_location(
     "yproto", str(Path(__file__).with_name("yelp_protocol.py")))
 _yproto = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_yproto)

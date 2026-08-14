@@ -32,7 +32,7 @@ import pandas as pd
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/analysis"))
-import forecast_combination as fc  # noqa: E402
+import forecast_combination as fc
 
 KEY = ["ticker", "accession", "horizon_days"]
 SORT = ["filing_time_utc", "ticker", "accession"]

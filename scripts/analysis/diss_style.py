@@ -83,10 +83,10 @@ from supp_style import (  # noqa: F401  (re-exported: the two documents share on
     VERM_TXT,
     YELLOW,
     annot,
-    note,
-    panel,
     apply_style,
     gate,
+    note,
+    panel,
     shutil_which_gs,
 )
 
@@ -197,8 +197,7 @@ def canvas(height_in, width_in=DISS_W, max_h=MAX_H):
     at `width=\\textwidth`, so a common canvas width is what makes the rendered
     text size common across figures too.
     """
-    if height_in > max_h:
-        height_in = max_h
+    height_in = min(height_in, max_h)
     return (width_in, height_in)
 
 
@@ -253,7 +252,7 @@ def finish(fig, name, tight=True, max_render_pt=None, note=""):
                     "-dNoOutputFonts", "-o", out, raw], check=True)
     os.remove(raw)
 
-    fonts = subprocess.run(["pdffonts", out], capture_output=True, text=True)
+    fonts = subprocess.run(["pdffonts", out], check=False, capture_output=True, text=True)
     n = len([ln for ln in fonts.stdout.splitlines()[2:] if ln.strip()])
     if n:
         sys.exit(f"FONT GATE FAIL — {out} still embeds {n} font(s)")

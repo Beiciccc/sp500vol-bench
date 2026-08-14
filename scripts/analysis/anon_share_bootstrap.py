@@ -50,7 +50,7 @@ import argparse
 import sys
 import time
 import warnings
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
@@ -61,7 +61,7 @@ os.chdir(REPO)
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
 
-import forecast_combination as fc  # noqa: E402
+import forecast_combination as fc
 
 KEY = ["ticker", "accession", "horizon_days"]
 DISC = "event_driven"
@@ -134,7 +134,7 @@ def cell_series(vu: pd.DataFrame, teu: pd.DataFrame,
     S_dU_m = np.add.reduceat(dU_m[order], starts)
     return dict(days=uniq, S_qR=S_qR, S_dU_u=S_dU_u, S_dU_m=S_dU_m,
                 rel_u=float(rel_u), rel_m=float(rel_m), share=float(share),
-                n_days=int(len(uniq)), n_test=int(len(teu)))
+                n_days=len(uniq), n_test=len(teu))
 
 
 def load_cell(a2: pd.DataFrame, tu: pd.DataFrame, tm: pd.DataFrame,
@@ -186,7 +186,7 @@ def summarise(name: str, arm: str, h, point: float,
         "readout": name, "arm": arm, "h": h,
         "share_point": point,
         "ci_lo": float(lo), "ci_hi": float(hi),
-        "n_draws": int(len(draws)), "n_defined": int(len(defined)),
+        "n_draws": len(draws), "n_defined": len(defined),
         "undefined_frac": float(frac_undef),
         "unstable": bool(frac_undef > UNSTABLE_FRAC),
     }
@@ -282,7 +282,7 @@ def main_real() -> int:
         "resampling_unit": "effective_trading_day (day-block, per cell "
                            "independent, with replacement, test panel only)",
         "weights": "committed val-fit test-frozen (not refit in draws)",
-        "generated_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "generated_utc": datetime.now(UTC).isoformat(timespec="seconds"),
     }
     out = df.copy()
     for k, v in meta.items():

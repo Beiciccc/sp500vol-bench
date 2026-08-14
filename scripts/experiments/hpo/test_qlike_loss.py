@@ -6,7 +6,7 @@ import pytest
 
 torch = pytest.importorskip("torch")
 
-from qlike_loss import EPS, U_CLAMP, make_objective, qlike_np  # noqa: E402
+from qlike_loss import EPS, U_CLAMP, make_objective, qlike_np
 
 
 def test_zero_at_perfect_prediction():

@@ -23,11 +23,13 @@ Run from repo root:  .venv/bin/python scripts/analysis/dm_pairwise.py
 """
 import sys
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
 import forecast_combination as fc  # se(), holm()
+
 sys.path.insert(0, "src")
 from sp500vol.evaluation.dm_test import dm_test
 
@@ -200,8 +202,8 @@ def main():
     text_models = [m for m in MULTI_SEED]
     vsA2 = full[(full.baseline == HAR) & (full.challenger.isin(text_models))]
     n_worse = int((vsA2.dm_stat > 0).sum())
-    n_tot = int(len(vsA2))
-    md.append(f"\n## Sanity — text/neural models vs A2_har_rv on SE\n")
+    n_tot = len(vsA2)
+    md.append("\n## Sanity — text/neural models vs A2_har_rv on SE\n")
     md.append(f"- {n_worse}/{n_tot} (challenger, A2) cells have dm_stat>0 (challenger WORSE than HAR on SE), "
               f"matching seed_aggregate.md (all text models WORSE than HAR on SE).\n")
 

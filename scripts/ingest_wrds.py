@@ -17,7 +17,6 @@ CIK is resolved point-in-time (a PERMNO can map to different CIKs across M&A).
 Usage:
     python scripts/ingest_wrds.py --wrds-dir "/Volumes/Z/sp500vol-data/raw/wrds"
 """
-# ruff: noqa: E402
 
 from __future__ import annotations
 

@@ -69,12 +69,12 @@ import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
-import forecast_combination as fc  # noqa: E402
-import m1_clustered as mc  # noqa: E402
-import m1_ensemble_primary as mep  # noqa: E402
-import maximal_reference_firm_control as mrf  # noqa: E402
-from clustered_dm import dm_test_clustered  # noqa: E402
-from twoway_dm import dm_test_2way  # noqa: E402
+import forecast_combination as fc
+import m1_clustered as mc
+import m1_ensemble_primary as mep
+import maximal_reference_firm_control as mrf
+from clustered_dm import dm_test_clustered
+from twoway_dm import dm_test_2way
 
 KEY = fc.KEY
 SORT = fc.SORT

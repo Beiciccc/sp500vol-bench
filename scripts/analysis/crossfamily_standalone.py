@@ -33,7 +33,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
+import forecast_combination as fc
 
 DISCS = ("event_driven", "long_form", "combined")
 FAMS = (("qwen3_32b", "C6_llmtext"), ("yi_34b", "C6_llmtext_yi34"))
@@ -50,7 +50,7 @@ def standalone_stats(y, f):
         "qlike_var": float(fc.qlike(y ** 2, f ** 2).mean()),
         "r2": float(1.0 - ((y - f) ** 2).sum() / ((y - y.mean()) ** 2).sum()),
         "pred_sd": float(f.std()),
-        "n_unique_2dp": int(len(vals)),
+        "n_unique_2dp": len(vals),
         "mode_val_2dp": float(vals[i]),
         "mode_share_pct": float(100.0 * counts[i] / len(f)),
     }

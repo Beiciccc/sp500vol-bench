@@ -4,7 +4,6 @@ Usage:
     python scripts/build_dataset.py --config configs/data/sample.yaml
     python scripts/build_dataset.py --config configs/data/full.yaml
 """
-# ruff: noqa: E402
 
 from __future__ import annotations
 

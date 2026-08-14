@@ -51,7 +51,6 @@ def test_token_cache_byte_identical_and_dedup() -> None:
 
 @pytest.mark.slow
 def test_token_cache_empty() -> None:
-    import torch
 
     from sp500vol.models.neural_text.bert_s1 import _TokenCache
     from sp500vol.models.neural_text.encoders import CLSEncoder, EncoderConfig

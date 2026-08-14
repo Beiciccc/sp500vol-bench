@@ -97,10 +97,20 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from maec_prompt import (CLIP_PCT_LO, CLIP_PCT_HI, HORIZONS, JSON_SCHEMA,  # noqa: E402
-                         MAX_MODEL_LEN, RETRY_SUFFIX, VOL_KEYS,
-                         build_excerpt, build_messages, horizon_of,
-                         parse_output, to_v)
+from maec_prompt import (
+    CLIP_PCT_HI,
+    CLIP_PCT_LO,
+    HORIZONS,
+    JSON_SCHEMA,
+    MAX_MODEL_LEN,
+    RETRY_SUFFIX,
+    VOL_KEYS,
+    build_excerpt,
+    build_messages,
+    horizon_of,
+    parse_output,
+    to_v,
+)
 
 REPO = Path(__file__).resolve().parents[3]
 KEY = ["permno", "call_date", "horizon"]
@@ -232,7 +242,7 @@ def load_done(out_dir: Path) -> set[tuple[str, str]]:
     done = set()
     for f in sorted(out_dir.glob("part-*.parquet")):
         d = pd.read_parquet(f, columns=["call_id", "variant"])
-        done.update(zip(d["call_id"], d["variant"]))
+        done.update(zip(d["call_id"], d["variant"], strict=False))
     return done
 
 
@@ -257,7 +267,7 @@ def _flush(gen, chunk: list[dict], out_dir: Path, part_idx: int) -> int:
             if p2 is not None:
                 parsed[i], raw[i] = p2, raw2[j]
     rows = []
-    for rec, rtext, p in zip(chunk, raw, parsed):
+    for rec, rtext, p in zip(chunk, raw, parsed, strict=False):
         r = {"call_id": rec["row"]["call_id"], "ticker": rec["row"]["ticker"],
              "call_date": rec["row"]["call_date"], "variant": rec["variant"],
              "model_name": gen.name, "raw_output": rtext[:2000]}
@@ -392,14 +402,14 @@ def cmd_collect(args) -> None:
         fp = out_dir / f"preds_{arm}.parquet"
         d.to_parquet(fp, index=False)
         stats[arm] = {
-            "rows": int(len(d)), "n_calls": int(g["call_id"].nunique()),
+            "rows": len(d), "n_calls": int(g["call_id"].nunique()),
             "model_name": str(g["model_name"].iloc[0]),
             "parse_ok_rate": float(g["parse_ok"].mean()),
             "retry_used": int(g["retry_used"].sum()),
             "transcript_truncated_calls": int(g["transcript_truncated"].sum()),
             "clip_pct_range": [CLIP_PCT_LO, CLIP_PCT_HI],
             "nan_fills_per_horizon": fills,
-            "shifted_only_key_rows": int(len(extra)),
+            "shifted_only_key_rows": len(extra),
         }
         print(f"[collect] {arm}: {len(d):,} rows -> {fp.name}  "
               f"(parse_ok {100 * stats[arm]['parse_ok_rate']:.2f}%, "
@@ -425,7 +435,7 @@ def cmd_collect(args) -> None:
             pubm["arm"] = f"{arm}_published"
             fpub = out_dir / f"preds_{arm}_published.parquet"
             pubm.to_parquet(fpub, index=False)
-            stats[arm]["published_rows"] = int(len(pubm))
+            stats[arm]["published_rows"] = len(pubm)
             stats[arm]["published_dropped_after_test_end"] = dropped
             print(f"[collect] {arm}: published assignment -> {fpub.name} "
                   f"({len(pubm):,} rows)")

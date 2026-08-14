@@ -56,7 +56,7 @@ def main():
         rows.append(dict(stratum=label, n_filings=len(s),
                          n_seen=int(s.cik.isin(train).sum()),
                          n_ciks=int(s.cik.nunique()),
-                         n_ciks_seen=int(len(set(s.cik.unique()) & train))))
+                         n_ciks_seen=len(set(s.cik.unique()) & train)))
     df = pd.DataFrame(rows)
     df["pct_filings"] = 100 * df.n_seen / df.n_filings
     df["pct_ciks"] = 100 * df.n_ciks_seen / df.n_ciks

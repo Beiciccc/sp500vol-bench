@@ -68,8 +68,8 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402  (qlike, log_combo, holm, load)
-import clustered_dm as cdm  # noqa: E402  (dm_test_clustered)
+import clustered_dm as cdm
+import forecast_combination as fc
 
 KEY = ["ticker", "accession", "horizon_days"]
 DISC = "event_driven"
@@ -145,7 +145,7 @@ def fit_cell(a2, t, h):
     gmean = v.label_realised_vol.mean()
     fid_v = v.ticker.map(fm).fillna(gmean).values
     fid_t = te.ticker.map(fm).fillna(gmean).values
-    L = lambda x: np.log(np.clip(x, EPS, None))  # noqa: E731
+    L = lambda x: np.log(np.clip(x, EPS, None))
     ly = L(v.label_realised_vol.values)
     bR = ols(ly, np.column_stack([np.ones(len(v)), L(v.fh.values), L(fid_v)]))
     bU = ols(ly, np.column_stack([np.ones(len(v)), L(v.fh.values), L(fid_v),

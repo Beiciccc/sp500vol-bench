@@ -136,7 +136,7 @@ def anova_r2(values, groups):
     gm = pd.Series(y).groupby(g.values)
     means, sizes = gm.mean().to_numpy(), gm.size().to_numpy(float)
     ss_between = float((sizes * (means - ybar) ** 2).sum())
-    return ss_between / ss_tot, int(len(means))
+    return ss_between / ss_tot, len(means)
 
 
 # ----------------------------------------------------------------------- y assembly
@@ -241,7 +241,7 @@ def x_sec():
             lfR_val = bR[0] + bR[1] * lh               # log f_R val predictions
             r2, n_ent = anova_r2(lfR_val, dv.ticker)
             out[f"{disc}/h{h}"] = dict(
-                x=r2, n_val=int(len(dv)), n_entities=n_ent,
+                x=r2, n_val=len(dv), n_entities=n_ent,
                 source_x=f"results/runs/{{A2,SHAR,GARCH,EGARCH,ARIMA}}_full_{disc}"
                          f"_seed2026/predictions.parquet (val rows, 5-model join)")
     return out
@@ -270,7 +270,7 @@ def x_yelp():
         fR_val = np.clip(np.exp(bR[0] + bR[1] * la), *YELP_CLIP)
         r2, n_ent = anova_r2(np.log(fR_val), dv.entity_id)
         out[f"chrono/h{h}m"] = dict(
-            x=r2, n_val=int(len(dv)), n_entities=n_ent,
+            x=r2, n_val=len(dv), n_entities=n_ent,
             source_x="results/second_domain/preds/preds_ar_ridge.parquet "
                      "(val rows, ∩ preds_tfidf_chrono)")
     return out
@@ -289,7 +289,7 @@ def x_maec():
             _assert_val_only(dv)
             r2, n_ent = anova_r2(dv.prediction.to_numpy(float), dv.permno)
             out[f"primary/{ref}/h{h}"] = dict(
-                x=r2, n_val=int(len(dv)), n_entities=n_ent,
+                x=r2, n_val=len(dv), n_entities=n_ent,
                 source_x=str(fp.relative_to(REPO)) + " (val rows, no label col)")
     return out
 

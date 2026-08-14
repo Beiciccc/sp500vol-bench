@@ -33,9 +33,13 @@ OUTPUT: results/tables/portfolio_econ.{csv,md}
 Run from repo root:  .venv/bin/python scripts/analysis/portfolio_econ.py
 """
 from __future__ import annotations
-import sys, json
+
+import json
+import sys
 from pathlib import Path
-import numpy as np, pandas as pd
+
+import numpy as np
+import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
@@ -125,7 +129,7 @@ def build_portfolio_returns(df, sigma_col, h):
             recs.append({
                 "day": t,
                 "port_ret": float(np.dot(w, r)),
-                "n_names": int(len(live)),
+                "n_names": len(live),
                 "target_var": float(np.dot(w ** 2, sig ** 2)),
             })
             i = i + h  # non-overlapping
@@ -241,7 +245,7 @@ def main():
 
                 rows.append({
                     "disc": disc, "model": model, "h": h,
-                    "n_periods": int(len(m)),
+                    "n_periods": len(m),
                     "avg_names": float(pd.concat([m["n_names_R"], m["n_names_U"]]).mean()),
                     "sharpe_R": sh_R, "sharpe_U": sh_U, "sharpe_diff": sh_U - sh_R,
                     "sharpe_diff_lo": lo, "sharpe_diff_hi": hi,
@@ -276,9 +280,9 @@ def main():
     elif n_sig_pos >= 1 and n_diff_pos > n_cells // 2:
         verdict = ("The cross-sectional increment translates into at most a MARGINAL, "
                    "NON-ROBUST portfolio-level improvement — Sharpe rises in a majority of "
-                   "cells but only {}/{} clear a day-block bootstrap CI (about the "
+                   f"cells but only {n_sig_pos}/{n_cells} clear a day-block bootstrap CI (about the "
                    "multiplicity false-positive floor), and the median gain is economically "
-                   "negligible (ΔSharpe={:+.3f})".format(n_sig_pos, n_cells, med_diff))
+                   f"negligible (ΔSharpe={med_diff:+.3f})")
     else:
         verdict = ("The cross-sectional increment does NOT translate into robust "
                    "portfolio-level value (Sharpe differences straddle zero after day-block "

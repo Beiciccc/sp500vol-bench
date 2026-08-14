@@ -38,15 +38,15 @@ for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
            "VECLIB_MAXIMUM_THREADS"):
     os.environ[_v] = "2"
 
-import sys  # noqa: E402
-from pathlib import Path  # noqa: E402
+import sys
+from pathlib import Path
 
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
+import numpy as np
+import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
-import clustered_dm as cdm  # noqa: E402
+import clustered_dm as cdm
+import forecast_combination as fc
 
 KEY = ["ticker", "accession", "horizon_days"]
 EPS = 1e-8
@@ -86,7 +86,7 @@ def close(a, b):  # verbatim from crossfamily_llama70.py
     return abs(a - b) <= RTOL * max(abs(a), abs(b), 1.0)
 
 
-L = lambda x: np.log(np.clip(x, EPS, None))  # noqa: E731
+L = lambda x: np.log(np.clip(x, EPS, None))
 
 
 def _lincomb(b, cols):
@@ -94,7 +94,7 @@ def _lincomb(b, cols):
     the committed M1 block's `bR[0] + bR[1]*x1 + bR[2]*x2` evaluation order bitwise
     (cols[0] is the ones column; 0+b0*1.0 == b0 exactly)."""
     acc = 0.0
-    for coef, col in zip(b, cols):
+    for coef, col in zip(b, cols, strict=False):
         acc = acc + coef * col
     return acc
 

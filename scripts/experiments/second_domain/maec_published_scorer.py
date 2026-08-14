@@ -133,7 +133,7 @@ def published_readings(frames: dict[str, pd.DataFrame]) -> dict:
     raw_cells = {}
     for (yp, h), g in d0.groupby(["year_panel", "horizon"]):
         raw_cells[f"{yp}_h{int(h)}"] = {
-            "n_test": int(len(g)),
+            "n_test": len(g),
             "mse_raw_vpast": mse(g["label"], clip_v(g["v_past_match"]))}
     raw_pooled = mse(d0["label"], clip_v(d0["v_past_match"]))
     raw_per_h = {str(int(h)): mse(g["label"], clip_v(g["v_past_match"]))
@@ -155,7 +155,7 @@ def published_readings(frames: dict[str, pd.DataFrame]) -> dict:
         arm_out[a] = {"cells": cells, "pooled_mse_text": pooled,
                       "pooled_beats_raw": bool(pooled < raw_pooled),
                       "n_cells_beating_raw": int(n_beat),
-                      "n_cells": int(len(cells))}
+                      "n_cells": len(cells)}
 
     # ---- G1 (§7): >= 1 text arm beats raw V_past somewhere (per-cell) ----
     g1_pass = any(v["n_cells_beating_raw"] >= 1 for v in arm_out.values())

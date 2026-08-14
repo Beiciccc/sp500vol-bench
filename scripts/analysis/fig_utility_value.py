@@ -10,11 +10,13 @@ Source: results/tables/utility_value.csv
 Out:    results/figures/fig_utility_value.{png,pdf}
 """
 import matplotlib
+
 matplotlib.use("Agg")
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from pathlib import Path
 
 ROOT = Path(".")
 SRC = ROOT / "results/tables/utility_value.csv"
@@ -54,7 +56,7 @@ fig, axes = plt.subplots(1, 2, figsize=(13, 5.2), sharey=True)
 
 hatch = {5: "", 10: "//", 20: ".."}
 
-for ax, disc in zip(axes, DISCS):
+for ax, disc in zip(axes, DISCS, strict=False):
     d = cell[cell.disclosure == disc]
     xticks = []
     for mi, m in enumerate(MODELS):
@@ -82,6 +84,7 @@ axes[0].set_ylabel("Annualized performance fee (bps)")
 
 # Legend: gamma via color, horizon via hatch
 from matplotlib.patches import Patch
+
 gamma_handles = [Patch(facecolor=GCOLOR[g], label=f"$\\gamma={g}$") for g in GAMMAS]
 horizon_handles = [Patch(facecolor="0.75", hatch=hatch[h], edgecolor="white",
                          label=f"h={h}d") for h in HORIZONS]

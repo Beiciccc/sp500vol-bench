@@ -34,13 +34,24 @@ import pandas as pd
 ANALYSIS = "scripts/analysis"
 sys.path.insert(0, ANALYSIS)
 
-from supp_style import (apply_style, gate, BLUE, SKY, VERM, VERM_TXT,  # noqa: E402
-                        GREEN, YELLOW, PURPLE, GREY, LIGHT, TAB, REPO,
-                        INK, INK2, RULE)
-import diss_style as ds  # noqa: E402  (same palette; dissertation OUTDIR + height gate)
+import textwrap
 
-import matplotlib.pyplot as plt  # noqa: E402
-import textwrap  # noqa: E402
+import diss_style as ds
+import matplotlib.pyplot as plt
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    INK,
+    INK2,
+    LIGHT,
+    RULE,
+    TAB,
+    VERM,
+    VERM_TXT,
+    apply_style,
+    gate,
+)
 
 # ---------------------------------------------------------------- evidence
 d70 = pd.read_csv(os.path.join(TAB, "crossfamily_llama70.csv"))
@@ -141,10 +152,10 @@ gate(
         "llama70_ens_firm_triple": tuple(np.round(_l.rel_firm.values, 2)),
         "probe_share_har_pct_wellid": tuple(
             int(round(v)) for v in
-            sh[sh.denominator_well_identified == True].share_har_pct.values),  # noqa: E712
+            sh[sh.denominator_well_identified == True].share_har_pct.values),
         "beyond_identity_retained_pct": tuple(
             int(round(100 * r / f)) for r, f in
-            zip(bi.rel_pct.values, fa.rel_har.values)),
+            zip(bi.rel_pct.values, fa.rel_har.values, strict=False)),
         "probe_n_test": tuple(int(v) for v in pm.n_test.values),
     },
 )
@@ -168,7 +179,7 @@ HFMT = {5: ("o", 5.2), 10: ("s", 4.6), 20: ("^", 5.4)}
 
 # =========================================================== (a) the screen
 ypos = np.arange(len(RUNS))[::-1]
-for y, (lab, fam, disc, chan) in zip(ypos, RUNS):
+for y, (lab, fam, disc, chan) in zip(ypos, RUNS, strict=False):
     qlo, qhi, mlo, mhi = run_health(fam, disc)
     ok = (qhi < QLIKE_CEIL) and (mhi < MODAL_CEIL)
     col = BLUE if ok else VERM
@@ -233,7 +244,7 @@ rows = np.arange(n_inc)[::-1]
 OFF = {5: +0.25, 10: 0.0, 20: -0.25}
 
 for ax, which in ((axH, "har"), (axF, "firm")):
-    for y, rec in zip(rows, INC):
+    for y, rec in zip(rows, INC, strict=False):
         lab, rh, ph, hh, rf, pf, hf, healthy = rec
         rel = rh if which == "har" else rf
         praw = ph if which == "har" else pf
@@ -290,7 +301,7 @@ axP.barh(yb, full_har, height=0.50, color="white", edgecolor=BLUE, lw=1.2,
          zorder=3)
 axP.barh(yb, probe_har, height=0.50, color=VERM, edgecolor=VERM, lw=0,
          zorder=4)
-for y, f, s, ok in zip(yb, full_har, shares, wellid):
+for y, f, s, ok in zip(yb, full_har, shares, wellid, strict=False):
     axP.text(f + 0.06, y, (f"{s:.0f} %" if ok else f"{s:.0f} %*"),
              va="center", ha="left", fontsize=8.9,
              color=VERM_TXT if ok else GREY)
@@ -305,7 +316,7 @@ bp = bi.p_holm.values
 retained = 100 * axB_full / full_har
 axB.barh(yb, axB_full, height=0.50, edgecolor=GREY, lw=0.6, zorder=3,
          color=[GREEN if q < 0.05 else LIGHT for q in bp])
-for y, b, q, r in zip(yb, axB_full, bp, retained):
+for y, b, q, r in zip(yb, axB_full, bp, retained, strict=False):
     axB.text(b + 0.05, y, ("Holm .005" if q < 0.005 else
                            (f"Holm .{int(round(q*1000)):03d}" if q < 0.05
                             else f"Holm .{int(round(q*100)):02d} ns"))

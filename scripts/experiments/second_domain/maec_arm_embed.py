@@ -62,7 +62,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from maec_prompt import TRANSCRIPT_CHAR_BUDGET  # noqa: E402  (frozen budget)
+from maec_prompt import TRANSCRIPT_CHAR_BUDGET
 
 EC_LOCAL = "/Volumes/Z/second-domain/earnings_calls"
 
@@ -171,7 +171,7 @@ def main() -> None:
         "generated": time.strftime("%Y-%m-%d %H:%M:%S"),
         "prereg": "configs/prereg_maec_audit.md §5-4 (OPEN-5)",
         "model": args.model, "pooling": pooling,
-        "n_calls": int(len(mf)), "dim": int(emb.shape[1]),
+        "n_calls": len(mf), "dim": int(emb.shape[1]),
         "max_model_len": args.max_model_len,
         "char_budget": TRANSCRIPT_CHAR_BUDGET,
         "n_char_truncated": int(n_char_trunc),

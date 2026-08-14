@@ -11,7 +11,6 @@ total_seconds are CPU wall-clock, not GPU) so they anchor the cheap end.
 Writes results/tables/cost_accuracy.{csv,md}.
 """
 import json
-import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]

@@ -66,8 +66,8 @@ from __future__ import annotations
 
 import json
 import os
-import tempfile
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.request
@@ -82,9 +82,10 @@ REPO = Path(__file__).resolve().parents[2]
 os.chdir(REPO)
 sys.path.insert(0, str(REPO / "src"))
 sys.path.insert(0, str(REPO / "scripts" / "analysis"))
-import forecast_combination as fc  # noqa: E402
-import clustered_dm as cdm  # noqa: E402
-from sp500vol.data.trading_calendar import get_schedule  # noqa: E402
+import clustered_dm as cdm
+import forecast_combination as fc
+
+from sp500vol.data.trading_calendar import get_schedule
 
 DATA = Path(os.environ.get("SP500VOL_DATA_ROOT", "/Volumes/Z/sp500vol-data"))
 SCRATCH = Path(os.environ.get("SP500VOL_SCRATCH", tempfile.gettempdir())) / "label_parity"
@@ -126,9 +127,9 @@ def provenance_check() -> dict:
     m = pub.merge(crsp, on=["ticker", "date"], suffixes=("_a", "_b"), how="inner")
     diffs = {c: float((m[f"{c}_a"] - m[f"{c}_b"]).abs().max()) for c in ["adj_close", "close", "volume"]}
     res = {
-        "full_ohlcv_rows": int(len(pub)),
-        "crsp_rows": int(len(crsp)),
-        "joined_rows": int(len(m)),
+        "full_ohlcv_rows": len(pub),
+        "crsp_rows": len(crsp),
+        "joined_rows": len(m),
         "max_abs_diff_adj_close": diffs["adj_close"],
         "max_abs_diff_close": diffs["close"],
         "max_abs_diff_volume": diffs["volume"],
@@ -198,7 +199,7 @@ def fetch_public_prices(tickers: list[str]) -> tuple[pd.DataFrame, pd.DataFrame]
         for fut in as_completed(futs):
             tkr, st_, df = fut.result()
             status.append({"ticker": tkr, "status": st_,
-                           "n_days": 0 if df is None else int(len(df)),
+                           "n_days": 0 if df is None else len(df),
                            "first": None if df is None else str(df.date.min().date()),
                            "last": None if df is None else str(df.date.max().date())})
             if df is not None:
@@ -314,7 +315,7 @@ def gate1_labels(af: pd.DataFrame, y_crsp: np.ndarray, panels: dict[str, pd.Data
                                  f"({disc}) missing from aligned_filings")
         max_pred = max(max_pred, float((mm.label_realised_vol - mm.y_aligned).abs().max()))
         n_pred += len(mm)
-    res = {"n_rows": int(len(af)), "n_unreconstructed": n_nan, "max_abs_diff": max_abs,
+    res = {"n_rows": len(af), "n_unreconstructed": n_nan, "max_abs_diff": max_abs,
            "max_rel_diff": max_rel, "bitwise_exact": exact,
            "modelled_rows_checked": n_pred, "max_abs_diff_pred_vs_aligned": max_pred,
            "passed": bool(ok and max_pred == 0.0)}
@@ -372,14 +373,14 @@ def corr_block(df: pd.DataFrame, label: dict) -> None:
     ok = df.y_pub_clean.notna() & (df.label_realised_vol > 0) & (df.y_pub_clean > 0)
     d = df[ok]
     if len(d) < 30:
-        add("parity_corr", **label, n=int(len(d)))
+        add("parity_corr", **label, n=len(d))
         return
     lx = np.log(d.label_realised_vol.to_numpy())
     ly = np.log(d.y_pub_clean.to_numpy())
     pe = float(stats.pearsonr(lx, ly)[0])
     sp = float(stats.spearmanr(lx, ly)[0])
     dl = ly - lx
-    add("parity_corr", **label, n=int(len(d)), pearson_logRV=pe, spearman_logRV=sp,
+    add("parity_corr", **label, n=len(d), pearson_logRV=pe, spearman_logRV=sp,
         mean_dlog=float(dl.mean()), sd_dlog=float(dl.std(ddof=1)),
         rmse_dlog=float(np.sqrt((dl ** 2).mean())))
 
@@ -416,7 +417,7 @@ def standalone_tests(panels_model: dict, verdict_rows: list) -> None:
                     dm, p, nd = cdm.dm_test_clustered(l_tx, l_a2, dt.effective_trading_day, h)
                     verdict_rows.append({
                         "family": f"F-STAND-{panel}", "panel": panel, "disc": disc,
-                        "model": model, "h": h, "n": int(len(dt)), "n_days": nd,
+                        "model": model, "h": h, "n": len(dt), "n_days": nd,
                         "qlike_a2": float(l_a2.mean()), "qlike_text": float(l_tx.mean()),
                         "dm": dm, "p": p})
 
@@ -449,7 +450,7 @@ def combo_tests(panels_model: dict, verdict_rows: list) -> None:
                     qR, qU = float(lR.mean()), float(lU.mean())
                     verdict_rows.append({
                         "family": f"F-COMBO-{panel}", "panel": panel, "disc": disc,
-                        "model": model, "h": h, "n": int(len(dt)), "n_days": nd,
+                        "model": model, "h": h, "n": len(dt), "n_days": nd,
                         "qlike_R": qR, "qlike_U": qU,
                         "rel_impr_pct": 100.0 * (qR - qU) / qR if qR > 0 else np.nan,
                         "g_log": g, "dm": dm, "p": p, "placebo_dm": float(np.mean(pdm))})
@@ -788,7 +789,7 @@ def write_md(prov, status, mm, af, mod, vd, rk, agree, rank_agree, cov_raw, cov_
     for _, r in vc.sort_values(["disc", "model", "h", "panel"]).iterrows():
         A(f"| {r.disc} | {r.model} | {r.h} | {r.panel} | {r.rel_impr_pct:+.2f} | {r.dm:+.2f} "
           f"| {r.p:.4f} | {r.holm:.3f} | {r.placebo_dm:+.2f} | "
-          f"{'YES' if r.genuine == True else 'no'} |")  # noqa: E712
+          f"{'YES' if r.genuine == True else 'no'} |")
     for panel in ["B", "C"]:
         n, sa, ga, fa = agree[("F-COMBO", panel)]
         A(f"\nCombo panel {panel} vs A: sign agreement {sa}/{n}, Holm-significance agreement {ga}/{n}, "
@@ -820,9 +821,9 @@ def write_md(prov, status, mm, af, mod, vd, rk, agree, rank_agree, cov_raw, cov_
       f"(iii) should ship the panel-B/panel-C agreement tables above as its calibration certificate. "
       f"Full-cascade replication on free labels remains the run-if-time follow-up.")
     A("\n---")
-    A(f"*Script: `scripts/analysis/label_parity.py`; public snapshot fetched 2026-07-09; "
-      f"CSV companion: `results/tables/label_parity.csv` (sections: provenance, sanity_gate, "
-      f"ticker_status, coverage*, parity_corr, verdict_*).*")
+    A("*Script: `scripts/analysis/label_parity.py`; public snapshot fetched 2026-07-09; "
+      "CSV companion: `results/tables/label_parity.csv` (sections: provenance, sanity_gate, "
+      "ticker_status, coverage*, parity_corr, verdict_*).*")
     OUT_MD.write_text("\n".join(L))
 
 

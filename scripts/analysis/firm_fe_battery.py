@@ -58,8 +58,8 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
-from clustered_dm import dm_test_clustered  # noqa: E402
+import forecast_combination as fc
+from clustered_dm import dm_test_clustered
 
 EPS = fc.EPS
 KEY = fc.KEY
@@ -237,11 +237,11 @@ def main():
         s = df[df.variant == v]
         lf = s[s.disc == "long_form"]
         surv = s[s.survives_holm]
-        surv_sets[v] = set(zip(surv.disc, surv.model, surv.h))
+        surv_sets[v] = set(zip(surv.disc, surv.model, surv.h, strict=False))
         summ.append({
             "variant": v,
             "raw": int(s.survives_raw.sum()), "holm": int(s.survives_holm.sum()),
-            "lf_neg": int(lf.lf_flip_neg.sum()), "lf_n": int(len(lf)),
+            "lf_neg": int(lf.lf_flip_neg.sum()), "lf_n": len(lf),
             "zerotext": int(s.zerotext_beats.sum()),
             "zerotext_mean_rel": float(s.rel_zerotext_pct.mean()),
             "cov_firm_lf": float(s[s.disc == "long_form"].cov_firm.iloc[0]),
@@ -260,7 +260,7 @@ def main():
                   "rel_impr_firmMeanOnly_vs_fR", "dm_firmMeanOnly_vs_fR"]],
         on=["disc", "model", "h"], how="inner")
     cellwise = {
-        "n_cells_joined": int(len(vi)),
+        "n_cells_joined": len(vi),
         "max_abs_diff_rel_firm": float((vi.rel_firm_pct - vi.rel_impr_pct_firm).abs().max()),
         "max_abs_diff_dm_firm": float((vi.dmclu_firm - vi.dm_q_clustered).abs().max()),
         "max_abs_diff_holm": float((vi.pclu_firm_holm - vi.holm_p).abs().max()),

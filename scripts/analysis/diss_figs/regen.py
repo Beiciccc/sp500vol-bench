@@ -45,7 +45,7 @@ SUPP_FIGS = os.path.join(ANALYSIS, "supp_figs")
 sys.path.insert(0, ANALYSIS)
 sys.path.insert(0, SUPP_FIGS)
 
-import diss_style as ds  # noqa: E402
+import diss_style as ds
 
 PREVIEW = os.path.join(HERE, "preview")
 

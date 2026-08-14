@@ -33,9 +33,9 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc          # noqa: E402  fc.load / log_combo / qlike (VOL-unit)
-import clustered_dm as cdm                 # noqa: E402  day-clustered DM
-import crossfamily_llama70 as cfl          # noqa: E402  ols / holm / close (verbatim M1 helpers)
+import clustered_dm as cdm
+import crossfamily_llama70 as cfl
+import forecast_combination as fc
 
 KEY = cfl.KEY                              # ["ticker", "accession", "horizon_days"]
 EPS = cfl.EPS
@@ -67,7 +67,7 @@ def m1_cell(a2, t, h):
     gmean = v.label_realised_vol.mean()
     fid_v = v.ticker.map(fm).fillna(gmean).values
     fid_t = te.ticker.map(fm).fillna(gmean).values
-    L = lambda x: np.log(np.clip(x, EPS, None))  # noqa: E731
+    L = lambda x: np.log(np.clip(x, EPS, None))
     ly = L(v.label_realised_vol.values)
     bR = cfl.ols(ly, np.column_stack([np.ones(len(v)), L(v.fh.values), L(fid_v)]))
     bU = cfl.ols(ly, np.column_stack([np.ones(len(v)), L(v.fh.values), L(fid_v),
@@ -249,10 +249,10 @@ def main():
          f"{sg['n_rep_har']}/3 -> {eg['n_rep_har']}/3)."),
         f"- Ensemble firmID rel%: {'/'.join(f'{ens[ens.h==h].rel_firm.iloc[0]:+.2f}' for h in HORIZONS)} "
         f"(h=5/10/20); Qwen event-driven benchmark was {_q}.",
-        (f"- CAVEAT on seed diversity: run_inference.py decodes at temperature 0 and does not pass --seed "
-         f"to vLLM, so the 3 seeds diverge only through AWQ-INT4 / TP2 kernel non-determinism. If the "
-         f"ensemble ≈ the single seed (rel% and Holm p nearly unchanged), that is the expected signature "
-         f"of near-deterministic decoding, NOT a bug — report it as such."),
+        ("- CAVEAT on seed diversity: run_inference.py decodes at temperature 0 and does not pass --seed "
+         "to vLLM, so the 3 seeds diverge only through AWQ-INT4 / TP2 kernel non-determinism. If the "
+         "ensemble ≈ the single seed (rel% and Holm p nearly unchanged), that is the expected signature "
+         "of near-deterministic decoding, NOT a bug — report it as such."),
         "",
         "## SANITY",
         "",

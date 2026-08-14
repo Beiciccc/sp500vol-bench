@@ -41,8 +41,8 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
-import clustered_dm as cdm  # noqa: E402
+import clustered_dm as cdm
+import forecast_combination as fc
 
 KEY = ["ticker", "accession", "horizon_days"]
 EPS = 1e-8
@@ -73,7 +73,7 @@ def standalone_stats(y, f):  # verbatim from crossfamily_standalone.py
         "qlike_var": float(fc.qlike(y ** 2, f ** 2).mean()),
         "r2": float(1.0 - ((y - f) ** 2).sum() / ((y - y.mean()) ** 2).sum()),
         "pred_sd": float(f.std()),
-        "n_unique_2dp": int(len(vals)),
+        "n_unique_2dp": len(vals),
         "mode_val_2dp": float(vals[i]),
         "mode_share_pct": float(100.0 * counts[i] / len(f)),
     }
@@ -154,7 +154,7 @@ def main():
                 gmean = v.label_realised_vol.mean()
                 fid_v = v.ticker.map(fm).fillna(gmean).values
                 fid_t = te.ticker.map(fm).fillna(gmean).values
-                L = lambda x: np.log(np.clip(x, EPS, None))  # noqa: E731
+                L = lambda x: np.log(np.clip(x, EPS, None))
                 ly = L(v.label_realised_vol.values)
                 bR = ols(ly, np.column_stack([np.ones(len(v)), L(v.fh.values), L(fid_v)]))
                 bU = ols(ly, np.column_stack([np.ones(len(v)), L(v.fh.values), L(fid_v),

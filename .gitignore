@@ -73,14 +73,8 @@ data/universe/*
 !data/market/.gitkeep
 !data/processed/.gitkeep
 !data/universe/.gitkeep
-# Membership table is a core benchmark artifact — commit it (small).
+# CRSP-derived universe artefacts are LOCAL ONLY and must never be committed.
 !data/universe/README.md
-!data/universe/sp500_membership.parquet
-!data/universe/crsp_cik_links.parquet
-!data/universe/sp500_membership_raw.csv
-!data/universe/sp500_membership_raw_unresolved.csv
-!data/universe/sp500_cik_candidates.csv
-!data/universe/historical_cik_overrides.csv
 # Sample data is small and committed for tests / spike
 !data/sample/
 !data/sample/**
@@ -133,7 +127,7 @@ data/universe/sec_company_tickers.json
 # E1 inference manifest: 133MB (>GitHub 100MB cap), deterministically regenerable via
 # run_inference.py build-manifest from A2 predictions + text cache
 results/e1_llm_forecast/manifest_valtest.parquet
-writing/paper/AuthorKit27/
+writing/
 writing/paper/*.aux
 writing/paper/*.bbl
 writing/paper/*.blg

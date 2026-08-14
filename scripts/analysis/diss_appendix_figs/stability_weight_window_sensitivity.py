@@ -24,6 +24,7 @@ import os
 import sys
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -31,9 +32,22 @@ import pandas as pd
 from matplotlib.lines import Line2D
 
 sys.path.insert(0, "scripts/analysis")
-import supp_style  # noqa: E402
-from supp_style import (apply_style, finish, gate, BLUE, SKY, VERM, VERM_TXT,  # noqa: E402
-                        GREEN, YELLOW, PURPLE, GREY, LIGHT, TAB, REPO)
+import supp_style
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    LIGHT,
+    PURPLE,
+    REPO,
+    SKY,
+    TAB,
+    VERM,
+    VERM_TXT,
+    apply_style,
+    finish,
+    gate,
+)
 
 supp_style.OUTDIR = os.path.join(REPO, "writing", "dissertation", "figures")
 RNG = np.random.default_rng(20260802)
@@ -57,7 +71,7 @@ dcc = (pv["calm_2021"] - pv["covid_2020"]).dropna()
 gate({"freeze_cells": 40, "freeze_traintail_fitted": 32,
       "sig_val_full": 35, "sig_val_ex_h1": 27, "sig_train_tail": 3,
       "vw_cells": 69, "vw_alt_cells": 57, "calm_higher": 37},
-     {"freeze_cells": int(len(pf)),
+     {"freeze_cells": len(pf),
       "freeze_traintail_fitted": int(pf["train_tail"].notna().sum()),
       "sig_val_full": int(sig_by_win["val_full"]),
       "sig_val_ex_h1": int(sig_by_win["val_ex_h1"]),
@@ -181,7 +195,7 @@ SB = [("drop the COVID half", 39, 40, BLUE),
       ("2018-19 tail (freeze)", 6, 32, VERM),
       ("2018-19 tail (val-window)", 22, 57, VERM)]
 ypos = np.arange(len(SB))[::-1]
-for y, (lab, keep, tot, col) in zip(ypos, SB):
+for y, (lab, keep, tot, col) in zip(ypos, SB, strict=False):
     ax_c.barh(y, 100 * keep / tot, height=0.56, color=col, edgecolor="none")
     ax_c.barh(y, 100 * (tot - keep) / tot, left=100 * keep / tot, height=0.56,
               color=LIGHT, edgecolor="none")

@@ -1,5 +1,5 @@
 """Verify the 6 old CIKs against live EDGAR: company name + form counts in window."""
-# ruff: noqa: E402, I001
+# ruff: noqa: I001
 
 from __future__ import annotations
 

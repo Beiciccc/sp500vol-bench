@@ -42,9 +42,10 @@ import pyarrow.parquet as pq
 
 sys.path.insert(0, "src")
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
-from sp500vol.evaluation.dm_test import dm_test  # noqa: E402
-from sp500vol.models.classical_text._fit_utils import (  # noqa: E402
+import forecast_combination as fc
+
+from sp500vol.evaluation.dm_test import dm_test
+from sp500vol.models.classical_text._fit_utils import (
     fit_ridge_cv,
     maybe_exp,
     maybe_log,
@@ -142,7 +143,7 @@ def build_features() -> pd.DataFrame:
     docs["split"] = docs.accession.map(split_map)  # NaN = not in run (prev-only)
 
     # ---- streaming pass over the 3.3GB text cache -------------------------
-    path2acc = dict(zip(docs.text_path.astype(str), docs.accession.astype(str)))
+    path2acc = dict(zip(docs.text_path.astype(str), docs.accession.astype(str), strict=False))
     needed = pa.array(list(path2acc.keys()), type=pa.string())
     vocab: dict[str, int] = {}
     reps: dict[str, tuple] = {}  # acc -> (uniq_ids u32, counts u32, sketch u64, n_tok)
@@ -156,7 +157,7 @@ def build_features() -> pd.DataFrame:
         sub = batch.filter(mask)
         paths = sub.column("text_path").to_pylist()
         texts = sub.column("text").to_pylist()
-        for pth, text in zip(paths, texts):
+        for pth, text in zip(paths, texts, strict=False):
             acc = path2acc[pth]
             toks = TOKEN_RE.findall(text.lower())
             n_tok = len(toks)
@@ -281,7 +282,7 @@ def fit_b6(feat: pd.DataFrame) -> pd.DataFrame:
             a = np.clip(yy**2, EPS, None); b = np.clip(ff**2, EPS, None)
             metrics.append({
                 "split": split, "disclosure_subset": "long_form",
-                "horizon_days": int(h), "n": int(len(s)),
+                "horizon_days": int(h), "n": len(s),
                 "mae": float(np.abs(ff - yy).mean()),
                 "rmse": float(np.sqrt(((ff - yy) ** 2).mean())),
                 "r2": float(1 - ((ff - yy) ** 2).sum() / ((yy - yy.mean()) ** 2).sum()),
@@ -402,7 +403,7 @@ def evaluate(p6: pd.DataFrame, feat: pd.DataFrame):
           f"({100*matched.mean():.1f}%) matched to a previous same-form filing "
           f"(row-level imputed fraction in the run: {100*frac_imputed:.1f}%; imputed with train means "
           f"{ {k: round(v,4) for k,v in imput.items()} }).",
-          f"Match rate by year: " + ", ".join(f"{y}:{v*100:.0f}%" for y, v in yearly.items()) + "\n",
+          "Match rate by year: " + ", ".join(f"{y}:{v*100:.0f}%" for y, v in yearly.items()) + "\n",
           f"**Change-feature distribution (matched docs):** change_score mean={fr.change_score.mean():.3f} "
           f"sd={fr.change_score.std():.3f} p10={fr.change_score.quantile(.1):.3f} "
           f"p90={fr.change_score.quantile(.9):.3f}; jaccard_change mean={fr.jaccard_change.mean():.3f}; "

@@ -40,16 +40,31 @@ import os
 import re
 import sys
 
-import numpy as np
-import pandas as pd
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from matplotlib.collections import LineCollection
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from supp_style import (apply_style, finish, gate, annot, note, BLUE, SKY,
-                        VERM, VERM_TXT, GREEN, YELLOW, PURPLE, GREY, LIGHT,
-                        INK, INK2, RULE, TAB, AGG, REPO)
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    INK,
+    INK2,
+    LIGHT,
+    REPO,
+    RULE,
+    TAB,
+    VERM,
+    VERM_TXT,
+    annot,
+    apply_style,
+    finish,
+    gate,
+    note,
+)
 
 CENSOR = pd.Timestamp("2025-12-31")
 XLO, XHI = pd.Timestamp("2009-09-01"), pd.Timestamp("2026-04-01")
@@ -72,7 +87,7 @@ rows = []
 for line in open(exit_md, encoding="utf-8"):
     cells = [c.strip() for c in line.strip().strip("|").split("|")]
     if len(cells) == 6 and cells[0] in ("exiting", "survivor"):
-        for h, cell in zip((5, 10, 20), cells[3:]):
+        for h, cell in zip((5, 10, 20), cells[3:], strict=False):
             m = re.match(r"^([+-][0-9.]+)(\*| ns)$", cell)
             rows.append({"stratum": cells[0], "model": cells[1],
                          "n_filings": int(cells[2]), "h": h,
@@ -289,7 +304,7 @@ keys = [(m, h) for m in ["C2_finbert_s1", "C4_longformer", "D2_gated_fusion"]
 ypos = np.arange(len(keys))
 axc.axvspan(-4.2, 0, color=LIGHT, alpha=0.55, zorder=0)
 axc.axvline(0, color=GREY, lw=0.7, zorder=1)
-for y, k in zip(ypos, keys):
+for y, k in zip(ypos, keys, strict=False):
     xe, xs_ = piv.loc[k, "exiting"], piv.loc[k, "survivor"]
     axc.plot([xe, xs_], [y, y], color=GREY, lw=0.7, alpha=0.55, zorder=2)
     for x, col, mk, st in ((xe, VERM, "o", "exiting"),

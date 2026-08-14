@@ -30,11 +30,15 @@ import pandas as pd
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/analysis"))
-import forecast_combination as fc  # noqa: E402
-import m1_ensemble_primary as mep  # noqa: E402
-from clustered_dm import dm_test_clustered  # noqa: E402
-from maximal_reference_firm_control import (  # noqa: E402
-    KEY, SORT, build_price_panel, firm_mean_val, log_ols_frozen,
+import forecast_combination as fc
+import m1_ensemble_primary as mep
+from clustered_dm import dm_test_clustered
+from maximal_reference_firm_control import (
+    KEY,
+    SORT,
+    build_price_panel,
+    firm_mean_val,
+    log_ols_frozen,
 )
 
 # The committed gate is THREE conditions -- DM<0, Holm<0.05, |placebo DM|<2.0
@@ -193,11 +197,11 @@ def main() -> None:
          "**Validation arm.** The identical code path run on the committed row set",
          f"(A2+text join, no five-model intersection) returns {n_repro}/69, matching the",
          f"committed table's {n_committed}/69. Independently, the matched arm's FIRM rung",
-         f"runs on the committed firm table's own support and reproduces it cell for cell",
+         "runs on the committed firm table's own support and reproduces it cell for cell",
          f"({len(set_mine)} cells, set-identical to its `adds_holm`"
          f"{'' if firm_repro else ' -- MISMATCH'}). The difference below is therefore the",
          "row set, not a reimplementation difference.", "",
-         f"| rung | Holm survivors of 69 |",
+         "| rung | Holm survivors of 69 |",
          "|---|---|",
          f"| recalibrated HAR, committed (unmatched rows) | {n_committed} |",
          f"| recalibrated HAR, **matched rows** | **{n_prim}** |",
@@ -214,7 +218,7 @@ def main() -> None:
          *[f"   - {r.disc}/{r.model}/h={int(r.h)}: p_primary {r.p_primary:.2e} -> p_firm "
            f"{r.p_firm:.2e} (weaker), excluded from the primary rung by placebo "
            f"{r.placebo_primary:+.2f}, not by DM or Holm." for r in placebo_risers.itertuples()],
-         "", 
+         "",
          "| disc | model | h | primary rel% | firm rel% | primary adds | firm adds |",
          "|---|---|---|---|---|---|---|"]
     for r in out.itertuples():

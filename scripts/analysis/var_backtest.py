@@ -42,14 +42,16 @@ Run from repo root:  .venv/bin/python scripts/analysis/var_backtest.py
 """
 import sys
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
 from scipy import stats
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
+import forecast_combination as fc
+
 sys.path.insert(0, "src")
-from sp500vol.evaluation.dm_test import dm_test  # noqa: E402
+from sp500vol.evaluation.dm_test import dm_test
 
 KEY = ["ticker", "accession", "horizon_days"]
 SORT = ["filing_time_utc", "ticker", "accession"]
@@ -138,7 +140,7 @@ def tick_loss(R, VaR, alpha):
     """Gonzalez-Rivera (2004) tick / quantile loss for a LEFT-tail VaR. Lower = better."""
     R = np.asarray(R, float)
     VaR = np.asarray(VaR, float)
-    ind = (R < VaR).astype(float)
+    ind = (VaR > R).astype(float)
     return (alpha - ind) * (R - VaR)
 
 
@@ -211,7 +213,7 @@ def main():
                         cell_viol = {}
                         for fname in ("rawHAR", "fR", "fU"):
                             VaR = mu_hat + z * sig[fname]
-                            viol = (R < VaR)
+                            viol = (VaR > R)
                             x = int(viol.sum())
                             n = len(R)
                             vr = x / n

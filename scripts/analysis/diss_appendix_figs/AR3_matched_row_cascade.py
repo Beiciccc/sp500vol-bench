@@ -23,9 +23,18 @@ from matplotlib.patches import FancyArrowPatch, Rectangle
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-import diss_style as ds  # noqa: E402
-from supp_style import (BLUE, GREEN, GREY, LIGHT, PURPLE, TAB, VERM,  # noqa: E402
-                        VERM_TXT, apply_style, gate)
+import diss_style as ds
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    LIGHT,
+    PURPLE,
+    TAB,
+    VERM,
+    apply_style,
+    gate,
+)
 
 KEY = ["disc", "model", "h"]
 PANELS = [("long_form", 5), ("long_form", 10), ("long_form", 20),
@@ -237,7 +246,7 @@ def main():
             label="test rows")
     cx.barh(y + 0.19, days_pct, height=0.34, color=LIGHT, edgecolor=GREY,
             linewidth=0.5, zorder=3, label="trading days")
-    for yi, (a, b) in enumerate(zip(rows_pct, days_pct)):
+    for yi, (a, b) in enumerate(zip(rows_pct, days_pct, strict=False)):
         cx.text(a - 1.2, yi - 0.19, f"{a:.0f}", ha="right", va="center",
                 fontsize=9, color="white", zorder=4)
         cx.text(b - 1.2, yi + 0.19, f"{b:.0f}", ha="right", va="center",

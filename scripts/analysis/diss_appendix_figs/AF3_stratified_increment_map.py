@@ -36,14 +36,12 @@ import pandas as pd
 
 ANALYSIS = "scripts/analysis"
 sys.path.insert(0, ANALYSIS)
-from supp_style import (BLUE, GREY, INK2, LIGHT, RULE, TAB,  # noqa: E402
-                        VERM, VERM_TXT, apply_style, gate)
-import diss_style as ds  # noqa: E402
-
-import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib.colors import LinearSegmentedColormap, Normalize  # noqa: E402
-from matplotlib.lines import Line2D  # noqa: E402
-from matplotlib.patches import Patch  # noqa: E402
+import diss_style as ds
+import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap, Normalize
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
+from supp_style import BLUE, GREY, INK2, LIGHT, RULE, TAB, VERM, apply_style, gate
 
 # --------------------------------------------------------------- evidence
 D = pd.read_csv(os.path.join(TAB, "m1_stratified.csv"))
@@ -88,7 +86,7 @@ GROUPS = [("volatility", 1, 3), ("period", 4, 3), ("form", 7, None)]
 DRAWN = pd.concat([
     D[(D.disclosure == disc)
       & np.array([(a, s) in {(c[0], c[1]) for c in COLS[disc]}
-                  for a, s in zip(D.axis, D.stratum)])]
+                  for a, s in zip(D.axis, D.stratum, strict=False)])]
     for disc in ("long_form", "event_driven")])
 DRAWN_PART = DRAWN[DRAWN.axis != "all"]
 
@@ -292,8 +290,7 @@ fig.text(KX / W, (P_BOT + P_HGT + 0.21) / H,
          "panel (a) colour: QLIKE improvement (%),",
          ha="left", va="center", fontsize=8.6, color=INK2)
 fig.text(KX / W, (P_BOT + P_HGT + 0.055) / H,
-         "clipped at $\\pm$5; carets mark the {} cells beyond it".format(
-             int((DRAWN.rel_impr_pct.abs() > CLIP).sum())),
+         f"clipped at $\\pm$5; carets mark the {int((DRAWN.rel_impr_pct.abs() > CLIP).sum())} cells beyond it",
          ha="left", va="center", fontsize=8.6, color=INK2)
 
 nonsig = int((DRAWN.dm_q_p >= 0.05).sum())

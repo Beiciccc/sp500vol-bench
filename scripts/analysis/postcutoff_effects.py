@@ -48,8 +48,8 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
-import clustered_dm as cdm  # noqa: E402
+import clustered_dm as cdm
+import forecast_combination as fc
 
 KEY = fc.KEY
 EPS = 1e-8
@@ -202,7 +202,7 @@ def main():
         mrg = mine.merge(ref_tab, on=["disc", "h"] + (["arm", "stratum"]
                          if "arm" in ref_tab.columns and "stratum" in mine.columns
                          else []), suffixes=("_mine", "_ref"))
-        report = {"n_rows_compared": int(len(mrg))}
+        report = {"n_rows_compared": len(mrg)}
         ok = len(mrg) == len(mine) == len(ref_tab)
         for c in cols:
             dmax = float((mrg[f"{c}_mine"] - mrg[f"{c}_ref"]).abs().max())
@@ -294,8 +294,8 @@ def main():
           "| pre-vs-post comparison | eyeballed (\"post > pre in 6/6 cells\") | "
           "post-minus-pre difference of the mean daily differential with a bootstrap "
           "95% CI per cell |",
-          f"| references | same | same two: (a) single recalibrated HAR; (b) identity-"
-          f"augmented [1, log fHAR, log f_datefirm] (same-model date+ticker control) |",
+          "| references | same | same two: (a) single recalibrated HAR; (b) identity-"
+          "augmented [1, log fHAR, log f_datefirm] (same-model date+ticker control) |",
           "",
           "**Protocol (no refit, no look-ahead):** combiner weights are the ORIGINAL "
           "full-validation fit, frozen; ONLY the test evaluation is stratified at "

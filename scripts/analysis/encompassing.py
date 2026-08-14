@@ -1,5 +1,8 @@
-import numpy as np, pandas as pd
 from math import erf, sqrt
+
+import numpy as np
+import pandas as pd
+
 KEY=["ticker","accession","horizon_days"]
 def preds(run,disc):
     p=pd.read_parquet(f"results/runs/{run}_full_{disc}_seed2026/predictions.parquet")

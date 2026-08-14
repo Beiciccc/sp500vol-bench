@@ -24,7 +24,6 @@ import csv
 import json
 import os
 import re
-import sys
 from collections import defaultdict
 
 ROOT = "."
@@ -73,7 +72,7 @@ def load_fields(path):
             if header is None:
                 header = [c.strip("* `") for c in cells]
                 continue
-            for k, v in zip(header, cells):
+            for k, v in zip(header, cells, strict=False):
                 m = re.search(r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?", v.replace(",", ""))
                 if m:
                     try:
@@ -276,7 +275,7 @@ def main():
     for fl in flags:
         print(f"  {fl['table']:28s} col{fl['col']:<2} header={fl['header']!r:16s} "
               f"-> {fl['winning_field']}  cov={fl['coverage']} n={fl['n']}")
-    print(f"\n=== NET 2: tables with printed numbers absent from every cited source ===")
+    print("\n=== NET 2: tables with printed numbers absent from every cited source ===")
     orphans.sort(key=lambda d: -d["n_orphan"])
     for o in orphans[:20]:
         print(f"  {o['table']:28s} {o['n_orphan']:4d}/{o['n_numbers']:4d} orphan  "

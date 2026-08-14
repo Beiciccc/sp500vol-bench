@@ -58,12 +58,16 @@ import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
-import forecast_combination as fc  # noqa: E402  (SETS, KEY, SORT, qlike, log_combo, holm)
-import m1_clustered as mc  # noqa: E402  (build_joined, day_key, HAR, DISCLOSURES — 180 universe)
-import m1_ensemble_primary as mep  # noqa: E402  (ensemble_text — the primary basis)
-from clustered_dm import dm_test_clustered, mbb_ci_daily  # noqa: E402
-from maximal_reference_firm_control import (  # noqa: E402
-    PRICE, build_price_panel, firm_mean_val, log_ols_frozen)
+import forecast_combination as fc
+import m1_clustered as mc
+import m1_ensemble_primary as mep
+from clustered_dm import dm_test_clustered, mbb_ci_daily
+from maximal_reference_firm_control import (
+    PRICE,
+    build_price_panel,
+    firm_mean_val,
+    log_ols_frozen,
+)
 
 T = Path("results/tables")
 KEY = fc.KEY
@@ -309,7 +313,7 @@ def sum180(full, u):
     return {"better_holm": int(full[f"better_{u}_holm"].sum()),
             "better_raw": int(full[f"better_{u}_raw"].sum()),
             "worse_holm": int(full[f"worse_{u}_holm"].sum()),
-            "n": int(len(full))}
+            "n": len(full)}
 
 
 # =========================================================================
@@ -500,7 +504,7 @@ def main():
            f"**{len(overlap_var)} ({'disjoint' if not overlap_var else '; '.join(overlap_var)})** |",
            f"\n- Variance-unit Holm survivor sets: maximal = {{{', '.join(sorted(mx_var)) or 'empty'}}}; "
            f"firm = {{{', '.join(sorted(fi_var)) or 'empty'}}}.",
-           f"- Full-AND cells at raw p (variance-unit): "
+           "- Full-AND cells at raw p (variance-unit): "
            + ("; ".join(cell_str(r) for _, r in ix[ix.AND_full_var_raw].iterrows()) or "none") + ".",
            f"- Verdict: the two headline properties of the vol-unit cascade — Holm AND = "
            f"{'0 (HOLDS)' if var_now['AND_full_holm'] == 0 else str(var_now['AND_full_holm']) + ' (BROKEN)'} "
@@ -627,8 +631,8 @@ def main():
                "standalone": {"se": s_se, "qlike_vol": s_qv, "qlike_var": s_qz,
                               "qlike_var_split": {
                                   "text_better_holm": t_holm, "text_better_raw": t_raw,
-                                  "text_n": int(len(textc)),
-                                  "price_better_holm": p_holm, "price_n": int(len(pricec))}},
+                                  "text_n": len(textc),
+                                  "price_better_holm": p_holm, "price_n": len(pricec)}},
                "runtime_s": round(time.time() - t0, 1)}
     print(json.dumps(summary, indent=2, default=str))
     print("wrote results/tables/variance_unit_cascade.{csv,md} + "

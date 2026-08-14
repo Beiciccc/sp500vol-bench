@@ -15,8 +15,9 @@ Outputs (new files only):
   results/tables/control_intersection.csv
   results/tables/control_intersection.md
 """
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 T = Path("results/tables")
 KEY = ["disc", "model", "h"]

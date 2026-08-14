@@ -45,7 +45,7 @@ import pandas as pd
 REPO_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
-from sp500vol.utils import (  # noqa: E402
+from sp500vol.utils import (
     CostTracker,
     configure_logging,
     get_logger,
@@ -59,7 +59,7 @@ train_base = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(train_base)
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _textcache import ensure_texts_available  # noqa: E402
+from _textcache import ensure_texts_available
 
 _EPS = 1e-6  # matches sp500vol.models.neural_text _EPSILON (internal log eps)
 
@@ -156,7 +156,7 @@ def assert_train_only(data: pd.DataFrame, firm_means: dict, firm_col: str) -> No
         )
 
 
-def main() -> int:  # noqa: PLR0915
+def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default="C2_finbert_s1")
     parser.add_argument("--dataset", default="full")
@@ -330,7 +330,7 @@ def main() -> int:  # noqa: PLR0915
                             "level units via * exp(m) before writing."
                         ),
                         "n_firm_horizon_cells": len(firm_means),
-                        "n_train_rows_used": int(len(train_frame)),
+                        "n_train_rows_used": len(train_frame),
                         "fallback_global_train_mean_rows": n_fb,
                         "reduced_form_note": (
                             "seed 2026 only, disclosures long_form + event_driven "

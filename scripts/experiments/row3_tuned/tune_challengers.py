@@ -34,7 +34,6 @@ Usage:
   CUDA_VISIBLE_DEVICES="" python ... --stage all --tag dryrun --limit 100 \
       --epochs 3 --batch-size 8 --precision no --max-length 64 --dl-workers 0
 """
-# ruff: noqa: E402
 
 from __future__ import annotations
 
@@ -210,7 +209,7 @@ def _curve_stats(val_curves: dict) -> tuple[dict[str, int], dict[str, int]]:
     return epochs_ran, best_epoch
 
 
-def run_config(  # noqa: PLR0915  (single linear train->predict->summarise flow, mirrors train.py main)
+def run_config(
     train_mod, model_id: str, disclosure: str, lr: float, args
 ) -> dict:
     """Train ONE grid config end-to-end (archived pipeline conventions), write a

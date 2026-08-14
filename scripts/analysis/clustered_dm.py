@@ -25,7 +25,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "src")
-from sp500vol.evaluation.dm_test import dm_test  # noqa: E402
+from sp500vol.evaluation.dm_test import dm_test
 
 __all__ = ["daily_mean", "dm_test_clustered", "mbb_ci_daily"]
 
@@ -68,7 +68,7 @@ def dm_test_clustered(lossA, lossB, days, h):
     dA, _ = daily_mean(lossA, days)
     dB, _ = daily_mean(lossB, days)
     stat, p = dm_test(dA, dB, h=int(h))
-    return float(stat), float(p), int(len(dA))
+    return float(stat), float(p), len(dA)
 
 
 def mbb_ci_daily(d, days, h, *, B=2000, seed=2026, alpha=0.05):

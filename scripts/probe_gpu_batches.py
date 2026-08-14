@@ -333,7 +333,7 @@ def _parse_worker_stdout(stdout: str) -> dict[str, Any] | None:
     return None
 
 
-def _run_worker(args: argparse.Namespace) -> dict[str, Any]:  # noqa: PLR0915
+def _run_worker(args: argparse.Namespace) -> dict[str, Any]:
     row = _empty_row(model=args.model, batch_size=args.batch_size)
     try:
         import torch

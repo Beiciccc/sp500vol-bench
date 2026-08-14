@@ -86,7 +86,7 @@ import pyarrow.parquet as pq
 
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "src"))
-from sp500vol.utils.paths import data_path  # noqa: E402
+from sp500vol.utils.paths import data_path
 
 PLACEHOLDER = {"CIK": "[CIK]", "TICKER": "[TICKER]", "FIRM": "[FIRM]",
                "PERSON": "[PERSON]", "PRODUCT": "[PRODUCT]"}
@@ -428,7 +428,7 @@ def leak_flags(masked: str, own_cik: int, own_ticker: str, rt: RuleTable):
     return leak_tick, leak_name
 
 
-def mask_docs(nlp, rt: "RuleTable", docs: list[dict], texts: dict[str, str],
+def mask_docs(nlp, rt: RuleTable, docs: list[dict], texts: dict[str, str],
               threads: int) -> tuple[list[dict], list[dict]]:
     """NER + rule spans + merge + replace for `docs` (records with text_path/
     ticker/cik_int). Returns (store rows, per-doc stat rows) in `docs` order.
@@ -483,7 +483,7 @@ def mask_docs(nlp, rt: "RuleTable", docs: list[dict], texts: dict[str, str],
     return rows, stat_rows
 
 
-def aggregate_stats(st: pd.DataFrame, rt: "RuleTable", ner_meta: dict,
+def aggregate_stats(st: pd.DataFrame, rt: RuleTable, ner_meta: dict,
                     text_prov: dict, smoke: bool, out_path: Path,
                     panel: str) -> dict:
     return {
@@ -491,7 +491,7 @@ def aggregate_stats(st: pd.DataFrame, rt: "RuleTable", ner_meta: dict,
                   + (" (long_form stretch)" if panel == "lf" else ""),
         "panel": panel, "smoke": smoke, "ner": ner_meta,
         "text_provenance": text_prov,
-        "n_docs": int(len(st)),
+        "n_docs": len(st),
         "n_name_entries": rt.n_names(),
         "docs_with_any_mask_pct": float(100 * (st.n_spans > 0).mean()),
         "mean_spans_per_doc": float(st.n_spans.mean()),
@@ -512,7 +512,7 @@ def aggregate_stats(st: pd.DataFrame, rt: "RuleTable", ner_meta: dict,
 
 def write_audit(audit_path: Path, st: pd.DataFrame, masked_by_tp: dict[str, str],
                 orig_by_tp: dict[str, str], agg: dict, ner_meta: dict,
-                rt: "RuleTable") -> None:
+                rt: RuleTable) -> None:
     """G2 audit sample (seed 2026 over the stats row order), original vs masked."""
     rng = np.random.default_rng(AUDIT_SEED)
     pick = rng.choice(len(st), size=min(AUDIT_N, len(st)), replace=False)
@@ -744,7 +744,7 @@ def main():
     stats_path.write_text(json.dumps(agg, indent=2))
 
     # ---- G2: 100-doc audit sample (seed 2026), original vs masked ----
-    masked_by_tp = dict(zip(out_df["text_path"], out_df["text"]))
+    masked_by_tp = dict(zip(out_df["text_path"], out_df["text"], strict=False))
     orig_by_tp = texts if not done else {
         **{tp: "" for tp in masked_by_tp}, **texts}
     if done:  # resume path: re-fetch originals for the audit picks
@@ -826,7 +826,7 @@ def run_batched(args, meta, rt, nlp, ner_meta, out_path: Path,
     pick = rng.choice(len(st), size=min(AUDIT_N, len(st)), replace=False)
     audit_tps = set(st.iloc[sorted(pick.tolist())]["text_path"])
     orig_by_tp, _ = stream_texts(audit_tps)
-    masked_by_tp = {tp: tx for tp, tx in zip(out_df["text_path"], out_df["text"])
+    masked_by_tp = {tp: tx for tp, tx in zip(out_df["text_path"], out_df["text"], strict=False)
                     if tp in audit_tps}
     write_audit(audit_path, st, masked_by_tp, orig_by_tp, agg, ner_meta, rt)
 

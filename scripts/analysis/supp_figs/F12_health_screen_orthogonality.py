@@ -77,14 +77,28 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from supp_style import (BLUE, GREEN, GREY, INK, INK2, LIGHT, PURPLE, REPO, SKY,
-                        TAB, VERM, VERM_TXT, YELLOW, annot, apply_style, finish,
-                        gate, note)
-
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.patches import FancyArrowPatch
 from matplotlib.transforms import offset_copy
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    INK,
+    INK2,
+    PURPLE,
+    SKY,
+    TAB,
+    VERM,
+    VERM_TXT,
+    YELLOW,
+    annot,
+    apply_style,
+    finish,
+    gate,
+    note,
+)
 
 W, H = 6.5, 8.80                      # canvas inches (portrait supplement page)
 

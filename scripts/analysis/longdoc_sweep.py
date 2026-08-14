@@ -17,8 +17,9 @@ import pandas as pd
 
 sys.path.insert(0, "src")
 sys.path.insert(0, "scripts/analysis")
-from sp500vol.evaluation.dm_test import dm_test  # noqa: E402
-import forecast_combination as fc  # noqa: E402
+import forecast_combination as fc
+
+from sp500vol.evaluation.dm_test import dm_test
 
 ROOT = Path(".")
 RUNS = ROOT / "results/runs"
@@ -265,7 +266,7 @@ def main():
                      if r["strategy"] != "S1_truncation"
                      and r["horizon"] in s1.index
                      and r["qlike_mean"] < s1[r["horizon"]]]
-            note = (f" (lower QLIKE but NOT DM-significant at: "
+            note = (" (lower QLIKE but NOT DM-significant at: "
                     + ", ".join(f"{a}@h{b}" for a, b in lower) + ")") if lower else ""
             verdict_lines.append(
                 f"- **{disclosure}**: NO long-doc strategy significantly beats "

@@ -21,6 +21,7 @@ import os
 import sys
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.colors as mcolors
 import matplotlib.patheffects as mpe
@@ -30,10 +31,26 @@ import pandas as pd
 from matplotlib.lines import Line2D
 
 sys.path.insert(0, "scripts/analysis")
-import supp_style  # noqa: E402
-from supp_style import (apply_style, finish, gate, annot, note,  # noqa: E402
-                        BLUE, SKY, VERM, VERM_TXT, GREEN, GREEN_TXT, YELLOW, PURPLE,
-                        GREY, LIGHT, INK, INK2, RULE, TAB, REPO)
+import supp_style
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREEN_TXT,
+    GREY,
+    INK,
+    INK2,
+    LIGHT,
+    PURPLE,
+    REPO,
+    RULE,
+    TAB,
+    VERM,
+    annot,
+    apply_style,
+    finish,
+    gate,
+    note,
+)
 
 supp_style.OUTDIR = os.path.join(REPO, "writing", "dissertation", "figures")
 
@@ -63,14 +80,14 @@ quarters = sorted(qp.quarter.unique())
 gate({"cells": 69, "quarters": 16, "quarter_cells": 1104,
       "genuine_fixed": 36, "genuine_exp": 6},
      {"cells": int(prim.groupby(KEY).ngroups), "quarters": len(quarters),
-      "quarter_cells": int(len(qp)),
+      "quarter_cells": len(qp),
       "genuine_fixed": int(prim.genuine_fixed.sum()),
       "genuine_exp": int(prim.genuine_exp.sum())})
 
 order = (prim.assign(_d=prim.disc.map({"event_driven": 0, "long_form": 1}))
              .sort_values(["_d", "model", "h"])
              .reset_index(drop=True))
-rows = list(zip(order.disc, order.model, order.h))
+rows = list(zip(order.disc, order.model, order.h, strict=False))
 row_of = {r: i for i, r in enumerate(rows)}
 
 M_fix = np.full((len(rows), len(quarters)), np.nan)

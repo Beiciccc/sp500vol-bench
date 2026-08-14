@@ -22,11 +22,14 @@ Run from repo root:  .venv/bin/python scripts/analysis/m1_multiseed.py
 """
 import sys
 from pathlib import Path
-import numpy as np, pandas as pd
+
+import numpy as np
+import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
 import forecast_combination as fc
+
 from sp500vol.evaluation.dm_test import dm_test
 
 KEY = fc.KEY
@@ -122,7 +125,7 @@ def main():
     n_overlap = len(chk)
 
     # ---- aggregates ----------------------------------------------------------
-    gen = wide[wide.grid2026_genuine == True]  # noqa: E712
+    gen = wide[wide.grid2026_genuine == True]
     n_gen = len(gen)
     keep3_h = int((gen.n_sig_holm == 3).sum())
     keep2_h = int((gen.n_sig_holm >= 2).sum())
@@ -164,8 +167,8 @@ def main():
                   "sign disagree | genuine@2026 |\n"
                   "|---|---|---|---|---|---|---|---|---|---|---|---|---|")
         for _, r in sub.iterrows():
-            gtag = ("YES" if r.grid2026_genuine == True else  # noqa: E712
-                    ("no" if r.grid2026_genuine == False else "-"))  # noqa: E712
+            gtag = ("YES" if r.grid2026_genuine == True else
+                    ("no" if r.grid2026_genuine == False else "-"))
             md.append(
                 f"| {r.model} | {r.h} | {r.rel_impr_pct_2026:+.2f} | {r.rel_impr_pct_2027:+.2f} | "
                 f"{r.rel_impr_pct_2028:+.2f} | {r.rel_mean:+.2f}±{r.rel_std:.2f} | "

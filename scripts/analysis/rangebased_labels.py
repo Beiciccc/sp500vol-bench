@@ -49,15 +49,15 @@ for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
            "VECLIB_MAXIMUM_THREADS", "NUMEXPR_NUM_THREADS"):
     os.environ.setdefault(_v, _THREADS)
 
-import argparse  # noqa: E402
-import json  # noqa: E402
-import sys  # noqa: E402
-import time  # noqa: E402
-from pathlib import Path  # noqa: E402
+import argparse
+import json
+import sys
+import time
+from pathlib import Path
 
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
-from scipy import stats  # noqa: E402
+import numpy as np
+import pandas as pd
+from scipy import stats
 
 DATA_ROOT = Path(os.environ.get("SP500VOL_DATA_ROOT", "/Volumes/Z/sp500vol-data"))
 ALIGNED = DATA_ROOT / "processed" / "full" / "aligned_filings.parquet"

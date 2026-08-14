@@ -45,9 +45,9 @@ import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
-import forecast_combination as fc  # noqa: E402
-import m1_ensemble_primary as mep  # noqa: E402  (ensemble_text — declared primary basis)
-from clustered_dm import dm_test_clustered  # noqa: E402
+import forecast_combination as fc
+import m1_ensemble_primary as mep
+from clustered_dm import dm_test_clustered
 
 KEY = fc.KEY
 SORT = fc.SORT
@@ -229,7 +229,7 @@ def main():
     s26f = grid[(grid.basis == "s26") & (grid.ref == "fitted_pool")]
     j = s26f.merge(ref_csv, on=["disc", "model", "h"], suffixes=("", "_ref"))
     sanity = {
-        "n_matched": int(len(j)),
+        "n_matched": len(j),
         "max_abs_diff_qlike_R": float((j.qlike_R - j.qlike_Rstar).abs().max()),
         "max_abs_diff_qlike_U": float((j.qlike_U - j.qlike_Ustar).abs().max()),
         "max_abs_diff_dm": float((j.dm_q_clustered - j.dm_q_clustered_ref).abs().max()),
@@ -358,7 +358,7 @@ def main():
         if union:
             md.append("- union cells: " + "; ".join(
                 f"{d}/{m}/h{h}" + " [" + "".join(
-                    t for t, s in zip("FEV", (f_, e_, v_)) if (d, m, h) in s) + "]"
+                    t for t, s in zip("FEV", (f_, e_, v_), strict=False) if (d, m, h) in s) + "]"
                 for d, m, h in union))
 
     # ---- per-cell grid (ensemble basis, all three refs side by side) ----

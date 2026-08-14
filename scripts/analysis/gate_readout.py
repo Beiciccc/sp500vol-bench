@@ -1,6 +1,12 @@
-import sys, numpy as np, pandas as pd, torch
+import sys
+
+import numpy as np
+import pandas as pd
+import torch
+
 sys.path.insert(0,"src")
 import sp500vol.models.fusion.gated_fusion as gf
+
 GATES={}  # horizon -> list of (1-g) arrays
 _orig=gf._GatedFusion.forward
 _cur={"h":None}

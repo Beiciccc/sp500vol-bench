@@ -21,6 +21,7 @@ import os
 import sys
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -28,10 +29,22 @@ import pandas as pd
 from matplotlib.lines import Line2D
 
 sys.path.insert(0, "scripts/analysis")
-import supp_style  # noqa: E402
-from supp_style import (apply_style, finish, gate, BLUE, SKY, VERM, VERM_TXT,  # noqa: E402
-                        GREEN, YELLOW, PURPLE, GREY, LIGHT, TAB, REPO,
-                        INK2, RULE)
+import supp_style
+from supp_style import (
+    BLUE,
+    GREY,
+    INK2,
+    LIGHT,
+    REPO,
+    RULE,
+    SKY,
+    TAB,
+    VERM,
+    VERM_TXT,
+    apply_style,
+    finish,
+    gate,
+)
 
 supp_style.OUTDIR = os.path.join(REPO, "writing", "dissertation", "figures")
 
@@ -55,8 +68,8 @@ g = m[m.gen26].copy()
 
 gate({"cells": 144, "sign_flips": 37, "genuine_2026": 14,
       "hold_3of3": 5, "hold_2of3": 12, "wedge": 40, "seeds": 3},
-     {"cells": int(len(m)), "sign_flips": int(m.sign_disagree.sum()),
-      "genuine_2026": int(len(g)), "hold_3of3": int((g.n_sig_holm == 3).sum()),
+     {"cells": len(m), "sign_flips": int(m.sign_disagree.sum()),
+      "genuine_2026": len(g), "hold_3of3": int((g.n_sig_holm == 3).sum()),
       "hold_2of3": int((g.n_sig_holm >= 2).sum()), "wedge": int(wedge.sum()),
       "seeds": int(m.n_seeds.max())})
 
@@ -119,12 +132,12 @@ BLK = BLK.sort_values("pct")
 ypos = np.arange(len(BLK))
 cols = [SKY if b in ("C5", "D3") else VERM for b in BLK.index]
 ax_b.barh(ypos, BLK.pct, height=0.66, color=cols, edgecolor="none")
-for y, (b, r) in zip(ypos, BLK.iterrows()):
+for y, (b, r) in zip(ypos, BLK.iterrows(), strict=False):
     ax_b.text(r.pct + 2.5, y, f"{int(r.flips)}/{int(r.n)}", fontsize=9,
               color=SKY if b in ("C5", "D3") else VERM_TXT, va="center")
 ax_b.set_yticks(ypos)
 ax_b.set_yticklabels(BLK.index, fontsize=9)
-for lab, b in zip(ax_b.get_yticklabels(), BLK.index):
+for lab, b in zip(ax_b.get_yticklabels(), BLK.index, strict=False):
     lab.set_color(SKY if b in ("C5", "D3") else GREY)
 ax_b.set_xlim(0, 100)
 ax_b.set_xticks([0, 25, 50, 75])
@@ -150,7 +163,7 @@ for i, r in g.iterrows():
     vals = [r[f"rel_impr_pct_{s}"] for s in SEEDS]
     ax_c.plot([min(vals), max(vals)], [i, i], color=LIGHT, lw=2.6,
               solid_capstyle="round", zorder=1)
-    for s, mk in zip(SEEDS, ("o", "s", "^")):
+    for s, mk in zip(SEEDS, ("o", "s", "^"), strict=False):
         v = r[f"rel_impr_pct_{s}"]
         holm_ok = (r[f"p_holm_{s}"] < 0.05) and (r[f"dm_q_{s}"] < 0)
         ax_c.plot([v], [i], ls="none", marker=mk, ms=5.0,
@@ -179,7 +192,7 @@ for i, r in g.iterrows():
               va="center", color=BLUE if r.n_sig_holm == 3 else GREY)
 
 hand = [Line2D([], [], ls="none", marker=mk, ms=4.6, mfc=BLUE, mec=BLUE,
-               label=f"seed {s}") for s, mk in zip(SEEDS, ("o", "s", "^"))]
+               label=f"seed {s}") for s, mk in zip(SEEDS, ("o", "s", "^"), strict=False)]
 hand.append(Line2D([], [], ls="none", marker="o", ms=4.6, mfc="white",
                    mec=VERM, mew=0.9, label="not Holm-significant, that seed"))
 ax_c.legend(handles=hand, loc="lower left", fontsize=9, handletextpad=0.35,

@@ -3,7 +3,6 @@
 Usage:
     python scripts/run_ablation.py --ablation AB1
 """
-# ruff: noqa: E402
 
 from __future__ import annotations
 

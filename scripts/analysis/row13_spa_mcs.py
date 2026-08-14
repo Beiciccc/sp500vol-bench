@@ -65,14 +65,16 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # qlike (vol-unit), se, load  # noqa: E402
-from clustered_dm import dm_test_clustered  # noqa: E402
+import forecast_combination as fc  # qlike (vol-unit), se, load
+from clustered_dm import dm_test_clustered
 
 sys.path.insert(0, "src")
-from sp500vol.evaluation.metrics import qlike as var_qlike  # variance-unit Patton QLIKE  # noqa: E402
+from sp500vol.evaluation.metrics import (
+    qlike as var_qlike,  # variance-unit Patton QLIKE
+)
 
 try:  # optional independent cross-check engine
-    import arch.bootstrap as _arch_boot  # noqa: F401
+    import arch.bootstrap as _arch_boot
     HAVE_ARCH = True
 except Exception:  # pragma: no cover
     HAVE_ARCH = False
@@ -465,7 +467,7 @@ def sanity_g2_clustered_dm():
         days = day_key(g)
         stat, _p, ndays = dm_test_clustered(fc.se(y, g[f"p__{ch}"].to_numpy()),
                                             fc.se(y, g[f"p__{BENCH}"].to_numpy()), days, h)
-        if not (_close(stat, row.dm_clust.iloc[0]) and int(len(g)) == int(row.n_obs.iloc[0])
+        if not (_close(stat, row.dm_clust.iloc[0]) and len(g) == int(row.n_obs.iloc[0])
                 and int(ndays) == int(row.n_days.iloc[0])):
             bad.append((disc, h, ch, f"got dm={stat!r} n_obs={len(g)} n_days={ndays} vs "
                                      f"committed dm={float(row.dm_clust.iloc[0])!r} "

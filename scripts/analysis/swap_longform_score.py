@@ -67,7 +67,7 @@ import subprocess
 import sys
 import tempfile
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
@@ -75,13 +75,12 @@ os.chdir(REPO)
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
 
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
-
-import forecast_combination as fc  # noqa: E402
-import matched_firm_swap as mfs  # noqa: E402
-from clustered_dm import dm_test_clustered  # noqa: E402
-from withindate_placebo import day_key, rel_pct  # noqa: E402
+import forecast_combination as fc
+import matched_firm_swap as mfs
+import numpy as np
+import pandas as pd
+from clustered_dm import dm_test_clustered
+from withindate_placebo import day_key, rel_pct
 
 DISC = "long_form"
 KEY, SORT, HORIZONS = fc.KEY, fc.SORT, fc.HORIZONS
@@ -154,7 +153,7 @@ def gate_g1_committed_reproduction(st: Settings) -> dict:
             os.symlink(st.table(name), work / "results" / "tables" / name)
         proc = subprocess.run(
             [sys.executable, "scripts/analysis/matched_firm_swap.py"],
-            cwd=work, capture_output=True, text=True, timeout=3600,
+            check=False, cwd=work, capture_output=True, text=True, timeout=3600,
             env={**os.environ},
         )
         if proc.returncode != 0:
@@ -175,9 +174,8 @@ def gate_g1_committed_reproduction(st: Settings) -> dict:
                        f"(max abs diff {np.nanmax(np.abs(a - b)):.3e})")
             with np.errstate(invalid="ignore"):
                 max_abs = max(max_abs, float(np.nanmax(np.abs(a - b))) if len(a) else 0.0)
-        else:
-            if not (fresh[c].astype(str) == ref[c].astype(str)).all():
-                _fatal(f"G1: non-numeric column {c} differs")
+        elif not (fresh[c].astype(str) == ref[c].astype(str)).all():
+            _fatal(f"G1: non-numeric column {c} differs")
     print(f"[score] G1 PASS — committed matched_firm_swap.csv reproduced on the same "
           f"code path (byte-identical={byte_equal}, max numeric |Δ|={max_abs:.2e})")
     return {"pass": True, "byte_identical": bool(byte_equal), "max_abs_diff": max_abs}
@@ -371,9 +369,9 @@ def write_outputs(st: Settings, df: pd.DataFrame, gates: dict,
 
     # PRE-DECLARED set: m1_ensemble_primary genuine_ens_vol long_form cells of the
     # re-inferred arms with a positive real increment (committed swap convention)
-    declared = df[(df.genuine_ens_vol == True) & (df.real_rel_pct > 0)]  # noqa: E712
+    declared = df[(df.genuine_ens_vol == True) & (df.real_rel_pct > 0)]
     q1, med, q3 = _quart(declared.retention_doc)
-    o_declared = df[(df.genuine_orig == True) & (df.real_rel_pct > 0)]  # noqa: E712
+    o_declared = df[(df.genuine_orig == True) & (df.real_rel_pct > 0)]
     oq1, omed, oq3 = _quart(o_declared.retention_doc)
     all_pos = df[df.real_rel_pct > 0]
     aq1, amed, aq3 = _quart(all_pos.retention_doc)
@@ -469,7 +467,7 @@ def write_outputs(st: Settings, df: pd.DataFrame, gates: dict,
            "frozen artefacts (`equiv max|Δf|` per cell above) instead of asserting "
            "it, and any deviation would have flagged hidden non-purity.\n",
            f"Single-shot: this file is written once "
-           f"({datetime.now(timezone.utc).isoformat(timespec='seconds')}); reruns "
+           f"({datetime.now(UTC).isoformat(timespec='seconds')}); reruns "
            f"require --i-know-this-violates-prereg and a disclosure block."]
     if rerun_disclosure:
         md += ["\n## RERUN DISCLOSURE\n", rerun_disclosure]
@@ -482,7 +480,7 @@ def write_outputs(st: Settings, df: pd.DataFrame, gates: dict,
         "arms_present": list(st.arms),
         "c2_finbert_s1_status": "artefact-lost, not executed (prereg-ea-v1.2); "
                                 "coverage degraded to B2+C5",
-        "n_declared_cells": int(len(declared)),
+        "n_declared_cells": len(declared),
         "retention_doc_median": med, "retention_doc_q1": q1, "retention_doc_q3": q3,
         "retention_doc_median_origset": omed,
         "branch": ("c" if mixed else branch), "mixed_flag": mixed,
@@ -492,7 +490,7 @@ def write_outputs(st: Settings, df: pd.DataFrame, gates: dict,
             "lf_genuine_median": float(c_lf.retention_vs_real.median()),
         },
         "gates": gates,
-        "generated_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "generated_utc": datetime.now(UTC).isoformat(timespec="seconds"),
     }
     st.out_meta.write_text(json.dumps(summary, indent=2, default=str))
     print(f"[score] wrote {st.out_csv}")
@@ -526,13 +524,13 @@ def _selftest() -> int:
 
     rng = np.random.default_rng(7)
     firms = [f"F{i}" for i in range(8)]
-    base = dict(zip(firms, np.geomspace(0.05, 0.6, len(firms))))
+    base = dict(zip(firms, np.geomspace(0.05, 0.6, len(firms)), strict=False))
     days = pd.bdate_range("2019-01-01", periods=360)
     splits = np.array(["train"] * 120 + ["val"] * 120 + ["test"] * 120)
 
     rows = []
     acc = 0
-    for d, s in zip(days, splits):
+    for d, s in zip(days, splits, strict=False):
         shock = float(np.exp(rng.normal(0, 0.3)))
         for f in firms:
             idio = float(np.exp(rng.normal(0, 0.4)))
@@ -639,7 +637,7 @@ def _selftest() -> int:
                          on=["split", "horizon_days", "accession"], validate="one_to_one")
             look = m.set_index(["split", "horizon_days", "accession"])[
                 "prediction_realised_vol"]
-            keys = list(zip(m.split, m.horizon_days, m.partner_accession))
+            keys = list(zip(m.split, m.horizon_days, m.partner_accession, strict=False))
             m["prediction_realised_vol"] = look.loc[keys].to_numpy()
             od = root / "results/runs" / f"ELF_swap_{arm}_full_{DISC}_seed2026"
             od.mkdir(parents=True)
@@ -702,7 +700,7 @@ def main() -> int:
         if not args.rerun_reason:
             _fatal("--i-know-this-violates-prereg requires --rerun-reason")
         disclosure = (f"Rerun forced at "
-                      f"{datetime.now(timezone.utc).isoformat(timespec='seconds')}; "
+                      f"{datetime.now(UTC).isoformat(timespec='seconds')}; "
                       f"reason: {args.rerun_reason}")
     run(st, rerun_disclosure=disclosure, force=args.force)
     return 0

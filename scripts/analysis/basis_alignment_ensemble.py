@@ -48,11 +48,15 @@ import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
-import forecast_combination as fc  # noqa: E402  (load, qlike, log_combo, holm, SETS)
-import m1_ensemble_primary as mep  # noqa: E402  (ensemble_text — THE primary basis)
-from clustered_dm import dm_test_clustered, mbb_ci_daily  # noqa: E402
-from maximal_reference_firm_control import (  # noqa: E402
-    PRICE, build_price_panel, firm_mean_val, log_ols_frozen)
+import forecast_combination as fc
+import m1_ensemble_primary as mep
+from clustered_dm import dm_test_clustered, mbb_ci_daily
+from maximal_reference_firm_control import (
+    PRICE,
+    build_price_panel,
+    firm_mean_val,
+    log_ols_frozen,
+)
 
 T = Path("results/tables")
 KEY = fc.KEY
@@ -193,8 +197,8 @@ def main():
     # ---- SANITY GATE: single-seed cells must reproduce the committed tables exactly
     ms, fs = maxdf[maxdf.n_seeds == 1], firmdf[firmdf.n_seeds == 1]
     sanity = {
-        "n_cells": int(len(maxdf)),
-        "n_single_seed_cells": int(len(ms)),
+        "n_cells": len(maxdf),
+        "n_single_seed_cells": len(ms),
         "max_dm_diff_maximal_single": float((ms.dm_q_clustered - ms.dm_q_clustered_s26).abs().max()),
         "max_rel_diff_maximal_single": float((ms.rel_impr_pct_maximal - ms.rel_impr_pct_maximal_s26).abs().max()),
         "max_dm_diff_firm_single": float((fs.dm_q_clustered - fs.dm_q_clustered_s26).abs().max()),
@@ -468,7 +472,7 @@ def write_intersection_md(ix, b4, now, mx_set, fi_set, overlap, overlap0, sanity
     md.append("\n## Survivor sets (Holm, ensemble basis)\n")
     md.append(f"**Maximal (n={len(mx_set)}):** " + (", ".join(sorted(mx_set)) or "none"))
     md.append(f"\n**Firm-identity (n={len(fi_set)}):** " + (", ".join(sorted(fi_set)) or "none"))
-    md.append(f"\n**Overlap:** " + (", ".join(overlap) if overlap
+    md.append("\n**Overlap:** " + (", ".join(overlap) if overlap
                                     else "EMPTY — the two survivor sets are disjoint"))
     md.append("\n\n## Sanity\n"
               f"- Single-seed cells ({sanity['n_single_seed_cells']}/{n}) bit-reproduce the "

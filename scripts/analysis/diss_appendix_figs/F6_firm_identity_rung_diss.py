@@ -89,14 +89,24 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-import diss_style as ds  # noqa: E402
-import _inclusion_floor  # noqa: E402
-from supp_style import (AGG, BLUE, GREEN, GREY, INK, INK2, LIGHT, PURPLE, REPO,
-                        RULE, SKY, TAB, VERM, VERM_TXT, YELLOW, apply_style,
-                        gate)
-
+import _inclusion_floor
+import diss_style as ds
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
+from supp_style import (
+    BLUE,
+    GREY,
+    INK,
+    INK2,
+    LIGHT,
+    PURPLE,
+    RULE,
+    TAB,
+    VERM,
+    VERM_TXT,
+    apply_style,
+    gate,
+)
 
 # --------------------------------------------------------------- evidence
 ENS = pd.read_csv(os.path.join(TAB, "firm_identity_ensemble.csv"))
@@ -275,7 +285,7 @@ for ax, block, rank0 in ((axL, srt.iloc[:NROW], 1), (axR, srt.iloc[NROW:], NROW 
     ax.set_ylim(NROW - 0.5, -0.7)
     ax.set_yticks(ypos)
     ax.set_yticklabels(
-        ["{} {} h={}  {}".format(SHORT[r.disc], r.model, r.h, CODE[r.verdict])
+        [f"{SHORT[r.disc]} {r.model} h={r.h}  {CODE[r.verdict]}"
          for r in block.itertuples()])
     ax.tick_params(axis="y", length=0, pad=2)
     ax.set_xticks([-10, -3, -1, 0, 1])
@@ -337,15 +347,10 @@ fig.text(0.5, (A_BOT + A_HGT + 0.38) / H,
          ha="center", va="center", fontsize=9.5, color=INK)
 
 note = [
-    "Channel means {lfm:+.2f}% long-form, {edm:+.2f}% event-driven. The firm "
-    "mean turns {neg} of {n} long-form cells negative.".format(
-        lfm=lf.rel_impr_pct_firm.mean(), edm=ed.rel_impr_pct_firm.mean(),
-        neg=int((lf.rel_impr_pct_firm < 0).sum()), n=len(lf)),
-    "Firm coverage {cf_lf:.3f} / {cf_ed:.3f} of firms and {co_lf:.3f} / "
-    "{co_ed:.3f} of test rows (long-form / event-driven).".format(
-        cf_lf=lf.firm_val_coverage.iloc[0], cf_ed=ed.firm_val_coverage.iloc[0],
-        co_lf=lf.firm_val_coverage_test_obs.iloc[0],
-        co_ed=ed.firm_val_coverage_test_obs.iloc[0]),
+    f"Channel means {lf.rel_impr_pct_firm.mean():+.2f}% long-form, {ed.rel_impr_pct_firm.mean():+.2f}% event-driven. The firm "
+    f"mean turns {int((lf.rel_impr_pct_firm < 0).sum())} of {len(lf)} long-form cells negative.",
+    f"Firm coverage {lf.firm_val_coverage.iloc[0]:.3f} / {ed.firm_val_coverage.iloc[0]:.3f} of firms and {lf.firm_val_coverage_test_obs.iloc[0]:.3f} / "
+    f"{ed.firm_val_coverage_test_obs.iloc[0]:.3f} of test rows (long-form / event-driven).",
 ]
 # Panel (a)'s basis block: channel means, the 38-of-45 count, and the firm and
 # row coverage the whole rung rests on.  Every word is kept; what changes is
@@ -363,13 +368,13 @@ hairline(A_BOT - 0.445)
 def lollipop(ax, rows, rel_key, dm_key, p_key):
     lab, dm, rel, pv = [], [], [], []
     for r in rows.itertuples():
-        lab.append("{} h={}".format(SHORT[r.disc], r.h))
+        lab.append(f"{SHORT[r.disc]} h={r.h}")
         dm.append(float(getattr(r, dm_key)))
         rel.append(float(getattr(r, rel_key)))
         pv.append(float(getattr(r, p_key)))
     y = np.arange(len(lab))
     ax.axvline(0, color=GREY, lw=0.7, zorder=4)
-    for i, (d, p) in enumerate(zip(dm, pv)):
+    for i, (d, p) in enumerate(zip(dm, pv, strict=False)):
         sig = p < 0.05
         ax.plot([0, d], [i, i], color=PURPLE if sig else GREY,
                 lw=1.6 if sig else 0.9, zorder=3, solid_capstyle="butt")
@@ -385,9 +390,9 @@ def lollipop(ax, rows, rel_key, dm_key, p_key):
     ax.xaxis.grid(True, color=LIGHT, lw=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.spines["left"].set_visible(False)
-    for i, (d, r, p) in enumerate(zip(dm, rel, pv)):
-        ptxt = "p<.001" if p < 0.0005 else "p={:.3f}".format(p)
-        ax.text(1.05, i, "{:+.2f}%  {}".format(r, ptxt),
+    for i, (d, r, p) in enumerate(zip(dm, rel, pv, strict=False)):
+        ptxt = "p<.001" if p < 0.0005 else f"p={p:.3f}"
+        ax.text(1.05, i, f"{r:+.2f}%  {ptxt}",
                 transform=ax.get_yaxis_transform(), ha="left", va="center",
                 fontsize=9, color=GREY, clip_on=False, zorder=6)
 
@@ -409,9 +414,9 @@ ROWS = "LF n {:,}-{:,}, ED n {:,}-{:,} by horizon".format
 # figure's own left margin, and the emitted page has to fit the A4 text block.
 blocks = [
     (0.06, "(b)  Firm mean alone vs " + r"$f_R$" + ", grid rows: "
-     "{} of 6".format(beats_ens),
+     f"{beats_ens} of 6",
      ROWS(max(n_lf), min(n_lf), max(n_ed), min(n_ed))),
-    (W / 2 + 0.06, "(c)  The same test, full A2 panel: {} of 6".format(beats_zt),
+    (W / 2 + 0.06, f"(c)  The same test, full A2 panel: {beats_zt} of 6",
      ROWS(max(z_lf), min(z_lf), max(z_ed), min(z_ed))),
 ]
 # Line one is the panel's title (marker and title in one string, one call);
@@ -436,10 +441,8 @@ foot_src = (
     "six: long-form h=5, 10, 20 and "
     "event-driven h=5; panel (c) runs the same test on every A2 row and returns "
     "three of six (long-form h=5 "
-    "falls from p=0.024 to p={p:.3f}), so the count moves with the row basis. "
-    "Long-form h=20 in (b): {r:+.2f}% against DM {d:+.2f}.".format(
-        p=float(lf5z.p_clustered), r=float(lf20.rel_impr_firmMeanOnly_vs_fR),
-        d=float(lf20.dm_firmMeanOnly_vs_fR))
+    f"falls from p=0.024 to p={float(lf5z.p_clustered):.3f}), so the count moves with the row basis. "
+    f"Long-form h=20 in (b): {float(lf20.rel_impr_firmMeanOnly_vs_fR):+.2f}% against DM {float(lf20.dm_firmMeanOnly_vs_fR):+.2f}."
 )
 foot = textwrap.wrap(foot_src, 110)
 if len(foot) != 4:

@@ -1,6 +1,10 @@
-import sys, numpy as np, pandas as pd
+import sys
+
+import pandas as pd
+
 sys.path.insert(0,"src")
 from sp500vol.evaluation.dm_test import dm_test
+
 KEY=["ticker","accession","horizon_days"]
 def preds(run,disc):
     p=pd.read_parquet(f"results/runs/{run}_full_{disc}_seed2026/predictions.parquet"); return p[p.split=="test"].copy()
@@ -25,7 +29,7 @@ for disc,chs in REP.items():
         for yr in [2022,2023,"24-25"]:
             sub=m[m.year==yr]; r=dmrow(b,c,sub)
             cell=lambda h:(f"{r[h][0]:+.2f}{'*' if r[h] and r[h][1]<0.05 else ' ns'}" if r[h] else "-")
-            line=f"  {ch:16s} {str(yr):6s}  h5 {cell(5):10s} h10 {cell(10):10s} h20 {cell(20):10s}"
+            line=f"  {ch:16s} {yr!s:6s}  h5 {cell(5):10s} h10 {cell(10):10s} h20 {cell(20):10s}"
             print(line)
             md.append(f"| {ch} | {yr} | {cell(5)} | {cell(10)} | {cell(20)} |")
 open("results/tables/dm_stratified.md","w").write("\n".join(md))

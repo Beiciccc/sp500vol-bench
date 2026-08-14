@@ -26,12 +26,20 @@ import pandas as pd
 ANALYSIS = "scripts/analysis"
 sys.path.insert(0, ANALYSIS)
 
-from supp_style import (apply_style, gate, BLUE, SKY, VERM, VERM_TXT,  # noqa: E402
-                        GREEN, YELLOW, PURPLE, GREY, LIGHT, TAB, REPO)
-import diss_style as ds  # noqa: E402
-
-import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib.patches import Rectangle  # noqa: E402
+import diss_style as ds
+import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
+from supp_style import (
+    BLUE,
+    GREY,
+    LIGHT,
+    PURPLE,
+    TAB,
+    VERM,
+    VERM_TXT,
+    apply_style,
+    gate,
+)
 
 # ---------------------------------------------------------------- evidence
 cells = pd.read_csv(os.path.join(TAB, "row13_spa_mcs.csv"))
@@ -98,7 +106,7 @@ gate(
     {"n_panels": 18, "n_text_cells": 222, "text_in_mcs": 0,
      "fusion_in_mcs": 24, "price_in_mcs": 73, "spa_rejects_full_set": 9,
      "spa_textfusion_p_is_one": 18, "panels_with_a_fusion_member": 12},
-    {"n_panels": int(len(pans)), "n_text_cells": n_text_cells,
+    {"n_panels": len(pans), "n_text_cells": n_text_cells,
      "text_in_mcs": int(counts.get("text", 0)),
      "fusion_in_mcs": int(counts.get("fusion", 0)),
      "price_in_mcs": int(counts.get("price", 0)),
@@ -132,9 +140,9 @@ ys = np.arange(len(ORDER))[::-1].astype(float)
 gap = {"price": 0.0, "text": -0.7, "fusion": -1.4}
 ys = np.array([ys[i] + gap[ORDER[i][0]] for i in range(len(ORDER))])
 
-for yi, (blk, mid, lab) in zip(ys, ORDER):
+for yi, (blk, mid, lab) in zip(ys, ORDER, strict=False):
     axM.axhline(yi, color=LIGHT, lw=0.45, zorder=0)
-    for xi, panel in zip(xs, PANELS):
+    for xi, panel in zip(xs, PANELS, strict=False):
         m = member(mid, panel)
         if m is None:
             axM.plot([xi], [yi], marker="x", ms=3.4, color=LIGHT, mew=1.0,
@@ -158,7 +166,7 @@ for blk, col in (("text", VERM), ("price", BLUE), ("fusion", PURPLE)):
 
 axM.set_yticks(ys)
 axM.set_yticklabels([o[2] for o in ORDER], fontsize=8.9)
-for tick, o in zip(axM.get_yticklabels(), ORDER):
+for tick, o in zip(axM.get_yticklabels(), ORDER, strict=False):
     tick.set_color(GREY)
 axM.set_xticks(xs)
 axM.set_xticklabels([lab for _ in range(9) for _, lab in LOSSES], fontsize=8.9)
@@ -205,7 +213,7 @@ p_tf = np.array(p_tf)
 
 axS.axhspan(0.0008, 0.05, color=LIGHT, alpha=0.55, lw=0, zorder=0)
 axS.axhline(0.05, color=GREY, ls="--", lw=0.8, zorder=2)
-for xi, pf in zip(xs, p_full):
+for xi, pf in zip(xs, p_full, strict=False):
     axS.plot([xi, xi], [0.0009, pf], color=GREY, lw=0.7, zorder=2)
     axS.plot([xi], [pf], marker="o", ms=5.0, zorder=4,
              mfc=BLUE if pf < 0.05 else "white", mec=BLUE, mew=1.1)

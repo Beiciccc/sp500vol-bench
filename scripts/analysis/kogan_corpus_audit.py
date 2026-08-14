@@ -127,9 +127,10 @@ REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "src"))
 sys.path.insert(0, str(REPO / "scripts" / "analysis"))
 
-import forecast_combination as fc  # noqa: E402  (committed Holm)
-from sp500vol.evaluation.dm_test import dm_test  # noqa: E402  (committed DM + HLN)
-from sp500vol.models.classical_text._fit_utils import fit_ridge_cv  # noqa: E402
+import forecast_combination as fc
+
+from sp500vol.evaluation.dm_test import dm_test
+from sp500vol.models.classical_text._fit_utils import fit_ridge_cv
 
 TABLES = REPO / "results" / "tables"
 YEARS = tuple(range(1996, 2007))
@@ -237,7 +238,7 @@ def _count_chunk(texts: list[str]) -> dict[str, int]:
     for t in texts:
         toks = TOKEN_RE.findall(t.lower())
         c.update(toks)
-        c.update(map(" ".join, zip(toks, toks[1:])))
+        c.update(map(" ".join, zip(toks, toks[1:], strict=False)))
     return {k: v for k, v in c.items() if v >= 2}
 
 
@@ -300,7 +301,7 @@ def stage_data(data_dir: Path, work: Path) -> None:
         consistency.append({"year": y, "n_rows": len(d),
                             "kogan_table1_docs": PUB_TABLE1_DOCS[y],
                             "matches_table1": len(d) == PUB_TABLE1_DOCS[y],
-                            "n_unique_keys": int(len(mult)),
+                            "n_unique_keys": len(mult),
                             "n_exact_dup_rows": int(len(meta) - len(mult)),
                             "n_cik": int(d.cik.nunique())})
         log(f"data: {y} n={len(d)} (Table 1: {PUB_TABLE1_DOCS[y]}) "
@@ -393,7 +394,7 @@ def stage_counts(data_dir: Path, work: Path, splits: list[dict]) -> None:
     log(f"counts: union vocab over {len(splits)} splits = {len(union_vocab)} terms")
 
     panel = pd.read_parquet(work / "panel.parquet")
-    row_of_key = dict(zip(panel.key, panel.doc_row))
+    row_of_key = dict(zip(panel.key, panel.doc_row, strict=False))
     n_unique = int(panel.doc_row.nunique())
     mats, order = [], []
     t0 = time.time()
@@ -480,7 +481,7 @@ def clustered_dm(loss_text: np.ndarray, loss_ref: np.ndarray, dates: np.ndarray,
     explicit via h = lag+1). NEGATIVE stat = text better."""
     a, b = date_mean(loss_text, dates), date_mean(loss_ref, dates)
     stat, p = dm_test(a, b, h=int(lag) + 1)
-    return float(stat), float(p), int(len(a))
+    return float(stat), float(p), len(a)
 
 
 # ------------------------------------------------------------------- the ladder
@@ -550,7 +551,7 @@ def fit_split(sp: dict, panel: pd.DataFrame, X: sparse.csr_matrix,
     L_ov, L_nw = overlap_lag(dates_te), nw_lag(n_d)
     out = {
         "test_year": sp["test_year"], "train_years": sp["train_years"],
-        "n_train": int(len(tr)), "n_test": int(len(te)), "n_test_dates": n_d,
+        "n_train": len(tr), "n_test": len(te), "n_test_dates": n_d,
         "alpha": float(ridge.alpha_), "vocab_guard": guard,
         "cik_train_coverage_test": cov,
         "frac_train_rows_singleton_cik": frac_singleton,
@@ -676,7 +677,7 @@ def main() -> None:
     # ---- G-K3: CIK coverage + cross-year firm recurrence
     per_cik_years = panel.groupby("cik").year.nunique()
     gk3 = {
-        "n_rows": int(len(panel)), "n_unique_cik": int(panel.cik.nunique()),
+        "n_rows": len(panel), "n_unique_cik": int(panel.cik.nunique()),
         "mean_years_per_cik": float(per_cik_years.mean()),
         "median_years_per_cik": float(per_cik_years.median()),
         "pct_cik_in_1_year_only": float(100.0 * (per_cik_years == 1).mean()),
@@ -715,7 +716,7 @@ def main() -> None:
         for v in ("incl", "loo"):
             ps = np.array([r[v]["L3"]["p"] for r in res], float)
             adj = fc.holm(np.where(np.isfinite(ps), ps, 1.0))
-            for r, a, p in zip(res, adj, ps):
+            for r, a, p in zip(res, adj, ps, strict=False):
                 c = r[v]["L3"]
                 r[v]["L4"] = {"mse_ref": c["mse_ref"], "mse_text": c["mse_text"],
                               "gain_pct": c["gain_pct"], "stat": c["stat"],

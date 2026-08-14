@@ -45,7 +45,7 @@ import argparse
 import importlib.util
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -321,7 +321,7 @@ def main() -> int:
         "horizons": horizons,
         "checkpoints": {str(h): str(p) for h, p in ckpt_paths.items()},
         "output": str(out_path),
-        "generated_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "generated_utc": datetime.now(UTC).isoformat(timespec="seconds"),
     }
     meta_name = fname.replace(".parquet", "_meta.json")
     (run_dir / meta_name).write_text(json.dumps(meta, indent=2))

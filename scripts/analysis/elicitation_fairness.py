@@ -113,17 +113,17 @@ if os.path.isdir("/root/rivermind-data"):  # box defaults (launch.sh convention)
     os.environ.setdefault("HF_HUB_OFFLINE", "1")
     os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 
-import argparse  # noqa: E402
-import datetime as _dt  # noqa: E402
-import hashlib  # noqa: E402
-import json  # noqa: E402
-import subprocess  # noqa: E402
-import sys  # noqa: E402
-from pathlib import Path  # noqa: E402
+import argparse
+import datetime as _dt
+import hashlib
+import json
+import subprocess
+import sys
+from pathlib import Path
 
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
-import pyarrow.parquet as pq  # noqa: E402
+import numpy as np
+import pandas as pd
+import pyarrow.parquet as pq
 
 _REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(_REPO / "scripts" / "analysis"))
@@ -135,10 +135,10 @@ sys.path.insert(0, str(_REPO / "scripts" / "experiments" / "e1_llm_forecast"))
 # scripts/.
 sys.path.insert(0, str(_REPO / "src"))
 
-import crossfamily_gemma27 as cf  # noqa: E402  the committed v1.3 template (machinery)
-import prompt as prompt_mod  # noqa: E402  the committed C6 prompt — V0 comes from here
-import run_inference as ri  # noqa: E402
-import postprocess as pp  # noqa: E402
+import crossfamily_gemma27 as cf
+import postprocess as pp
+import prompt as prompt_mod
+import run_inference as ri
 
 # ---- everything scientific is the committed constant, IMPORTED (single source of truth)
 HORIZONS = cf.HORIZONS
@@ -300,14 +300,14 @@ def assert_writeonce(*paths):
 
 
 def _now():
-    return _dt.datetime.now(_dt.timezone.utc).isoformat()
+    return _dt.datetime.now(_dt.UTC).isoformat()
 
 
 def _git_commit():
     try:
-        return subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(_REPO),
+        return subprocess.run(["git", "rev-parse", "HEAD"], check=False, cwd=str(_REPO),
                               capture_output=True, text=True, timeout=10).stdout.strip()
-    except Exception:  # noqa: BLE001
+    except Exception:
         return "unknown"
 
 
@@ -389,7 +389,7 @@ def _health_from_long(df, pred_col="prediction_realised_vol"):
     for h in HORIZONS:
         d = df[df.horizon_days == h]
         st = cf.standalone_stats(d.label_realised_vol.to_numpy(), d[pred_col].to_numpy())
-        st["n"] = int(len(d))
+        st["n"] = len(d)
         per_h[str(h)] = st
     mq = max(v["qlike_var"] for v in per_h.values())
     mm = max(v["mode_share_pct"] for v in per_h.values())
@@ -1301,7 +1301,7 @@ def assemble_pilot(args):
             mark = " <- selected" if v == d["selection"]["selected_variant"] else ""
             print(f"{fam:<11} {v:<8} {pv['max_qlike_var']:>15.4f} "
                   f"{pv['max_mode_share_pct']:>12.2f} "
-                  f"{str(pv['healthy']):>8}{mark}")
+                  f"{pv['healthy']!s:>8}{mark}")
     print()
     for fam, d in families.items():
         s = d["selection"]
@@ -1484,7 +1484,7 @@ def _elide(s, keep):
 
 
 # ============================================================ selftest
-def _selftest():  # noqa: C901
+def _selftest():
     """Synthetic fixtures in a sandbox tmpdir. Never touches the real results/ tree."""
     import shutil
     import tempfile
@@ -1658,7 +1658,7 @@ def _selftest():  # noqa: C901
         def pv(*shares, healthy=(True, True, True)):
             return {v: {"max_mode_share_pct": s, "healthy": h,
                         "max_qlike_var": 1.0}
-                    for v, s, h in zip(VARIANTS, shares, healthy)}
+                    for v, s, h in zip(VARIANTS, shares, healthy, strict=False)}
 
         s = apply_selection(pv(50.0, 30.0, 40.0))
         check("selects the lowest val modal share", s["selected_variant"] == "V1",

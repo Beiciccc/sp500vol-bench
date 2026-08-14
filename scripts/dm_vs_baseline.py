@@ -8,7 +8,6 @@ Usage:
     python scripts/dm_vs_baseline.py --dataset dry_run_medium
     python scripts/dm_vs_baseline.py --dataset dry_run_medium --baseline A1_hv
 """
-# ruff: noqa: E402
 
 from __future__ import annotations
 

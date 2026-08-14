@@ -184,7 +184,7 @@ def dm_test_date(loss_a, loss_b, dates, lag):
     ma, _ = date_mean(loss_a, dates)
     mb, _ = date_mean(loss_b, dates)
     stat, p = dm_test(ma, mb, lag=lag)
-    return float(stat), float(p), int(len(ma))
+    return float(stat), float(p), len(ma)
 
 
 def dm_test_2way(d, entities, dates, lag):
@@ -196,7 +196,7 @@ def dm_test_2way(d, entities, dates, lag):
     assert len(d) == len(ent) == len(dat)
     df = pd.DataFrame({"d": d, "ent": ent, "dat": np.asarray(dat)})
     dat_means = df.groupby("dat", sort=True)["d"].mean()
-    T, G = int(len(dat_means)), int(df.ent.nunique())
+    T, G = len(dat_means), int(df.ent.nunique())
     dbar = float(dat_means.mean())
     n_t = df.groupby("dat")["d"].transform("size").to_numpy(float)
     df["u"] = (d - dbar) / (T * n_t)
@@ -294,7 +294,7 @@ def mde_rel_pct(l_new, l_ref, dates, lag):
     v = _hac_variance(dd, lag=max(int(lag), 0))
     se_d = float(np.sqrt(v / len(dd))) if v > 0 else float("nan")
     mse_ref = float(np.mean(l_ref))
-    return Z_POWER * se_d / mse_ref * 100.0, int(len(dd))
+    return Z_POWER * se_d / mse_ref * 100.0, len(dd)
 
 
 def run_injection(yt, dates_t, ents_t, fR, lR, fU0, g_ar, lRe, fUe0, g_ent,
@@ -352,7 +352,7 @@ def block_bootstrap_ci(l_ref, l_new, dates, block=BOOT_BLOCK, draws=BOOT_DRAWS,
     mr, _ = date_mean(l_ref, dates)
     mn, _ = date_mean(l_new, dates)
     D = len(mr)
-    if D <= block:
+    if block >= D:
         return {"ci_lo": float("nan"), "ci_hi": float("nan"), "n_dates": D}
     rng = np.random.default_rng(seed)
     n_blocks = int(np.ceil(D / block))
@@ -484,7 +484,7 @@ def run_horizon(d, h, lag, embargo_val, test_start, stpev_primary="stpev_expandi
     ents_t = dt["permno"].to_numpy()
     groups_v, groups_t = dv["call_date"].to_numpy(), dt["call_date"].to_numpy()
 
-    res = {"n_val": int(len(dv)), "n_test": int(len(dt)),
+    res = {"n_val": len(dv), "n_test": len(dt),
            "n_test_dates": int(pd.Series(dates_t).nunique()),
            "n_entities_test": int(pd.Series(ents_t).nunique()),
            "hac_lag_L": int(lag),
@@ -549,7 +549,7 @@ def crosscheck_reference_predictions(panel, preds_dir, alignment):
             assert maxdiff < 1e-8, (
                 f"{fp.name} h={h}: reference PREDICTIONS disagree with the "
                 f"fit-stage half (max |diff| = {maxdiff:.3e})")
-            out[f"{h}_{ref}"] = {"n_rows": int(len(m)),
+            out[f"{h}_{ref}"] = {"n_rows": len(m),
                                  "max_pred_absdiff": maxdiff}
     return out
 
@@ -647,7 +647,7 @@ def selftest():
         res[h] = run_horizon(dh, h, L, False, test_start)
 
     check("L_n monotone nondecreasing in n",
-          all(lags[a] <= lags[b] for a, b in zip(HORIZONS, HORIZONS[1:])),
+          all(lags[a] <= lags[b] for a, b in zip(HORIZONS, HORIZONS[1:], strict=False)),
           f"lags={lags}")
     check("L_n <= n-1 on an all-trading-day grid",
           all(lags[h] <= h - 1 for h in HORIZONS), f"lags={lags}")
@@ -791,7 +791,7 @@ def main() -> None:
     for fam, row in (("F1_combined", "combined"), ("F2_residual", "residual")):
         ps = [res[h][ref][row]["p"] for h, ref in cells]
         adj = holm_adjust(ps)
-        for (h, ref), a in zip(cells, adj):
+        for (h, ref), a in zip(cells, adj, strict=False):
             res[h][ref][row]["p_holm8"] = float(a)
 
     # cross-check vs the baseline half — bug-fix 2026-07-15 (§6.5, header log):

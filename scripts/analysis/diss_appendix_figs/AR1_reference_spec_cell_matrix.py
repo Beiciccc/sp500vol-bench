@@ -22,9 +22,19 @@ import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-import diss_style as ds  # noqa: E402
-from supp_style import (BLUE, GREY, INK, INK2, LIGHT, RULE,  # noqa: E402
-                        TAB, VERM, apply_style, gate)
+import diss_style as ds
+from supp_style import (
+    BLUE,
+    GREY,
+    INK,
+    INK2,
+    LIGHT,
+    RULE,
+    TAB,
+    VERM,
+    apply_style,
+    gate,
+)
 
 KEY = ["disc", "model", "h"]
 HS = [5, 10, 20]
@@ -234,7 +244,7 @@ def main():
     y = np.arange(4)
     bx.barh(y, cons, color=[LIGHT, PALE, MID, BLUE], edgecolor=GREY,
             linewidth=0.5, height=0.74)
-    for yi, c in zip(y, cons):
+    for yi, c in zip(y, cons, strict=False):
         bx.text(c + 0.9, yi, str(c), va="center", ha="left", fontsize=9,
                 color=GREY)
     bx.set_yticks(y)
@@ -256,7 +266,7 @@ def main():
     s26 = [got["s26_primary"], got["s26_vbs"], got["s26_eqw"],
            got["s26_fitted"]]
     y = np.arange(4)
-    for yi, (a, b) in enumerate(zip(ens, s26)):
+    for yi, (a, b) in enumerate(zip(ens, s26, strict=False)):
         cx.plot([min(a, b), max(a, b)], [yi, yi], color=LIGHT, lw=2.0,
                 zorder=1, solid_capstyle="round")
         cx.text(50, yi, f"{a} / {b}", ha="right", va="center", fontsize=9,

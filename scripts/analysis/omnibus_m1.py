@@ -65,22 +65,23 @@ import os
 for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
     os.environ[_v] = "2"  # resource cap, set BEFORE importing numpy/pandas
 
-import json  # noqa: E402
-import sys  # noqa: E402
-import time  # noqa: E402
-from pathlib import Path  # noqa: E402
+import json
+import sys
+import time
+from pathlib import Path
 
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
-from scipy import stats  # noqa: E402
+import numpy as np
+import pandas as pd
+from scipy import stats
 
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
-import forecast_combination as fc  # noqa: E402  (SETS, KEY, SORT, HORIZONS, qlike, log_combo, holm)
-import m1_ensemble_primary as mep  # noqa: E402  (run_dir, ensemble_text — seed-ensemble basis)
-from clustered_dm import daily_mean, dm_test_clustered  # noqa: E402
-from signal_injection_power import TOL_PP, calibrate_kappa, rel_pct  # noqa: E402
-from sp500vol.evaluation.dm_test import dm_test  # noqa: E402
+import forecast_combination as fc
+import m1_ensemble_primary as mep
+from clustered_dm import daily_mean, dm_test_clustered
+from signal_injection_power import TOL_PP, calibrate_kappa, rel_pct
+
+from sp500vol.evaluation.dm_test import dm_test
 
 T = Path("results/tables")
 KEY, SORT, HORIZONS = fc.KEY, fc.SORT, fc.HORIZONS
@@ -178,7 +179,7 @@ def omnibus_t(D):
     lag = h-1 = 19 days, HLN factor with h = 20, Student-t(n_days - 1), two-sided p.
     """
     stat, p = dm_test(D, np.zeros(len(D)), h=H_OMNI)
-    return float(stat), float(p), int(len(D))
+    return float(stat), float(p), len(D)
 
 
 # ------------------------------------------------------------------------ sanity
@@ -212,7 +213,7 @@ def sanity_gate(cells):
                 f"| {abs(dm1 - row.vol_dm_q_clu):.2e} | {abs(dm2 - dm1):.2e} |")
     g = pd.DataFrame(rows)
     summary = {
-        "n_cells_checked": int(len(g)),
+        "n_cells_checked": len(g),
         "max_abs_diff_dm_vs_committed_csv": float(g.diff_dm_vs_csv.max()),
         "max_abs_diff_p_vs_committed_csv": float(g.diff_p_vs_csv.max()),
         "max_abs_diff_ndays_vs_committed_csv": float(g.diff_ndays_vs_csv.max()),
@@ -266,7 +267,7 @@ def mbb_rejection_rate(D, *, seed_key):
 
 def interp_mde(levels, rates, target=POWER_TARGET):
     """Smallest injection level with rejection rate >= target, linear interpolation."""
-    for i, (x, r) in enumerate(zip(levels, rates)):
+    for i, (x, r) in enumerate(zip(levels, rates, strict=False)):
         if r >= target:
             if i == 0:
                 return float(x), "<= smallest grid level"

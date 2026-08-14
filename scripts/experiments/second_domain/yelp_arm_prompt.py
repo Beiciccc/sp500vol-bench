@@ -98,10 +98,10 @@ def cmd_infer(args) -> None:
         strict = [[{"role": "user", "content": build_prompt(ev.iloc[i].to_dict(), args.arm)
                     + ' Output exactly one line of JSON and nothing else.'}]
                   for i in retry_idx]
-        for i, o in zip(retry_idx, llm.chat(strict, sp)):
+        for i, o in zip(retry_idx, llm.chat(strict, sp), strict=False):
             rows[i] = parse(o.outputs[0].text)
     with open(args.out, "w", encoding="utf-8") as fh:
-        for (_, r), got in zip(ev.iterrows(), rows):
+        for (_, r), got in zip(ev.iterrows(), rows, strict=False):
             fh.write(json.dumps({
                 "entity_id": r.entity_id, "event_time": str(r.event_time),
                 "h1": None if got is None else got[0],

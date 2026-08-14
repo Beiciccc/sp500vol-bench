@@ -57,10 +57,11 @@ from scipy import stats
 
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
-from clustered_dm import _day_index  # noqa: E402
-from sp500vol.evaluation.dm_test import _hac_variance  # noqa: E402
+from clustered_dm import _day_index
 
-__all__ = ["dm_test_2way", "TwoWayResult", "EPS_V"]
+from sp500vol.evaluation.dm_test import _hac_variance
+
+__all__ = ["EPS_V", "TwoWayResult", "dm_test_2way"]
 
 EPS_V = 1e-30
 
@@ -95,7 +96,7 @@ def dm_test_2way(d, firms, days, h):
 
     df_ = pd.DataFrame({"d": d, "firm": firm, "day": day})
     day_means = df_.groupby("day", sort=True)["d"].mean()
-    T = int(len(day_means))
+    T = len(day_means)
     G = int(df_["firm"].nunique())
     dbar = float(day_means.mean())
 

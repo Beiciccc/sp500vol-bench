@@ -57,12 +57,23 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from supp_style import (apply_style, finish, gate, BLUE, SKY, VERM, VERM_TXT,  # noqa: E402
-                        GREEN, YELLOW, PURPLE, GREY, LIGHT, TAB, AGG, REPO,
-                        INK, INK2, annot, note, panel)
-
-import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib.lines import Line2D  # noqa: E402
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    INK,
+    TAB,
+    VERM,
+    VERM_TXT,
+    annot,
+    apply_style,
+    finish,
+    gate,
+    note,
+    panel,
+)
 
 # --------------------------------------------------------------- load evidence
 PE = pd.read_csv(os.path.join(TAB, "portfolio_econ.csv"))
@@ -99,7 +110,7 @@ N_RECAL_SIG = int(((RAW.dm_tick_vs_fR_stat > 0) & (RAW.dm_tick_vs_fR_p < .05)).s
 # exception is long_form / C5_qwen3 / h=20 under fU.
 A1 = POOLED[POOLED.alpha == 0.01]
 N_OVER_1PC = int((A1.viol_rate > 0.01).sum())
-N_CELLS_1PC = int(len(A1))
+N_CELLS_1PC = len(A1)
 UNDER_1PC = A1[A1.viol_rate <= 0.01]
 assert len(UNDER_1PC) == 1
 EXC = UNDER_1PC.iloc[0]                      # the single under-violating cell
@@ -125,10 +136,10 @@ NAN_CI = PE[PE.sharpe_diff_lo.isna()]
 # coverage count is taken over the cells that actually have an interval, and the
 # prompted arm's count is taken the same way (one of its six has none).
 HAS_CI = PE[PE.sharpe_diff_lo.notna()]
-N_HAS_CI = int(len(HAS_CI))
+N_HAS_CI = len(HAS_CI)
 N_COVER0 = int(((HAS_CI.sharpe_diff_lo <= 0) & (HAS_CI.sharpe_diff_hi >= 0)).sum())
 C6_CI = C6[C6.sharpe_diff_lo.notna()]
-N_C6_HAS_CI = int(len(C6_CI))
+N_C6_HAS_CI = len(C6_CI)
 N_C6_COVER0 = int(((C6_CI.sharpe_diff_lo <= 0)
                    & (C6_CI.sharpe_diff_hi >= 0)).sum())
 
@@ -156,8 +167,8 @@ gate(
         "n_c6_rows_in_var": 0, "n_c6_rows_in_utility": 0,
     },
     {
-        "n_portfolio_cells": int(len(PE)), "n_sig_sharpe": N_SIG,
-        "n_c6_cells": int(len(C6)), "n_c6_sig": int(C6.sig_sharpe_diff.sum()),
+        "n_portfolio_cells": len(PE), "n_sig_sharpe": N_SIG,
+        "n_c6_cells": len(C6), "n_c6_sig": int(C6.sig_sharpe_diff.sum()),
         "median_dsharpe": round(MEDIAN_DSH, 3),
         "sig_cell": tuple(PE[PE.sig_sharpe_diff][["disc", "model", "h"]]
                           .itertuples(index=False, name=None))[0],
@@ -165,10 +176,10 @@ gate(
             round(float(v), 4) for v in
             PE[PE.sig_sharpe_diff][["sharpe_diff", "sharpe_diff_lo",
                                     "sharpe_diff_hi"]].iloc[0]),
-        "n_undefined_ci": int(len(NAN_CI)),
+        "n_undefined_ci": len(NAN_CI),
         "undefined_periods": int(NAN_CI.n_periods.unique()[0]),
         "undefined_sharpe_R": round(float(NAN_CI.sharpe_R.unique()[0]), 3),
-        "n_var_cells": int(len(FU)), "tick_lower": N_LOWER,
+        "n_var_cells": len(FU), "tick_lower": N_LOWER,
         "tick_lower_sig": N_LOWER_SIG, "tick_worse_sig": N_WORSE_SIG,
         "viol_closer": CLOSER,
         "recal_better": N_RECAL, "recal_better_sig": N_RECAL_SIG,
@@ -178,7 +189,7 @@ gate(
         "under_1pc_rate": round(float(EXC.viol_rate), 4),
         "n_with_ci": N_HAS_CI, "n_cover_zero": N_COVER0,
         "n_c6_with_ci": N_C6_HAS_CI, "n_c6_cover_zero": N_C6_COVER0,
-        "recal_move_larger": N_RECAL_LARGER, "n_move_pairs": int(len(PIV)),
+        "recal_move_larger": N_RECAL_LARGER, "n_move_pairs": len(PIV),
         "median_move_recal_pp": MED_RECAL_PP,
         "median_move_text_pp": MED_TEXT_PP,
         "n_c6_rows_in_var": int((VB.model == "C6_llmtext").sum()),
@@ -354,7 +365,7 @@ for k, (disc, alpha, xlim, xticks) in enumerate(PANELS):
         tls = ax.set_yticklabels(labels_b, fontsize=9)
         # Colour is never the only channel: the ringed cell's row label is also
         # the only vermillion one, and the ring itself is the second channel.
-        for tl, (_, mod, h) in zip(tls, rows_b):
+        for tl, (_, mod, h) in zip(tls, rows_b, strict=False):
             if (disc, mod, h) == (EXC.disclosure, EXC.model, int(EXC.horizon)):
                 tl.set_color(VERM_TXT)
         ax.text(0.0, 1.115, DISC_LONG[disc], transform=ax.transAxes,

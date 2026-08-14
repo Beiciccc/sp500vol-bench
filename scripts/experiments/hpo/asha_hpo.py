@@ -39,20 +39,21 @@ sys.path.insert(0, str(REPO / "src"))
 # shared-memory file descriptors under the default 'file_descriptor' strategy
 # ("Too many open files" -> pin-memory thread death). 'file_system' shares by
 # name, not FD; pair with a raised ulimit -n in the driver.
-import torch  # noqa: E402
+import torch
+
 try:
     torch.multiprocessing.set_sharing_strategy("file_system")
-except Exception:  # noqa: BLE001
+except Exception:
     pass
 try:
     import resource
     _soft, _hard = resource.getrlimit(resource.RLIMIT_NOFILE)
     resource.setrlimit(resource.RLIMIT_NOFILE, (min(1_048_576, _hard), _hard))
-except Exception:  # noqa: BLE001
+except Exception:
     pass
 
-from sp500vol.evaluation.metrics import qlike  # noqa: E402
-from sp500vol.utils import seed_everything  # noqa: E402
+from sp500vol.evaluation.metrics import qlike
+from sp500vol.utils import seed_everything
 
 CFG = yaml.safe_load((REPO / "configs" / "hpo_arm.yaml").read_text())
 HPO_ROOT = REPO / "results" / "hpo"

@@ -59,14 +59,24 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.colors import LinearSegmentedColormap, TwoSlopeNorm
 from matplotlib.patches import Rectangle
-
-from supp_style import (BLUE, GREEN, GREY, LIGHT, PURPLE, SKY, TAB, VERM,
-                        VERM_TXT, YELLOW, apply_style, finish, gate)
-import matplotlib.pyplot as plt
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    PURPLE,
+    TAB,
+    VERM,
+    VERM_TXT,
+    YELLOW,
+    apply_style,
+    finish,
+    gate,
+)
 
 rob = pd.read_csv(os.path.join(TAB, "maximal_pool_robustness.csv"))
 pan = pd.read_csv(os.path.join(TAB, "maximal_pool_robustness_panels.csv"))
@@ -120,9 +130,9 @@ gate(
      "reversal_p_lt_1e15": bool(rev.p_pool_vs_valbest < 1e-15),
      "reversal_pool_is_worst": bool(float(rev.pool_test_qlike)
                                     == max(float(rev[c]) for c in REV_COLS)),
-     "single_ref_cells": int(len(sng[["disc", "model", "h"]]
-                                 .drop_duplicates())),
-     "stronger_cells": int(len(stronger)),
+     "single_ref_cells": len(sng[["disc", "model", "h"]]
+                                 .drop_duplicates()),
+     "stronger_cells": len(stronger),
      "a2_rank1_panels": int(sum(r["a2_rank"] == 1
                                 for r in g1["single_ref_a2_rank_orig"])),
      "frontier_pool5_qlike": round(float(frontier_q["pool5 (paper)"]), 4),
@@ -169,7 +179,7 @@ ax_a.bar(xs, s26_v, width=0.70, color="white", edgecolor=GREY, linewidth=0.6,
          hatch="////", zorder=1, label="seed-2026")
 ax_a.bar(xs, ens_v, width=0.44, color=BLUE, edgecolor="none", zorder=2,
          label="seed-ensemble")
-for x, ve, vs in zip(xs, ens_v, s26_v):
+for x, ve, vs in zip(xs, ens_v, s26_v, strict=False):
     ax_a.text(x, ve + 0.7, str(ve), ha="center", va="bottom", fontsize=9,
               color=BLUE, fontweight="bold")
     ax_a.text(x + 0.30, vs + 0.7, str(vs), ha="center", va="bottom",

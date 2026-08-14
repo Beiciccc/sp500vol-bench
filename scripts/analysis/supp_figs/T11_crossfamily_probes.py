@@ -335,7 +335,7 @@ gate(
                            & (STD.disc == "long_form")].context_flag.iloc[0]),
      "yi_combined_flag": str(STD[(STD.family == "yi_34b")
                                  & (STD.disc == "combined")].context_flag.iloc[0]),
-     "yi_clean_rows": int(len(yi_ed)),
+     "yi_clean_rows": len(yi_ed),
      "ens70_no_health": ens70_no_health,
      "n_holm_conventions": len({"Holm(3) per reference", "own-family Holm(6)",
                                 "inherited committed Holm(6)"}),

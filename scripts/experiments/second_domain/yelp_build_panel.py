@@ -80,7 +80,7 @@ def pass1_counts(path: Path):
     cnt: dict = defaultdict(int)
     ssum: dict = defaultdict(float)
     t0, n = time.time(), 0
-    with open(path, "r", encoding="utf-8") as fh:
+    with open(path, encoding="utf-8") as fh:
         for line in fh:
             try:
                 r = json.loads(line)
@@ -101,7 +101,7 @@ def pass2_text(path: Path, events: set, max_reviews: int):
     """Stream review.json again, keeping truncated text ONLY for qualifying events."""
     texts: dict = defaultdict(list)
     t0, n = time.time(), 0
-    with open(path, "r", encoding="utf-8") as fh:
+    with open(path, encoding="utf-8") as fh:
         for line in fh:
             try:
                 r = json.loads(line)
@@ -246,7 +246,7 @@ def main() -> None:
     biz_path = root / BUSINESS_FILE
     if biz_path.exists():
         life = {}
-        with open(biz_path, "r", encoding="utf-8") as fh:
+        with open(biz_path, encoding="utf-8") as fh:
             for line in fh:
                 try:
                     b = json.loads(line)

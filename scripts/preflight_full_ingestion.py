@@ -7,7 +7,6 @@ fail early on universe/data-source problems.
 Usage:
     python scripts/preflight_full_ingestion.py
 """
-# ruff: noqa: E402
 
 from __future__ import annotations
 

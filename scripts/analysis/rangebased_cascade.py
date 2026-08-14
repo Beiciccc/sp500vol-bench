@@ -57,29 +57,39 @@ for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
            "VECLIB_MAXIMUM_THREADS", "NUMEXPR_NUM_THREADS"):
     os.environ.setdefault(_v, _THREADS)
 
-import argparse  # noqa: E402
-import json  # noqa: E402
-import sys  # noqa: E402
-import time  # noqa: E402
-from pathlib import Path  # noqa: E402
+import argparse
+import json
+import sys
+import time
+from pathlib import Path
 
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
+import numpy as np
+import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "scripts/experiments")
 sys.path.insert(0, "src")
 
-import forecast_combination as fc  # noqa: E402
-import m1_ensemble_primary as mep  # noqa: E402
-import stronger_baselines as sb  # noqa: E402
-from clustered_dm import daily_mean, dm_test_clustered  # noqa: E402
-from maximal_reference_firm_control import (  # noqa: E402
-    PRICE, build_price_panel, firm_mean_val, log_ols_frozen)
-from signal_injection_power import (  # noqa: E402
-    TARGETS, Z_POWER, calibrate_kappa, rel_pct, stage_eval)
-from sp500vol.evaluation.dm_test import _hac_variance  # noqa: E402
-from sp500vol.models.price.har_rv import HARRV  # noqa: E402
+import forecast_combination as fc
+import m1_ensemble_primary as mep
+import stronger_baselines as sb
+from clustered_dm import daily_mean, dm_test_clustered
+from maximal_reference_firm_control import (
+    PRICE,
+    build_price_panel,
+    firm_mean_val,
+    log_ols_frozen,
+)
+from signal_injection_power import (
+    TARGETS,
+    Z_POWER,
+    calibrate_kappa,
+    rel_pct,
+    stage_eval,
+)
+
+from sp500vol.evaluation.dm_test import _hac_variance
+from sp500vol.models.price.har_rv import HARRV
 
 DATA_ROOT = Path(os.environ.get("SP500VOL_DATA_ROOT", "/Volumes/Z/sp500vol-data"))
 # stronger_baselines hardcodes /Volumes/Z paths at module level — re-root for the box.

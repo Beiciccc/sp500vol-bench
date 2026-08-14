@@ -34,6 +34,7 @@ Run from repo root:  .venv/bin/python scripts/analysis/utility_value.py
 """
 import sys
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -267,7 +268,7 @@ def main():
 
     # verdict numbers
     pos = int((base.fee_bps_ann > 0).sum())
-    tot = int(len(base))
+    tot = len(base)
     med_fee = float(base.fee_bps_ann.median())
     pos_w = int((base.fee_bps_ann_wins > 0).sum())
     med_fee_w = float(base.fee_bps_ann_wins.median())

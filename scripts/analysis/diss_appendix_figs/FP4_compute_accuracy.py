@@ -27,12 +27,9 @@ from scipy.stats import spearmanr
 ANALYSIS = "scripts/analysis"
 sys.path.insert(0, ANALYSIS)
 
-from supp_style import (apply_style, gate, BLUE, SKY, VERM, VERM_TXT,  # noqa: E402
-                        GREEN, YELLOW, PURPLE, GREY, LIGHT, TAB, REPO,
-                        INK, INK2, RULE)
-import diss_style as ds  # noqa: E402
-
-import matplotlib.pyplot as plt  # noqa: E402
+import diss_style as ds
+import matplotlib.pyplot as plt
+from supp_style import BLUE, GREY, INK, INK2, PURPLE, RULE, TAB, VERM, YELLOW, apply_style, gate
 
 # ---------------------------------------------------------------- evidence
 c = pd.read_csv(os.path.join(TAB, "cost_accuracy.csv"))
@@ -57,7 +54,7 @@ gate(
      "total_gpu_h": 590.4, "longformer_gpu_h": 254.7,
      "longformer_share_pct": 43.1, "har_best_qlike": 0.297,
      "n_pareto_arms": 1, "spearman_rho_paid": 0.76},
-    {"n_arms": int(len(c)), "block_C_gpu_h": round(tot_c, 1),
+    {"n_arms": len(c), "block_C_gpu_h": round(tot_c, 1),
      "block_D_gpu_h": round(tot_d, 1), "total_gpu_h": round(total, 1),
      "longformer_gpu_h": round(c4, 1),
      "longformer_share_pct": round(100 * c4 / total, 1),
@@ -169,7 +166,7 @@ NAME = {"C4_longformer": "C4 Longformer", "C2_finbert_s2": "C2 FinBERT (chunk)",
         "D3_e5mistral": "D3 price + E5-Mistral", "D3_qwen3": "D3 price + Qwen3"}
 axB.set_yticks(yy)
 axB.set_yticklabels([NAME[m] for m in srt.model], fontsize=8.9)
-for y, (_, r) in zip(yy, srt.iterrows()):
+for y, (_, r) in zip(yy, srt.iterrows(), strict=False):
     # The share of the budget is printed because a logarithmic axis cannot
     # carry it: bar length here is log hours, so the 254.7 h arm draws about
     # 3.4 times the 12.7 h arm rather than 20 times, and the panel's claim is

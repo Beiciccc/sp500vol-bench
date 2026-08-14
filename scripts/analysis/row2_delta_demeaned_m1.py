@@ -60,9 +60,9 @@ import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
-import forecast_combination as fc  # noqa: E402  (load, qlike, log_combo, holm)
-import maximal_reference_firm_control as mrf  # noqa: E402  (canonical firm-ref spec)
-from clustered_dm import dm_test_clustered, mbb_ci_daily  # noqa: E402
+import forecast_combination as fc
+import maximal_reference_firm_control as mrf
+from clustered_dm import dm_test_clustered, mbb_ci_daily
 
 T = Path("results/tables")
 KEY = fc.KEY
@@ -232,7 +232,7 @@ def main():
         "gateB_max_drel": float((g.B_rel - g.rel_impr_pct_firm).abs().max()),
         "gateB_max_ddm": float((g.B_dm - g.dm_q_clustered).abs().max()),
         "gateB_max_dp": float((g.B_p - g.p_q_clustered).abs().max()),
-        "n_gate_cells": int(len(g)),
+        "n_gate_cells": len(g),
     }
     sanity["pass"] = bool(
         max(v for k, v in sanity.items() if k.startswith(("gateA_max", "gateB_max"))) < TOL
@@ -376,7 +376,7 @@ def main():
           f"| genuine vs single recalibrated HAR (Holm, placebo-gated) | {n_ogh}/9 "
           f"(s26 basis) | **{n_gh}/9** |",
           f"| survives the firm-identity reference (Holm) | {n_ogf}/9 | **{n_gf}/9** |",
-          f"| HAR-genuine cell composition | "
+          "| HAR-genuine cell composition | "
           + (", ".join(f"{r.disc}/{r.orig_model}/h{r.h}"
                        for _, r in df[df.orig_genuine_har_s26].iterrows()) or "none")
           + " | " + (", ".join(f"{r.disc}/{r.model}/h{r.h}"

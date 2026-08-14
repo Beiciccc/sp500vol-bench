@@ -236,7 +236,7 @@ def adj_close_comparison(mr: pd.DataFrame) -> dict:
     diff = (m["px_ret"] - m["ret"]).abs()
     worst = m.loc[diff.idxmax()]
     return {
-        "n_days_compared": int(len(m)),
+        "n_days_compared": len(m),
         "frac_absdiff_gt_1e-6": float((diff > 1e-6).mean()),
         "frac_absdiff_gt_1bp": float((diff > 1e-4).mean()),
         "frac_absdiff_gt_100bp": float((diff > 1e-2).mean()),
@@ -394,8 +394,8 @@ def main() -> None:
     gf513, calgap = load_gapfill()
     cal = cal700.union(cal513).union(calgap)
     report["calendar"] = {
-        "n_days_union": int(len(cal)), "n_days_700": int(len(cal700)),
-        "n_days_513": int(len(cal513)),
+        "n_days_union": len(cal), "n_days_700": len(cal700),
+        "n_days_513": len(cal513),
         "days_only_in_one_source": int(len(cal) - len(cal700.intersection(cal513))),
         "span": [str(cal[0].date()), str(cal[-1].date())]}
 
@@ -416,7 +416,7 @@ def main() -> None:
     stubs = mf[mf["n_chars"] < STUB_CHARS]
     assert len(stubs) == 32, f"G6 FAIL: stub count {len(stubs)} != 32"
     report["stub_exclusion"] = {
-        "rule": f"n_chars < {STUB_CHARS}", "n": int(len(stubs)),
+        "rule": f"n_chars < {STUB_CHARS}", "n": len(stubs),
         "per_split": stubs["split"].value_counts().to_dict(),
         "kept_100_500_chars": int(((mf.n_chars >= 100) & (mf.n_chars < 500)).sum()),
     }
@@ -477,7 +477,7 @@ def main() -> None:
                               index=False)):
         if tk in multi:
             g = memb_f[(memb_f["ticker"] == tk) & (memb_f["permno"] == p)]
-            pairs[(tk, int(p))] = list(zip(g["member_from"], g["member_to_f"]))
+            pairs[(tk, int(p))] = list(zip(g["member_from"], g["member_to_f"], strict=False))
         else:
             pairs[(tk, int(p))] = None
     gapfill_check = verify_gapfill_overlap(by_ticker, by_gap, pairs, cal)
@@ -604,7 +604,7 @@ def main() -> None:
                  "zip for S&P500-side permnos whose membership-window cache "
                  "left incomplete/missing price windows; precedence ONLY "
                  "where market_returns has no (firm, day) row"),
-        "rows": int(len(gf513)),
+        "rows": len(gf513),
         "n_permnos": int(gf513["permno"].nunique()),
         "n_tickers": int(gf513["ticker"].nunique()),
         "span": [str(gf513["date"].min().date()),
@@ -660,7 +660,7 @@ def main() -> None:
         tr, va, te = (pa.loc[pa["split"] == s, "call_date"] for s in
                       ("train", "val", "test"))
         assert tr.max() < va.min() < te.min(), f"G3 FAIL: split order in {align}"
-        assert tr.max() <= TRAIN_END and VAL_START <= va.min() and \
+        assert tr.max() <= TRAIN_END and va.min() >= VAL_START and \
             va.max() <= VAL_END and te.min() >= TEST_START, "G3 FAIL: pinned dates"
         for h in HORIZONS:
             ph = pa[pa["horizon"] == h]
@@ -684,7 +684,7 @@ def main() -> None:
                 f"={total} != {len(ph)}")
             acct[f"{align}_h{h}"] = {
                 "stub": n_stub, "ambiguity_dropped": n_amb, **ex,
-                "rows_final": int(len(ph)),
+                "rows_final": len(ph),
                 "reconciles_to_3443": True}
             counts[f"{align}_h{h}"] = ph["split"].value_counts().to_dict()
     report["exclusion_accounting"] = acct

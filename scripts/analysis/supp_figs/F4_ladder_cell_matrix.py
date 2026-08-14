@@ -45,15 +45,30 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import matplotlib.patheffects as pe
+import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
-
-from supp_style import (BLUE, GREEN, GREY, INK, INK2, LIGHT, PURPLE, RULE, SKY,
-                        TAB, VERM, VERM_TXT, annot, apply_style, finish, gate,
-                        note)
-import matplotlib.patheffects as pe
-import matplotlib.pyplot as plt
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    INK,
+    INK2,
+    LIGHT,
+    PURPLE,
+    RULE,
+    SKY,
+    TAB,
+    VERM,
+    VERM_TXT,
+    annot,
+    apply_style,
+    finish,
+    gate,
+    note,
+)
 
 SRC = os.path.join(TAB, "control_intersection_ensemble.csv")
 d = pd.read_csv(SRC)

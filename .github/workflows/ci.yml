@@ -67,3 +67,28 @@ jobs:
         run: uv run mypy src/sp500vol/ || true
         # `|| true` for now — strict mypy will be ramped up later.
         # Remove once full type coverage is in place.
+
+  licence-guard:
+    name: licensed-data guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      # release/ is the licence-safe public bundle: it must never carry a
+      # per-row CRSP-derived value. This fails the build if one reappears.
+      - name: No CRSP-derived per-row values in release/
+        run: |
+          set -e
+          if grep -rInE '"(labels|feature_rv[a-z0-9_]*|realised_vol[a-z0-9_]*|logRV[a-z0-9_]*|ret_[a-z0-9_]*)"[[:space:]]*:' release/ ; then
+            echo "::error::A CRSP-derived per-row field appeared in release/. See release/DATA_CARD.md."
+            exit 1
+          fi
+          echo "release/ carries no per-row CRSP-derived field."
+      - name: No CRSP artefacts tracked under data/
+        run: |
+          set -e
+          if git ls-files data/ | grep -InE 'crsp|permno|daily_returns|aligned_filings' ; then
+            echo "::error::A CRSP-derived artefact is tracked under data/."
+            exit 1
+          fi
+          echo "No CRSP artefact tracked under data/."

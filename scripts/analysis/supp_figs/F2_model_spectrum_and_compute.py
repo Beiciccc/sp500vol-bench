@@ -56,11 +56,25 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import matplotlib.pyplot as plt  # noqa: E402
-import pandas as pd  # noqa: E402
-
-from supp_style import (AGG, BLUE, GREEN, GREY, LIGHT, PURPLE, REPO, SKY, TAB,  # noqa: E402,F401
-                        VERM, VERM_TXT, YELLOW, apply_style, finish, gate)
+import matplotlib.pyplot as plt
+import pandas as pd
+from supp_style import (  # noqa: F401
+    AGG,
+    BLUE,
+    GREEN,
+    GREY,
+    LIGHT,
+    PURPLE,
+    REPO,
+    SKY,
+    TAB,
+    VERM,
+    VERM_TXT,
+    YELLOW,
+    apply_style,
+    finish,
+    gate,
+)
 
 # ------------------------------------------------------------------ evidence
 seed_agg = pd.read_csv(os.path.join(TAB, "seed_aggregate.csv"))
@@ -131,14 +145,14 @@ gate(
      "gpu_C_D_total": (566.7, 23.6, 590.4),
      "cpu_seconds_A2_A3_A5_B2": (3.9, 212.1, 2862.6, 4474.1)},
     {"n_text_arms": int(text.model.nunique()),
-     "n_text_cells": int(len(text)),
+     "n_text_cells": len(text),
      "n_text_cells_negative_r2": int((text.r2_mean < 0).sum()),
      "text_best_r2_mean": round(float(text.r2_mean.max()), 4),
      "n_single_seed_text_arms": int((text.groupby("model").n_seeds.max() == 1).sum()),
      "A2_r2": tuple(round(v, 4) for v in A2_R2),
-     "n_cost_rows": int(len(cost)),
+     "n_cost_rows": len(cost),
      "n_zero_gpu_rows": int((cost.gpu_hours_total == 0).sum()),
-     "n_pareto": int(len(pareto)),
+     "n_pareto": len(pareto),
      "pareto_model": str(pareto.iloc[0].model),
      "pareto_gpu_h": float(pareto.iloc[0].gpu_hours_total),
      "pareto_qlike": float(pareto.iloc[0].best_qlike),
@@ -172,7 +186,7 @@ def spread_labels(ax, pts, side="r", pad_px=8.0, bias_px=0.0, fontsize=9,
         ys.append(cur)
     shift = (sum(d[0][1] for d in disp) - sum(ys)) / len(ys) + bias_px
     ys = [y + shift for y in ys]
-    for ((px, py), t), ly in zip(disp, ys):
+    for ((px, py), t), ly in zip(disp, ys, strict=False):
         lx = px + pad_px if side == "r" else px - pad_px
         ax.annotate(t, xy=inv.transform((px, py)), xytext=inv.transform((lx, ly)),
                     fontsize=fontsize, color=colour, va="center",
@@ -207,7 +221,7 @@ def spread_labels_gutter(ax, pts, x_anchor, fontsize=9, colour=GREY):
     ys = [y - over for y in ys]
     under = max(0.0, (lo_lim + gap * 0.4) - min(ys))
     ys = [y + under for y in ys]
-    for ((px, py), t), ly in zip(disp, ys):
+    for ((px, py), t), ly in zip(disp, ys, strict=False):
         ax.annotate(t, xy=inv.transform((px, py)),
                     xytext=(x_anchor, inv.transform((px, ly))[1]),
                     fontsize=fontsize, color=colour, va="center", ha="left",
@@ -263,7 +277,7 @@ draw_rows(order, ypos)
 ref_order = ["A2_har_rv", "A5_arima", "A3_garch", "A4_egarch", "A1_hv"]
 GAP = 1.5
 ref_y = {m: len(order) - 1 + GAP + i for i, m in enumerate(ref_order)}
-for h, r2 in zip(HORIZONS, A2_R2):
+for h, r2 in zip(HORIZONS, A2_R2, strict=False):
     col, mk, _ = H_STYLE[h]
     ax_a.plot(r2, ref_y["A2_har_rv"] + OFFSET[h], marker=mk, ms=4.1, color=col,
               mfc="white", mew=1.0, zorder=3)

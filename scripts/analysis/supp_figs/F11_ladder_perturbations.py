@@ -69,13 +69,27 @@ import pandas as pd
 from scipy import stats
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from supp_style import (AGG, BLUE, GREEN, GREY, INK, INK2, LIGHT, PURPLE,  # noqa: E402
-                        REPO, RULE, SKY, TAB, VERM, VERM_TXT, YELLOW,
-                        apply_style, finish, gate)
-
 import matplotlib.patheffects as _pe
-import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib.lines import Line2D  # noqa: E402
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    INK,
+    INK2,
+    LIGHT,
+    PURPLE,
+    RULE,
+    SKY,
+    TAB,
+    VERM,
+    VERM_TXT,
+    YELLOW,
+    apply_style,
+    finish,
+    gate,
+)
 
 # --------------------------------------------------------------- evidence
 CIE = pd.read_csv(os.path.join(TAB, "control_intersection_ensemble.csv"))
@@ -368,7 +382,7 @@ def rung_block(ax, names, values, colours, hatches, holm_primary, groups=RUNGS):
         ax.bar(x, v, width=bw * 0.86, color=colours[i], hatch=hatches[i],
                edgecolor="white", linewidth=0.5, label=name, zorder=3)
         hv = holm_primary[i]
-        for k, (xx, vv) in enumerate(zip(x, v)):
+        for k, (xx, vv) in enumerate(zip(x, v, strict=False)):
             # on the primary rung the count sits clear of the Holm tick
             top = max(vv, hv) if k == 0 else vv
             ax.text(xx, top + 2.6, "%d" % vv, va="bottom", ha="center",
@@ -419,12 +433,12 @@ axA2.set_ylim(-1.75, 2.55)
 # region is shaded, and the one variance-unit survivor carries its value.
 axA2.axvspan(8e-6, 0.05, ymin=0.36, ymax=1.0, color=LIGHT, alpha=0.55,
              lw=0, zorder=0)
-for a, b, y0 in zip(res_holm_vol, res_holm_var, yy):
+for a, b, y0 in zip(res_holm_vol, res_holm_var, yy, strict=False):
     axA2.plot([a, b], [y0, y0], color=GREY, lw=0.7, zorder=2)
-for p_, y0 in zip(res_holm_vol, yy):
+for p_, y0 in zip(res_holm_vol, yy, strict=False):
     axA2.plot([p_], [y0], "o", ms=4.6, color=BLUE, mec=BLUE,
               mfc=BLUE if p_ < 0.05 else "white", mew=1.0, zorder=3)
-for p_, y0 in zip(res_holm_var, yy):
+for p_, y0 in zip(res_holm_var, yy, strict=False):
     axA2.plot([p_], [y0], "s", ms=4.6, color=SKY, mec=GREY,
               mfc=SKY if p_ < 0.05 else "white", mew=0.8, zorder=3)
 axA2.plot([0.05, 0.05], [-0.2, 2.55], color=GREY, lw=0.8, ls=(0, (2, 2)),
@@ -464,7 +478,7 @@ axB2 = axes_in(CMPX, 2.14, CMPW, AXH)
 companion_title(axB2, "median MDE, rel %")
 axB2.barh([2, 1, 0], b_mde, height=0.55, color=[BLUE, YELLOW, PURPLE],
           hatch=[None, "\\\\\\", "xxx"], edgecolor="white", linewidth=0.5, zorder=3)
-for y0, v in zip([2, 1, 0], b_mde):
+for y0, v in zip([2, 1, 0], b_mde, strict=False):
     axB2.text(v + 0.05, y0, "%.3f" % v, va="center", ha="left", fontsize=9, color=GREY)
 axB2.set_yticks([2, 1, 0])
 axB2.set_yticklabels(["close-close", "Parkinson", "Garman-K."])
@@ -508,7 +522,7 @@ cols = [LIGHT, LIGHT, LIGHT, GREY, GREY, GREY]
 ypos = np.arange(len(strata))[::-1].astype(float)
 axC2.barh(ypos, covals, height=0.62, color=cols, edgecolor="white", linewidth=0.5,
           zorder=3)
-for y0, v in zip(ypos, covals):
+for y0, v in zip(ypos, covals, strict=False):
     # keep the value clear of the benchmark-clean reference line
     xt = v + 2.5 if abs(v - cov_bench) > 9.0 else cov_bench + 3.0
     axC2.text(xt, y0, "%.4g" % v, va="center", ha="left", fontsize=9, color=GREY)
@@ -544,7 +558,7 @@ for i, name in enumerate(dnames):
     v = np.array([dvals[0][i], dvals[1][i]], dtype=float)
     axD.bar(x, v, width=0.29, color=[BLUE, VERM][i], hatch=[None, "///"][i],
             edgecolor="white", linewidth=0.5, label=name, zorder=3)
-    for xx, vv in zip(x, v):
+    for xx, vv in zip(x, v, strict=False):
         axD.text(xx, vv + 2.4, "%d" % vv, va="bottom", ha="center", fontsize=9,
                  color=GREY)
 axD.axhline(69, color=LIGHT, lw=0.8, ls=(0, (2, 2)), zorder=1)
@@ -566,7 +580,7 @@ axD2 = axes_in(3.60, 6.11, 0.95, AXH)
 # 8-K residual against the firm-identity reference drawn in block (a)
 companion_title(axD2, "8-K C6, pooled rel %\nvs recalibrated HAR")
 yy = np.arange(3)[::-1].astype(float)
-for y0, row in zip(yy, c6.itertuples()):
+for y0, row in zip(yy, c6.itertuples(), strict=False):
     axD2.plot([row.fixed_pooled_rel, row.exp_pooled_rel], [y0 + 0.17, y0 - 0.17],
               color=GREY, lw=0.7, zorder=2)
     axD2.plot(row.fixed_pooled_rel, y0 + 0.17, "o", ms=4.6, color=BLUE,

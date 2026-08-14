@@ -46,8 +46,13 @@ import pandas as pd
 import pyarrow.parquet as pq
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from prompt import (JSON_SCHEMA, RETRY_SUFFIX, build_excerpt, build_messages,  # noqa: E402
-                    parse_output)
+from prompt import (
+    JSON_SCHEMA,
+    RETRY_SUFFIX,
+    build_excerpt,
+    build_messages,
+    parse_output,
+)
 
 DATA_ROOT = Path(os.environ.get("SP500VOL_DATA_ROOT", "/Volumes/Z/sp500vol-data"))
 TEXT_CACHE = DATA_ROOT / "processed" / "_text_cache" / "filing_texts.parquet"
@@ -230,7 +235,7 @@ def load_done(out_dir: Path) -> set[tuple[str, str]]:
     done = set()
     for f in sorted(out_dir.glob("part-*.parquet")):
         d = pd.read_parquet(f, columns=["text_path", "variant"])
-        done.update(zip(d["text_path"], d["variant"]))
+        done.update(zip(d["text_path"], d["variant"], strict=False))
     return done
 
 
@@ -309,7 +314,7 @@ def _flush(gen, chunk: list[dict], out_dir: Path, part_idx: int) -> int:
             if p2 is not None:
                 parsed[i], raw[i] = p2, raw2[j]
     rows = []
-    for rec, rtext, p in zip(chunk, raw, parsed):
+    for rec, rtext, p in zip(chunk, raw, parsed, strict=False):
         rows.append({
             "text_path": rec["row"]["text_path"],
             "variant": rec["variant"],

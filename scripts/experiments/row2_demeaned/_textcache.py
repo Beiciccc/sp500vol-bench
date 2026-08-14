@@ -45,5 +45,5 @@ def ensure_texts_available(sample_text_path: str) -> str:
     # Foreign absolute paths (e.g. /Volumes/Z/... recorded on the ingest machine)
     # are keys of the shared store, not on-disk files here: mark everything
     # cacheable so load_texts() consults the store instead of reading disk.
-    tds._is_cacheable = lambda _path: True  # noqa: E731
+    tds._is_cacheable = lambda _path: True
     return f"parquet-store({len(store)} texts)"

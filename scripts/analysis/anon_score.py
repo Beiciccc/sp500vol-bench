@@ -124,15 +124,15 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
-import clustered_dm as cdm  # noqa: E402
+import clustered_dm as cdm
+import forecast_combination as fc
 
 KEY = ["ticker", "accession", "horizon_days"]
 EPS = 1e-8
@@ -326,7 +326,7 @@ def m1_cells(run: str) -> dict[int, dict]:
         gmean = v.label_realised_vol.mean()
         fid_v = v.ticker.map(fm).fillna(gmean).values
         fid_t = te.ticker.map(fm).fillna(gmean).values
-        L = lambda x: np.log(np.clip(x, EPS, None))  # noqa: E731
+        L = lambda x: np.log(np.clip(x, EPS, None))
         ly = L(v.label_realised_vol.values)
         bR = ols(ly, np.column_stack([np.ones(len(v)), L(v.fh.values), L(fid_v)]))
         bU = ols(ly, np.column_stack([np.ones(len(v)), L(v.fh.values), L(fid_v),
@@ -718,7 +718,7 @@ def main():
     meta_cols = {
         "prereg": PREREG,
         "g1_deviation": args.record_g1_deviation or "",
-        "generated_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "generated_utc": datetime.now(UTC).isoformat(timespec="seconds"),
     }
     out = df.copy()
     for k, v in meta_cols.items():

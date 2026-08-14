@@ -34,11 +34,13 @@ Run from repo root:  .venv/bin/python scripts/analysis/m1_stratified.py
 """
 import sys
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
 import forecast_combination as fc  # qlike, se, log_combo, moving_block_ci, holm, load
+
 sys.path.insert(0, "src")
 from sp500vol.evaluation.dm_test import dm_test
 

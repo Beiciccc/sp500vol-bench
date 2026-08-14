@@ -55,14 +55,14 @@ for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
            "VECLIB_MAXIMUM_THREADS", "NUMEXPR_NUM_THREADS"):
     os.environ.setdefault(_v, _THREADS)
 
-import argparse  # noqa: E402
-import json  # noqa: E402
-import sys  # noqa: E402
-import time  # noqa: E402
-from pathlib import Path  # noqa: E402
+import argparse
+import json
+import sys
+import time
+from pathlib import Path
 
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
+import numpy as np
+import pandas as pd
 
 REPO = Path(__file__).resolve().parents[2]
 os.chdir(REPO)
@@ -70,17 +70,22 @@ sys.path.insert(0, str(REPO / "scripts" / "analysis"))
 sys.path.insert(0, str(REPO / "scripts" / "experiments"))
 sys.path.insert(0, str(REPO / "src"))
 
-import forecast_combination as fc  # noqa: E402
-import m1_clustered as mc  # noqa: E402  (build_joined, day_key, HAR — the 180 universe)
-import m1_ensemble_primary as mep  # noqa: E402
-import rangebased_cascade as rbc  # noqa: E402  (refit_a2, base_table, run_injection, ...)
-import stronger_baselines as sb  # noqa: E402
-from clustered_dm import daily_mean, dm_test_clustered  # noqa: E402
-from maximal_reference_firm_control import (  # noqa: E402
-    PRICE, build_price_panel, firm_mean_val, log_ols_frozen)
-from signal_injection_power import TARGETS, Z_POWER  # noqa: E402
-from variance_unit_cascade import qlike_var  # noqa: E402
-from sp500vol.evaluation.dm_test import _hac_variance  # noqa: E402
+import forecast_combination as fc
+import m1_clustered as mc
+import m1_ensemble_primary as mep
+import rangebased_cascade as rbc
+import stronger_baselines as sb
+from clustered_dm import daily_mean, dm_test_clustered
+from maximal_reference_firm_control import (
+    PRICE,
+    build_price_panel,
+    firm_mean_val,
+    log_ols_frozen,
+)
+from signal_injection_power import TARGETS, Z_POWER
+from variance_unit_cascade import qlike_var
+
+from sp500vol.evaluation.dm_test import _hac_variance
 
 DATA_ROOT = Path(os.environ.get("SP500VOL_DATA_ROOT", "/Volumes/Z/sp500vol-data"))
 PUB_PARQUET = DATA_ROOT / "processed" / "full" / "public_variant_labels.parquet"
@@ -358,13 +363,13 @@ def leaderboard(panel_tag: str, pub_map: pd.Series | None, log=print) -> pd.Data
 def lb_summary(lb: pd.DataFrame) -> dict:
     text = lb[~lb.is_price_arm]
     price = lb[lb.is_price_arm]
-    return {"n": int(len(lb)),
+    return {"n": len(lb),
             "better_holm": int(lb.better_holm.sum()),
             "better_raw": int(lb.better_raw.sum()),
             "worse_holm": int(lb.worse_holm.sum()),
             "text_better_holm": int(text.better_holm.sum()),
             "text_better_raw": int(text.better_raw.sum()),
-            "text_n": int(len(text)),
+            "text_n": len(text),
             "price_better_holm": int(price.better_holm.sum()),
             "winners": sorted((lb[lb.better_holm].disclosure + "/h"
                                + lb[lb.better_holm].horizon.astype(str) + "/"

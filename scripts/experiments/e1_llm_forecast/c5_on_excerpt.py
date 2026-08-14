@@ -22,11 +22,11 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import pyarrow.parquet as pq
 import pyarrow.compute as pc
+import pyarrow.parquet as pq
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from prompt import build_excerpt  # noqa: E402
+from prompt import build_excerpt
 
 DATA_ROOT = Path(os.environ.get("SP500VOL_DATA_ROOT", "/Volumes/Z/sp500vol-data"))
 TEXT_CACHE = DATA_ROOT / "processed" / "_text_cache" / "filing_texts.parquet"
@@ -46,7 +46,7 @@ def stream_texts(paths: set[str]) -> dict[str, str]:
     for batch in pf.iter_batches(batch_size=2048, columns=["text_path", "text"]):
         mask = pc.is_in(batch.column("text_path"), value_set=__import__("pyarrow").array(list(paths)))
         sub = batch.filter(mask)
-        for p, t in zip(sub.column("text_path").to_pylist(), sub.column("text").to_pylist()):
+        for p, t in zip(sub.column("text_path").to_pylist(), sub.column("text").to_pylist(), strict=False):
             out[p] = t or ""
     return out
 
@@ -183,7 +183,7 @@ def assemble_and_train(a2: pd.DataFrame, filings: pd.DataFrame, num_shards: int)
             g = res[(res.split == split) & (res.horizon_days == h)]
             e = g.prediction_realised_vol - g.label_realised_vol
             metrics.append({"split": split, "disclosure_subset": "long_form", "horizon_days": h,
-                            "n": int(len(g)), "mae": float(e.abs().mean()),
+                            "n": len(g), "mae": float(e.abs().mean()),
                             "rmse": float(np.sqrt((e ** 2).mean())),
                             "r2": float(1 - (e ** 2).sum() / ((g.label_realised_vol - g.label_realised_vol.mean()) ** 2).sum()),
                             "qlike": q_var(g.label_realised_vol, g.prediction_realised_vol)})

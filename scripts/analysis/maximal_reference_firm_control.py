@@ -43,7 +43,7 @@ import pandas as pd
 sys.path.insert(0, "src")
 sys.path.insert(0, "scripts/analysis")
 import forecast_combination as fc  # SETS, load, qlike, ols, log_combo, clark_west, holm
-from clustered_dm import dm_test_clustered, mbb_ci_daily, daily_mean
+from clustered_dm import dm_test_clustered, mbb_ci_daily
 
 KEY = ["ticker", "accession", "horizon_days"]
 SORT = ["filing_time_utc", "ticker", "accession"]
@@ -151,7 +151,7 @@ def run():
 
                 # single-model recalibrated references for KEY cells only (esp EGARCH)
                 if (disc, m) in KEY_CELLS:
-                    for smodel, scol in zip(SINGLE_REF, PRICE):
+                    for smodel, scol in zip(SINGLE_REF, PRICE, strict=False):
                         sfv, sft = dv[scol].to_numpy(), dt[scol].to_numpy()
                         fRs1, fUs1, gs1 = fc.log_combo(yv, sfv, ftv, sft, ftt)
                         lRs1, lUs1 = fc.qlike(yt, fRs1), fc.qlike(yt, fUs1)

@@ -4,7 +4,6 @@ Usage:
     python scripts/train.py --model A2_har_rv
     python scripts/train.py --model C2_finbert_s3 --seed 2026
 """
-# ruff: noqa: E402
 
 from __future__ import annotations
 
@@ -83,7 +82,7 @@ _SUPPORTED_MODELS = {
 _NEEDS_MARKET_RETURNS = {"A3_garch", "A4_egarch", "A5_arima"}
 
 
-def main() -> int:  # noqa: PLR0915  (CLI entry: argparse + full train/predict/save flow)
+def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", required=True, help="model_id (e.g. C2_finbert_s3)")
     parser.add_argument("--seed", type=int, default=2026)

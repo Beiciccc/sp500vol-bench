@@ -54,9 +54,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
-import os
 import tempfile
 import time
 from collections import Counter
@@ -72,8 +72,8 @@ REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "src"))
 sys.path.insert(0, str(REPO / "scripts" / "analysis"))
 
-from sp500vol.evaluation.dm_test import dm_test  # noqa: E402
-from sp500vol.models.classical_text._fit_utils import (  # noqa: E402
+from sp500vol.evaluation.dm_test import dm_test
+from sp500vol.models.classical_text._fit_utils import (
     fit_ridge_cv,
     maybe_exp,
     maybe_log,
@@ -201,7 +201,7 @@ def _load_reference_sections(needed: set[str]) -> dict[str, dict[str, tuple[int,
     for batch in f.iter_batches(batch_size=2048, columns=["form", "text_path", "sections_json"]):
         d = batch.to_pandas()
         d = d[d["form"].isin(["10-K", "10-Q"])]
-        for tp, form, sj in zip(d["text_path"], d["form"], d["sections_json"]):
+        for tp, form, sj in zip(d["text_path"], d["form"], d["sections_json"], strict=False):
             if tp in ref or tp not in needed:
                 continue
             try:
@@ -224,7 +224,7 @@ def stage_extract(workdir: Path, limit: int | None) -> None:
         return
     master = load_master()
     filings = master.drop_duplicates("accession")[["accession", "text_path", "form"]]
-    needed = dict(zip(filings["text_path"].astype(str), filings["form"].astype(str)))
+    needed = dict(zip(filings["text_path"].astype(str), filings["form"].astype(str), strict=False))
     if limit:
         needed = dict(list(needed.items())[:limit])
     log(f"extract: {len(needed)} unique text_paths needed")
@@ -254,7 +254,7 @@ def stage_extract(workdir: Path, limit: int | None) -> None:
         if d.empty:
             continue
         rows = {k: [] for k in schema.names}
-        for tp, text in zip(d["text_path"].astype(str), d["text"].astype(str)):
+        for tp, text in zip(d["text_path"].astype(str), d["text"].astype(str), strict=False):
             form = needed[tp]
             secs, rest, spans = extract_one(text, form)
             rows["text_path"].append(tp)
@@ -350,7 +350,7 @@ def _count_chunk(texts: list[str], prune_hapax: bool) -> dict[str, int]:
     for t in texts:
         toks = TOKEN_RE.findall(t.lower())
         c.update(toks)
-        c.update(map(" ".join, zip(toks, toks[1:])))
+        c.update(map(" ".join, zip(toks, toks[1:], strict=False)))
     if prune_hapax:
         return {k: v for k, v in c.items() if v >= 2}
     return dict(c)
@@ -378,7 +378,7 @@ def _iter_store_chunks(store_path: Path, col: str):
 def build_vocab(store_path: Path, col: str, train_paths: set[str], prune_hapax: bool) -> list[str]:
     def gen_tasks():
         for paths, texts in _iter_store_chunks(store_path, col):
-            chunk = [t for p, t in zip(paths, texts) if p in train_paths]
+            chunk = [t for p, t in zip(paths, texts, strict=False) if p in train_paths]
             if chunk:
                 yield delayed(_count_chunk)(chunk, prune_hapax)
 
@@ -500,7 +500,7 @@ def compute_metrics(pred_df: pd.DataFrame) -> list[dict]:
                 "split": sp,
                 "disclosure_subset": DISCLOSURE,
                 "horizon_days": int(h),
-                "n": int(len(g)),
+                "n": len(g),
                 "mae": float(np.mean(np.abs(y - f))),
                 "rmse": float(np.sqrt(np.mean((y - f) ** 2))),
                 "r2": float(1 - np.sum((y - f) ** 2) / np.sum((y - y.mean()) ** 2)),
@@ -598,7 +598,7 @@ def stage_evaluate(workdir: Path, publish_root: Path) -> None:
                     "model_id": model_id,
                     "section": VARIANT_NOTES.get(model_id, "full text (archived B2 run)"),
                     "horizon_days": h,
-                    "n_test": int(len(te)),
+                    "n_test": len(te),
                     "frac_nonempty_all": round(frac_all, 4),
                     "frac_nonempty_10K": round(frac_k, 4),
                     "frac_nonempty_10Q": round(frac_q, 4),

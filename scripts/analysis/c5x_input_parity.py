@@ -29,9 +29,9 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
-import clustered_dm as cdm  # noqa: E402
-from m1_ensemble_primary import ensemble_text  # noqa: E402
+import clustered_dm as cdm
+import forecast_combination as fc
+from m1_ensemble_primary import ensemble_text
 
 KEY = fc.KEY
 SORT = fc.SORT
@@ -65,7 +65,7 @@ def standalone_stats(y, f):
         "qlike_var_alone": float(fc.qlike(y ** 2, f ** 2).mean()),
         "r2_alone": float(1.0 - ((y - f) ** 2).sum() / ((y - y.mean()) ** 2).sum()),
         "pred_sd": float(f.std()),
-        "n_unique_2dp": int(len(vals)),
+        "n_unique_2dp": len(vals),
     }
 
 

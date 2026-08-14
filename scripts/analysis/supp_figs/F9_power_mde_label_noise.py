@@ -40,12 +40,24 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from supp_style import (AGG, BLUE, GREEN, GREY, INK, LIGHT, PURPLE, REPO, SKY,
-                        TAB, VERM, VERM_TXT, YELLOW, annot, apply_style, finish,
-                        gate, note)
-
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    INK,
+    PURPLE,
+    SKY,
+    TAB,
+    VERM,
+    VERM_TXT,
+    annot,
+    apply_style,
+    finish,
+    gate,
+    note,
+)
 
 W, H = 6.5, 8.60                      # canvas inches (portrait supplement page)
 
@@ -228,7 +240,7 @@ ax_a.set_xlabel("injected firm-orthogonal signal (realised rel-QLIKE, %)")
 leg = ax_a.legend(loc="upper left", bbox_to_anchor=(-0.115, -0.52), ncol=2,
                   handlelength=1.3, columnspacing=1.1, labelspacing=0.30,
                   borderpad=0.0, handletextpad=0.5, fontsize=9)
-for txt, (_, _, col, _) in zip(leg.get_texts(), series):
+for txt, (_, _, col, _) in zip(leg.get_texts(), series, strict=False):
     txt.set_color(col)
 # The strip's header is apparatus, not data: it names the denominator and the
 # column order of the sixteen counts printed in the key.  It drops to INK2 with
@@ -327,7 +339,7 @@ ax_c.set_xticks(xc)
 # the noise share sits under its own bar rather than inside it: the h=20
 # noise block is too thin to hold 9pt text without overprinting the hatch
 ax_c.set_xticklabels([f"h={int(v)}\nnoise {100 * s:.1f}%"
-                      for v, s in zip(h_lab, share)])
+                      for v, s in zip(h_lab, share, strict=False)])
 ax_c.set_xlim(-0.62, 2.55)
 ax_c.set_ylim(0, 1.70)
 ax_c.set_yticks([0.0, 0.4, 0.8, 1.2])
@@ -344,7 +356,7 @@ ax_c2.spines["right"].set_visible(True)
 ax_c2.spines["right"].set_color(GREY)
 ax_c2.plot(xc, ceil, color=GREY, lw=1.2, marker="D", ms=4.4, mfc="white",
            mec=GREY, mew=1.0, zorder=6)
-for xi, c_ in zip(xc, ceil):
+for xi, c_ in zip(xc, ceil, strict=False):
     ax_c2.annotate(f"{c_:.3f}", (xi, c_), textcoords="offset points",
                    xytext=(-8, 0), ha="right", va="center", fontsize=9,
                    color=GREY)

@@ -20,15 +20,25 @@ import os
 import sys
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-import diss_style as ds  # noqa: E402
-from supp_style import (BLUE, GREEN, GREY, INK, INK2, LIGHT,  # noqa: E402
-                        PURPLE, RULE, TAB, VERM, VERM_TXT, YELLOW,
-                        apply_style, gate)
+import diss_style as ds
+from supp_style import (
+    BLUE,
+    GREEN,
+    GREY,
+    INK,
+    INK2,
+    LIGHT,
+    PURPLE,
+    RULE,
+    TAB,
+    YELLOW,
+    apply_style,
+    gate,
+)
 
 POOLS = ["pool5 (paper)", "pool6 +HARQ", "pool6 +HARX", "pool7 (all)"]
 SHORT = {"pool5 (paper)": "five members (the reported pool)",

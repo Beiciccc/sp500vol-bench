@@ -66,12 +66,17 @@ import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
 sys.path.insert(0, "src")
-import forecast_combination as fc  # noqa: E402  (SETS, qlike, log_combo, holm)
-import m1_ensemble_primary as mep  # noqa: E402  (ensemble_text, run_dir — primary basis)
-from clustered_dm import daily_mean, dm_test_clustered  # noqa: E402
-from maximal_reference_firm_control import (  # noqa: E402
-    PRICE, build_price_panel, firm_mean_val, log_ols_frozen)
-from sp500vol.evaluation.dm_test import _hac_variance  # noqa: E402
+import forecast_combination as fc
+import m1_ensemble_primary as mep
+from clustered_dm import daily_mean, dm_test_clustered
+from maximal_reference_firm_control import (
+    PRICE,
+    build_price_panel,
+    firm_mean_val,
+    log_ols_frozen,
+)
+
+from sp500vol.evaluation.dm_test import _hac_variance
 
 T = Path("results/tables")
 KEY = fc.KEY

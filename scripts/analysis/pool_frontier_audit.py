@@ -30,9 +30,9 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "scripts/analysis")
-import forecast_combination as fc  # noqa: E402
-from clustered_dm import dm_test_clustered  # noqa: E402
-from maximal_reference import fit_apply_log  # noqa: E402
+import forecast_combination as fc
+from clustered_dm import dm_test_clustered
+from maximal_reference import fit_apply_log
 
 KEY, SORT, HORIZONS = fc.KEY, fc.SORT, fc.HORIZONS
 BASE5 = ["A2_har_rv", "A6_shar", "A3_garch", "A4_egarch", "A5_arima"]
@@ -82,7 +82,7 @@ def main():
                     "disc": disc, "h": h, "pool": name, "n_members": len(members),
                     "qlike_test": float(losses[name].mean()),
                     "max_abs_weight": float(np.abs(beta[1:]).max()),
-                    "weights": ";".join(f"{m}={b:+.2f}" for m, b in zip(members, beta[1:])),
+                    "weights": ";".join(f"{m}={b:+.2f}" for m, b in zip(members, beta[1:], strict=False)),
                 })
             # each larger pool vs the paper's pool5, day-clustered
             for name in POOLS:

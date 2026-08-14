@@ -110,6 +110,9 @@ cp .env.example .env      # set EDGAR_USER_AGENT="Your Name your.email@example.c
 uv run pytest tests/ -m "not slow"
 ```
 
+`REPRODUCIBILITY.md` sets out what can be checked without any licence, what
+needs one, and exactly what the reported numbers rest on.
+
 The pre-registration records under `configs/` fix each audit family's design
 before the statistics inside it were inspected. Where a record was amended, the
 amendment states its date and its reason.

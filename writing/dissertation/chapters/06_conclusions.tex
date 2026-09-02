@@ -1,0 +1,82 @@
+% ============================================================================
+% Ch6 ground-up rebuild (W2, 2026-08-02): drafted from the frozen sources per
+% DISSERTATION_ARCHITECTURE.md (Ch6) and AUDIT_DOSSIER.md. The June chapter is
+% retired (dossier Part 3: verdict paragraph, "one outright win", and future-
+% work items 1-5/7 all rest on dead cells or executed work). Objective verdicts
+% below carry the same O1-O5 numbering and key phrases as Section 1.2.
+% ============================================================================
+\chapter{Conclusions and Future Work}
+\label{ch:conclusions}
+
+\section{Conclusions}
+\label{sec:conc-verdicts}
+
+The disclosure mandate rests on the premise that a firm's own account of its risks is useful to those bearing them. This investigation measured one corner of that premise: what the text adds about future volatility beyond the price history, and how much of that is \emph{which firm filed} rather than \emph{what the filing said}. The five objectives of Section~\ref{sec:intro-objectives} each now receive a verdict. The first, benchmark construction (O1), is delivered as SP500Vol-Bench: a survivorship-free, point-in-time panel of 914 index-membership intervals covering 832 distinct securities. % src: crsp_restricted/membership_intervals.csv
+Each is resolved to its SEC filer identity through 30,100 point-in-time link windows, % src: crsp_restricted/cik_links_pit.csv
+including 31 audited successor-CIK override windows covering 23 acquired or restructured firms. % src: frozen 03_dataset.tex; release/DATA_CARD.md
+The panel carries 144,129 aligned filings and 431,245 aligned rows under an effective-trading-day rule whose no-look-ahead audit found zero violations; 427,429 survive the feature--label joins. % src: frozen 03_dataset.tex; TECHNICAL_SUPPLEMENT.md S1
+That census deliberately retains the exiting firms whose high-volatility episodes a current-membership sample silently drops.
+
+The second objective, the model spectrum (O2), is implemented in full: seven price baselines, four classical text pipelines, fine-tuned Transformer encoders under five long-document strategies, three frozen seven-to-eight-billion-parameter embedding arms, a prompted 32-billion-parameter language model and four fusion architectures. % src: frozen 04_methods.tex (model matrix)
+Every trained Block~C/D arm ran under one fixed recipe at three seeds, one ASHA-tuned arm apart, and the campaign is archived as 240 fingerprinted production runs with 233 distinct configuration digests % src: results/tables/config_fingerprints.md
+over 590.4 GPU-hours of training compute. % src: results/tables/cost_accuracy.md
+0 of 180 squared-error comparisons favour a challenger over HAR-RV, 155 are significantly worse (Table~\ref{tab:app-dm180}), % src: results/tables/dm_pairwise_clustered.md
+and reading more of a long filing improves a text model without moving it to the reference. Two of those arms merely tie a naive persistence forecast (single-seed, observation-level), so the reference, not the text, decides the verdict (Section~\ref{sec:res-standalone}). % src: results/tables/dm_weak_vs_strong_baseline.md
+
+The third objective, the incremental-value audit protocol with power calibration (O3), is the project's methodological core. The recalibrated log-space combiner leaves 38 of 69 combination cells genuine against the single-HAR rung. % src: results/tables/m1_ensemble_primary.md; control_intersection_ensemble.md
+The firm-identity reference leaves 8 of 69 on the merged-grid rows, the pool 9, the full conjunction 0, with the two survivor sets disjoint (Table~\ref{tab:app-ladder}). % src: results/tables/firm_identity_ensemble.md; maximal_reference_ensemble.md; control_intersection_ensemble.md
+Injected firm-orthogonal signals of 0.3, 0.5 and 1.0 per cent recover through the conjunction in 2, 6 and 13 of 69 cells respectively. % src: results/tables/signal_injection_power.csv
+Yet a pooled test across the grid detects a systematic micro-increment ($t=+8.29$, Table~\ref{tab:app-omnibus}; minimum detectable effect 0.375 per cent, Table~\ref{tab:app-power}). % src: results/tables/omnibus_m1.md
+The protocol states what its nulls could and could not have seen: the discipline the literature surveyed in Chapter~\ref{ch:background} lacks.
+
+The fourth objective, identity attribution (O4), produced the dissertation's most distinctive numbers. Three instruments triangulate what the apparent gains are made of: anonymisation prices the pooled identity share at 0.51 with interval $[0.44,0.56]$, % src: results/tables/anon_share_ci.md
+bracketed between the matched-firm swap's retention of 0.29 and the reference-interval bound of 0.72. % src: results/tables/anon_arm.md
+What the firm-identity reference does not remove is the prompted arm's (C6)
+reading of the 8-K current reports, which retains $+0.52/+0.24/+0.21$ per cent against it
+on the merged-grid rows at the three horizons; the matched-firm swap removes most of that. % src: results/tables/firm_identity_ensemble.md
+This bounded residual survives six of the seven checks of Section~\ref{sec:res-residual} --- three only at shorter horizons, the cross-family probe directional only --- yet moves Sharpe significantly in none of its own six portfolio cells; the one significant cell among the eighteen grid-wide belongs to another arm. % src: results/tables/portfolio_econ.csv; results/tables/crossfamily_llama70_ens.md
+
+The fifth objective, portability (O5), is met by running the audit end-to-end on two public corpora outside the SEC panel (Chapter~\ref{ch:validation}). On Yelp the identity control points the other way: it costs 9.5--10.6 per cent, because that panel's reference already encodes the entity. A content residual of $+0.37/+0.38$ per cent still survives both fitted arms, placebo-clean and above both stage-specific detectable effects, yet orders of magnitude below a field-standard split's $+28$--$37$ per cent. % src: frozen 08_discussion.tex; results/tables/yelp_multiarm.md; yelp_cascade.md
+On MAEC the published text gain is reproduced in full: 12 of 12 cells against the raw reference. It then reprices to 0 of 24 cells under recalibration plus a same-ticker mean (Table~\ref{tab:app-maec}), a zero-content probe matching or exceeding the full transcript at three of four horizons. % src: frozen 08_discussion.tex; results/tables/maec_audit.md
+The audit surfaces positives where they exist and dissolves them where they are identity; the size and even the sign of the identity effect is a property of the panel, not a constant of text.
+
+The transferable contribution is the ordering itself: \emph{detectable}, \emph{attributable} and \emph{realisable} are three different claims (Section~\ref{sec:intro-aim}), and conflating them is how weak-baseline studies overclaim. Text here is detectable: the pooled out-of-sample micro-increment, with 48 of 48 in-sample encompassing tests agreeing. % src: results/tables/encompassing_regression.md
+Detection is not attribution; roughly half of the surviving increment is who filed. And attribution is not realisability: the deployable expanding-weight combiner keeps 6 of 69 cells genuine % src: results/tables/deployable_combiner.md
+and no test converts the residual into portfolio value. Any claim that a new representation extracts value from disclosure text can now be required to say which of the three it makes, on an apparatus built to ask.
+
+Future users receive a benchmark that ships with its own audit. The released core carries the benchmark index of Chapter~\ref{ch:data}, SHA-256 fingerprints for all 240 production runs with a re-hashing script, and the prompted arms' templates and raw generations; the day-clustered evidence tables behind every claim travel with the wider repository rather than that core (Appendix~\ref{app:external}). % src: frozen 12_reproducibility.tex
+Labels and predictions derived from licensed CRSP data are withheld, with the full regeneration pipeline and a licence-free public variant released in their place. % src: frozen 12_reproducibility.tex
+Every run is documented and none was dropped after seeing test results. % src: frozen 09_conclusion.tex
+A new text model slots into the 69-cell grid and meets the same ladder, placebo, power gate and economic adjudication.
+
+\subsection{Limitations}
+\label{sec:conc-limitations}
+
+These limitations bound the conclusions, and none is softened. First, the firm-identity reference is deliberately strong: a firm-mean term absorbs \emph{any} firm-stable signal, genuine firm-stable content along with identity proper, so the 8-of-69 count under that rung is conservative by construction and the anonymisation arm supplies the \emph{lower} estimate of the identity share. The pooled 0.51 is a point estimate bracketed by the swap's retention of 0.29 and the reference-interval bound of 0.72, not a settled constant. % src: frozen 10_limitations.tex; results/tables/anon_share_ci.md; anon_arm.md
+The share is estimated on the event-driven channel only: the long-form masking gate ran, but that channel closed with zero executed arms. % src: results/tables/anon_arm_lf.md
+
+Second, the headline counts are convention- and proxy-sensitive. The primary rung reads 38 genuine cells in volatility units, 20 in variance units and 19 under a Parkinson relabelling of the target. The conjunction rung holds 0 cells on the committed labels, 1 under Parkinson and 2 under Garman--Klass, none shared. % src: frozen 10_limitations.tex; frozen 06_results.tex tab:cascade; results/tables/rangebased_cascade.csv
+The ladder's collapse pattern is stable across conventions; individual survivors are not, and any cell quoted from this dissertation should travel with that sentence.
+
+Third, the instruments have edges. Four of the five cross-family probes failed the forecaster-health screen and are instrument-dead (uninformative rather than disconfirming), and a fair-adaptation pilot revived neither of the two families re-tested. Cross-family support for the 8-K residual therefore rests on a single healthy instrument and is directional, not an independent confirmation. % src: frozen 10_limitations.tex; frozen 07_ablations.tex; results/tables/crossfamily_llama70_ens.md
+The contamination probes bound how much of the prompted arm's skill could be memorisation; they cannot establish its absence. % src: frozen 10_limitations.tex
+The evidence covers one market and one regime: large-cap United States equities, test years 2022--2025. % src: frozen 03_dataset.tex Table 1; frozen 10_limitations.tex
+And the earliest run metadata logged no package versions, which retired two anonymisation arms and a long-form swap arm at their reproduction gates. The retirements are on record, but the statistics those arms would have produced do not exist. % src: frozen 10_limitations.tex; TECHNICAL_SUPPLEMENT.md S19
+
+Finally, one registered analysis failed outright and is reported as such. The project attempted to predict the sign and size of the identity control's effect from how strongly a panel's reference forecasts already encode entity identity. The registered direction was negative, the observed Spearman correlation across the sixteen panel cells was $\rho=+0.59$ (Section~\ref{app:mechanism}), and the analysis record's own falsification branch fired. % src: results/tables/mechanism_identity.md
+When an identity control will help and when it will cost remains descriptive knowledge, not a mechanism this project can claim to predict.
+
+\section{Future Work}
+\label{sec:conc-future}
+
+The five below are ordered by expected return; none duplicates work already executed in Chapters~\ref{ch:results} and~\ref{ch:validation}. First, richer masking. The mask strips identifying strings but not the style, boilerplate and vocabulary that fingerprint an unnamed firm. Paraphrasing filings through a style-normaliser before the same gate, on the long-form channel too, would price that residue, and would be informative only if it moved the pooled share outside $[0.44, 0.56]$, the interval the executed arms already give it. If style carries identity, 0.51 is a floor and the harder mask should raise it. % src: results/tables/anon_share_ci.md
+Second, scope. Rebuilding the audit on European and Asian filings, whose conventions and identity structures differ from EDGAR's, is a fleet-scale undertaking at this campaign's cost. % src: results/tables/cost_accuracy.md
+The identity share, not the ladder's collapse, is what Chapter~\ref{ch:validation} gives reason to expect will differ.
+
+Third, the falsified mechanism analysis leaves a census: identity-control behaviour over many published panels rather than sixteen cells from three, each CPU-cheap once its forecasts exist, deciding whether $\rho=+0.59$ was chance. % src: results/tables/mechanism_identity.md
+Fourth, the labels are daily-return realised volatility, the implied-volatility control the market-level index only. % src: results/tables/vix_control.md
+Relabelling with an intraday realised-variance estimator and re-running the ladder would test the empty conjunction of Section~\ref{sec:conc-limitations} against a fourth proxy; a firm-level implied rung extends the control the other way. Refitting the text arms is what makes this future work, and the bar is the power calibration's median per-cell minimum detectable effect of 0.82 per cent. % src: results/tables/signal_injection_power.csv (median per-cell MDE 0.82 per cent over the 69 cells)
+
+Fifth, the audit is modality-agnostic: earnings-call audio, news flow, analyst reports, and any entity panel with a free history --- patients, authors, firms --- suit the same ladder. On MAEC a free history absorbed the published gain; another panel need not repeat that.
+
+What disclosure text adds beyond who filed it is now measurable, and the instruments are public.

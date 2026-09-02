@@ -1,0 +1,62 @@
+{
+  "base_model": "C2_finbert_s1",
+  "dataset": "full",
+  "disclosure": "event_driven",
+  "model": "C2t_finbert_s1",
+  "model_config": {
+    "compute": {
+      "estimated_hours_per_seed": 4,
+      "required_gpu": "A100_40G"
+    },
+    "encoder": {
+      "max_length": 512,
+      "pretrained": "ProsusAI/finbert"
+    },
+    "head": {
+      "dropout": 0.1,
+      "hidden_dim": 128
+    },
+    "model_class": "sp500vol.models.neural_text.finbert_s1.FinBertS1",
+    "model_id": "C2_finbert_s1",
+    "strategy": "S1",
+    "training": {
+      "batch_size": 128,
+      "dataloader_num_workers": 8,
+      "dataloader_persistent_workers": true,
+      "dataloader_pin_memory": true,
+      "dataloader_prefetch_factor": 4,
+      "early_stopping": true,
+      "es_min_delta": 0.0,
+      "es_patience": 1,
+      "grad_accumulation_steps": 1,
+      "log_target": true,
+      "lr": 5e-06,
+      "max_epochs": 5,
+      "mixed_precision": "bf16",
+      "optimizer": "adamw",
+      "pretokenize": true,
+      "tokenization_batch_size": 512,
+      "tokenizer_threads": 24,
+      "warmup_ratio": 0.06,
+      "weight_decay": 0.01
+    }
+  },
+  "row3_selection": {
+    "criterion": "min pooled validation QLIKE (vol-unit), all horizons",
+    "grid_lrs": [
+      5e-06,
+      1e-05,
+      2e-05
+    ],
+    "selected_grid_run": "C2_finbert_s1_full_event_driven_lr5e-6_seed2026",
+    "selected_lr": 5e-06,
+    "tuned_training": {
+      "early_stopping": true,
+      "es_min_delta": 0.0,
+      "es_patience": 1,
+      "max_epochs": 5
+    },
+    "val_qlike": 4.175437172267842
+  },
+  "seed": 2026
+}

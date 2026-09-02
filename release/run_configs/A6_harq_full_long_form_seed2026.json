@@ -1,0 +1,20 @@
+{
+  "dataset": "full",
+  "disclosure": "long_form",
+  "insanity_filter": {
+    "h10": 7.11111111111111e-05,
+    "h20": 7.213445863088797e-05,
+    "h5": 6.815703380588877e-05
+  },
+  "model_id": "A6_harq",
+  "note": "HARQ (Bollerslev-Patton-Quaedvlieg), log-space analogue: daily-lag coefficient varies with sqrt(RQ_22); RQ_22=(22*252^2/3)*mean(r^4) over 22d PIT window; log-space pooled OLS per horizon + Duan smearing; ret_match_ok drops applied; BPQ insanity filter (clamp forecasts to train-RV range per horizon) \u2014 unfiltered log-HARQ diverges on extreme RQ test points.",
+  "regressors": [
+    "log(rv_1+eps)",
+    "log(rv_5+eps)",
+    "log(rv_22+eps)",
+    "sqrt(RQ_22)*log(rv_1+eps)"
+  ],
+  "returns_source": "market/crsp/market_returns.parquet",
+  "rq_definition": "RQ_22 = (22*252^2/3)*mean(r^4), 22 trading days <= feature_window_end",
+  "seed": 2026
+}

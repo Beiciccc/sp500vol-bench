@@ -1,0 +1,89 @@
+\usepackage{setspace}
+\usepackage{geometry}
+\usepackage[toc]{appendix}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{graphicx}
+% The appendices are figure-dense, and tbp floats queue up and drift across
+% section boundaries -- one was measured eight pages downstream, landing in a
+% section it does not illustrate. The [section] option is not used: it would
+% fence the chapters too, and the main text has no page to spare at its 60-page limit.
+% \FloatBarrier is placed by hand before each appendix section instead.
+\usepackage{placeins}
+\usepackage{titlesec}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+\usepackage[hidelinks,bookmarksnumbered=true]{hyperref}
+% Long dataset URLs in the bibliography cannot break without this and stretch
+% their neighbouring lines to visibly gappy inter-word spacing.
+\usepackage{xurl}
+% xurl permits a break at any character, which keeps the reference list free
+% of overfull lines but split the Yelp URL mid-word as "open-datas / et/".
+% The bibliography carries exactly two URLs, of 54 and 47 characters, so the
+% break points can be confined to punctuation without risking an overfull
+% line; the build gate counts overfull boxes and would catch a regression.
+\def\UrlBreaks{\do\/\do\-\do\.\do\_\do\?\do\=\do\&}
+
+% Float and caption geometry sized against the regenerated figures (W3).
+\input{figuresetup.tex}
+
+\newcommand{\projectTitle}{SP500Vol-Bench: A Point-in-Time Benchmark and Identity-Controlled Audit of Disclosure-Based Volatility Forecasting}
+\newcommand{\fullname}{Kun Zhang}
+\newcommand{\degreeTitle}{MSc Advanced Computer Science}
+\newcommand{\session}{2025/26}
+
+% Document properties. hyperref is loaded above, but pdftitle and pdfauthor
+% have to expand the four macros defined immediately above this line, so the
+% metadata is set here rather than in the package options.
+\hypersetup{%
+  pdftitle={\projectTitle},
+  pdfauthor={\fullname},
+  pdfsubject={\degreeTitle{} dissertation, School of Computer Science, University of Leeds},
+  pdfkeywords={volatility forecasting; corporate disclosure; point-in-time benchmark; incremental value}%
+}
+
+% 25 mm binding edge (official Leeds LaTeX template geometry)
+\geometry{a4paper, left=25mm, right=25mm, top=25mm, bottom=20mm}
+\onehalfspacing
+
+\titleformat{\chapter}[display]
+   {\normalfont\Huge\bfseries}{\vspace*{-1\baselineskip}\chaptertitlename\ \thechapter}{15pt}{\huge}
+\titlespacing*{\chapter}{0pt}{0pt}{15pt}
+
+\renewcommand\bibname{References}
+\bibliographystyle{abbrv}
+\DeclareTextCommandDefault{\textcopyright}{\textcircled{c}}
+
+\newenvironment{dissertationsummary}
+ {\cleardoublepage \null \begin{center}\textbf{Summary}\end{center}}
+ {\vfill \null}
+
+\newcommand{\frontcover}{ \begin{titlepage}
+\newgeometry{left=25mm,right=25mm,top=45mm,bottom=0.1cm}
+\pdfbookmark[0]{Title Page}{fm:titlepage}
+\noindent
+\begin{minipage}[t]{8cm}
+\textbf{\Large{School of Computer Science}}\\
+{\fontfamily{ptm}\selectfont \uppercase{faculty of engineering and \\physical sciences}}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{7cm}
+\raggedleft
+\includegraphics[scale=0.2]{logo_black.png}
+\end{minipage}
+\noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
+\begin{center}
+\vspace*{37mm}
+\textbf{\Large\projectTitle}\\[10mm]
+\textbf{\large\fullname}\\[10mm]
+\textbf{Submitted in accordance with the requirements for the degree of}\\
+\textbf{\degreeTitle}\\[10mm]
+\session
+\end{center}
+\restoregeometry
+\end{titlepage} }

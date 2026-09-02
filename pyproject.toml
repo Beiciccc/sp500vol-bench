@@ -1,0 +1,135 @@
+[project]
+name = "sp500vol"
+version = "0.0.1"
+description = "Evaluating the Incremental Value of Long and Event-Driven Regulatory Disclosures for Volatility Forecasting"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "Kun Zhang", email = "your.email@example.com" },
+]
+
+dependencies = [
+  # === Core scientific ===
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "scipy>=1.13",
+  "scikit-learn>=1.5",
+  "pyarrow>=16.0",                    # parquet
+  # === Time-series / econometrics ===
+  "arch>=7.0",                        # GARCH / EGARCH
+  "statsmodels>=0.14",                # ARIMA, HAR-RV
+  "pandas-market-calendars>=4.4",     # US equities trading calendar
+  # === NLP ===
+  "torch>=2.3",
+  "transformers>=4.42,<5",            # 5.x lazy-import (create_import_structure_from_path) hangs on import; pin to 4.x
+  "tokenizers>=0.19",
+  "datasets>=2.20",
+  "accelerate>=0.32",                 # multi-GPU + mixed precision
+  # === Data ingestion ===
+  "aiohttp>=3.9",                     # async EDGAR fetcher
+  "httpx>=0.27",
+  "tenacity>=8.4",                    # retry with backoff
+  "beautifulsoup4>=4.12",             # 8-K HTML parsing
+  "lxml>=5.2",                        # iXBRL parsing
+  # === Config / CLI / logging ===
+  "hydra-core>=1.3",
+  "omegaconf>=2.3",
+  "typer>=0.12",
+  "rich>=13.7",
+  "structlog>=24.2",
+  "python-dotenv>=1.0",
+  # === Storage / versioning ===
+  "filelock>=3.15",
+  # === Utilities ===
+  "tqdm>=4.66",
+  "sentencepiece>=0.2.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+  "pytest-cov>=5.0",
+  "pytest-asyncio>=0.23",
+  "hypothesis>=6.108",
+  "ruff==0.14.14",   # pinned: an open lower bound let a new ruff minor add rules and turn CI red
+  "mypy>=1.10",
+  "pre-commit>=3.7",
+  "jupyterlab>=4.2",
+]
+tracking = [
+  "wandb>=0.17",                      # optional experiment tracking
+]
+viz = [
+  "matplotlib>=3.9",
+  "seaborn>=0.13",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.2",
+  "pytest-cov>=5.0",
+  "pytest-asyncio>=0.23",
+  "hypothesis>=6.108",
+  "ruff==0.14.14",   # pinned: an open lower bound let a new ruff minor add rules and turn CI red
+  "mypy>=1.10",
+  "pre-commit>=3.7",
+  "jupyterlab>=4.2",
+]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sp500vol"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "PL", "RUF"]
+ignore = [
+  "PLR0913",   # allow many fn args (common in model configs)
+  "PLR2004",   # magic-value comparisons are pervasive + readable (thresholds, dims, test asserts)
+  "N803",      # sklearn fit(X, y): uppercase X is idiomatic in ML code
+  "RUF002",    # intentional math minus sign (−) in docstring formulae
+  "PLC0415",   # deferred imports (statsmodels/arch/torch) keep module import-time light
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Model factories dispatch one branch per model_id; high branch/return counts
+# are inherent and clearer than a dict-of-lambdas indirection.
+"scripts/train.py" = ["PLR0911", "PLR0912"]
+# Frozen model code. The two long branches are one training loop each, read top
+# to bottom; splitting them to satisfy a counter would make them harder to check
+# against the report, not easier.
+"src/sp500vol/models/neural_text/bert_s1.py" = ["PLR0912", "PLR0915"]
+# max(1, max(gen)) and max(1, *gen) differ on an empty batch: the first raises
+# inside the inner max, the second raises on a lone int. The nesting is load
+# bearing, so the rule is switched off here rather than the code rewritten.
+"src/sp500vol/models/neural_text/bert_s2.py" = ["PLW3301"]
+# A local and a parameter shadow two names this module re-exports. Both shadows
+# are confined to their own function and neither name is read before it is
+# bound; renaming the parameter would change a signature callers pass by keyword.
+"scripts/analysis/diss_style.py" = ["F811"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = false                        # ramp up gradually
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+pythonpath = ["src"]
+addopts = "-ra -q --strict-markers"
+markers = [
+  "slow: marks tests that take >5s",
+  "gpu: marks tests requiring GPU",
+  "network: marks tests requiring internet",
+]

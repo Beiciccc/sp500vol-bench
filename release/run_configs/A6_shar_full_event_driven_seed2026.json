@@ -1,0 +1,19 @@
+{
+  "dataset": "full",
+  "disclosure": "event_driven",
+  "insanity_filter": {
+    "h10": 0.0,
+    "h20": 0.0,
+    "h5": 9.51782688976453e-06
+  },
+  "model_id": "A6_shar",
+  "note": "Semivariance HAR (Patton-Sheppard): daily lag split into RS-/RS+ from CRSP signed daily returns; log-space pooled OLS per horizon + Duan smearing (A2 conventions); ret_match_ok drops applied; BPQ insanity filter (clamp to train-RV range, rarely binds).",
+  "regressors": [
+    "log(RS-_1+eps)",
+    "log(RS+_1+eps)",
+    "log(rv_5+eps)",
+    "log(rv_22+eps)"
+  ],
+  "returns_source": "market/crsp/market_returns.parquet",
+  "seed": 2026
+}

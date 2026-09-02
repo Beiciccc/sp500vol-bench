@@ -1,0 +1,4 @@
+{
+  "model_id": "B2sec_item7",
+  "note": "E2 section ablation (MD&A only (10-K Item 7 / 10-Q Part I Item 2)). B2_tfidf_ridge recipe: TF-IDF 1-2grams max_features=5000 sublinear_tf, per-horizon Ridge(lsqr) on log target, alpha CV grid (0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0) -> chosen {5: 1.0, 10: 1.0, 20: 1.0}; sections re-extracted from cached full text (sections_json is TOC-contaminated first-match text), TOC-skip rule: first label-match span >= 500 chars else last match. Missing section => empty string. Non-empty section fraction: {'all': 0.9957732155342274, '10-K': 0.9950425829414008, '10-Q': 0.9960167803720497}. Splits joined from A2_har_rv long_form seed2026."
+}

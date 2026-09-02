@@ -1,0 +1,36 @@
+# Full SP500Vol-Bench dataset config: S&P 500 main universe.
+
+defaults:
+  - _self_
+
+name: full
+description: "Full SP500Vol-Bench: time-varying S&P 500 × 2010-2025 × {10-K, 10-Q, 8-K}."
+
+universe:
+  source: time_varying_sp500
+  membership_table: ./data/universe/sp500_membership.parquet
+  # Built by scripts/ingest_wrds.py from the WRDS CRSP S&P 500 constituents file
+  # (survivorship-free PIT membership) + CCM point-in-time CIK linking.
+
+# CRSP/WRDS coverage: survivorship-free S&P 500 membership + daily returns,
+# 2010-2025. See design/03_universe_source_decision.md.
+date_range:
+  start: "2010-01-01"
+  end: "2025-12-31"
+
+forms:
+  - 10-K
+  - 10-Q
+  - 8-K
+
+edgar:
+  cache_root: ./data/raw
+  max_concurrency: 8
+  rate_limit_per_sec: 10            # SEC fair-access ceiling
+  in_flight: 16
+
+market:
+  source: crsp
+  cache_root: ./data/market
+  crsp_store: ./data/market/crsp/daily_returns.parquet      # OHLCV (split-adjusted DlyClose)
+  returns_store: ./data/market/crsp/market_returns.parquet  # log1p(DlyRet) total return

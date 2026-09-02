@@ -1,0 +1,255 @@
+\chapter{Validation of Results}
+\label{ch:validation}
+
+% ============================================================================
+% Ground-up rebuild (W2, 2026-08): assembled from the frozen sources only.
+% Sections 5.1-5.5 per DISSERTATION_ARCHITECTURE.md; every number carries a
+% same-line evidence comment per the blueprint's verification protocol.
+% Basis discipline: seed-ensemble + day-clustered + Holm primary; departures
+% tagged inline (single-seed, variance-unit, raw-p-only, off-panel).
+% ============================================================================
+
+Chapter~\ref{ch:results} closed on an ordering: detectable, only partly attributable, not realisable. Each term is a claim the five directions of this chapter must earn. Internal and statistical validity ask whether the increment is \emph{detectable} at all; instrument and external validity, whether it is \emph{attributable} to content; reproducibility underwrites every count. Not every direction returns a confirmation; Table~\ref{tab:val-ledger} gathers the verdicts where the chapter closes.
+
+\section{Internal Validity}
+\label{sec:val-internal}
+
+Detectability is worth nothing if the apparatus can manufacture it. Internal validity asks whether the combiner, the frozen weights and the selection rules produced the increments on their own, and whether they survive the protocol's arbitrary draws. Four instruments answer, the last confronting the machinery with the literature's founding design.
+
+\subsection{The Label-Shuffle Placebo}
+\label{sec:val-placebo}
+
+The placebo asks whether the combination machinery can award credit to information-free input: per Section~\ref{sec:design-inference}, the text forecast in Eq.~\eqref{eq:m1} is randomly permuted on validation and test rows alike, so the combination weight is refit on shuffled text (five permutation seeds; reference, labels and inference unchanged). A genuine cell must see the shuffle earn nothing ($|\mathrm{DM}| < 2$). On the primary grid the gate never fires: all 38 Holm survivors of the primary rung are placebo-clean, so genuine and Holm-only counts agree. Across the single-seed stratum sweep, on one permutation not five, every placebo stays inside $\pm0.78$ per cent of relative QLIKE (Figure~\ref{fig:app-stratum-map-b}). % src: results/tables/m1_ensemble_primary.md; TECHNICAL_SUPPLEMENT.md S15 block (a); results/tables/m1_stratified.csv (max |placebo_rel_impr_pct| = 0.777 over all 756 stratum cells)
+Where the gate does fire, it proves itself a live control, not a formality. Under the variance-unit rescoring of Section~\ref{sec:val-perturb}, exactly one cell, event-driven FinBERT at $h{=}5$, clears Holm yet fails the placebo, which is why that convention's genuine count reads 20 against a Holm-only 21. % src: results/tables/variance_unit_cascade.md; TECHNICAL_SUPPLEMENT.md S15 block (a)
+On the prior-art corpus of Section~\ref{sec:val-kogan}, shuffled text significantly beats the reference in 13 of 50 placebo draws. The gate detects a structurally weak control, not a property of the documents. % src: results/tables/kogan_corpus_audit.md
+
+\subsection{Within-Date Permutation: Which Firm versus When}
+\label{sec:val-withindate}
+
+The genuine increments are cross-sectional rather than regime-timing (Section~\ref{sec:res-residual}), and two manipulations bracket the information type. The \emph{within-date permutation} exchanges text forecasts at random among the filings sharing a trading day (five permutation seeds). Every date-level property survives: the day's volatility regime, its filing count, its distribution of text forecasts. Only the document--firm correspondence is destroyed. An increment that survives it therefore cannot be about which firm filed. % src: results/tables/withindate_placebo.md
+The \emph{date-mean-text combiner} destroys the other pole, replacing each filing's text forecast with its day's mean text forecast, a pure timing signal with zero cross-sectional content. The fraction of the real increment it already delivers (clipped to $[0,1]$) is the regime-timing share. % src: results/tables/withindate_placebo.md
+A cell counts as regime-timing if the date-mean share reaches 0.5 or the permutation retains half the increment, and as cross-sectional if both readings are at or below 0.25. % src: results/tables/withindate_placebo.md
+Over the 38 genuine cells of the archived single-seed combination grid (observation-level selection, day-clustered inference), the verdicts read 33 cross-sectional, 4 regime-timing and 1 mixed. The median genuine increment decomposes as 100 per cent which-firm against 0 per cent when. The within-date permutation retains a median 0 per cent of the real increment. % src: results/tables/withindate_placebo.md
+The decomposition distinguishes the finding from aggregate-regime tracking (consistent with the VIX-augmented re-test of Section~\ref{sec:res-ladder}) while sharpening the identity concern: knowing \emph{which firm} is riskier is exactly what a firm-identity reference can price.
+
+Sections~\ref{sec:intro-aim} and~\ref{sec:bg-shortcut} assert that a model has usually read the filer before; here the overlap is measured. On the released public index, 463 of the 558 distinct filer CIKs active in the test era also file in the training years (83.0 per cent), and 29{,}597 of the 33{,}144 test filings come from a filer already read (89.3 per cent; 89.8 on 8-Ks, 87.8 on long-form). % src: results/tables/filer_overlap.md
+The unit is distinct filer CIKs, not the 832 PERMNOs of Section~\ref{sec:data-universe}.
+
+\subsection{Seed Fragility and the Ensemble Basis}
+\label{sec:val-seeds}
+
+Chapter~\ref{ch:results} declared the seed ensemble primary, and Section~\ref{sec:design-training} recorded the headline fragility: 37 of 144 single-seed trained text and fusion cells flip the sign of their DM statistic across the three training seeds. Of the 14 of those 144 genuine under seed 2026 alone on the archived selection, only 5 hold in all three (Table~\ref{tab:app-seeds}; Figure~\ref{fig:app-seed-dispersion-b}). % src: frozen 05_protocol.tex (seed fragility)
+The archived single-seed, observation-level campaign counted 38 genuine cells; day-clustering that seed leaves 29; ensembling restores 38. Yet only 30 of the archived 38 survive: 8 are lost and 8 different cells are gained. % src: results/tables/m1_ensemble_primary.md (attribution note)
+A verdict that migrates across cells under nothing but the initialisation draw cannot be read cell-by-cell from any single run. The per-observation seed-ensemble forecast is therefore the primary object, and single-seed numbers appear only under inline tags. The prompted arms sit outside this concern by construction: C6 and D4 involve no training seed, and repeat decoding reproduces 94--97 per cent of outputs exactly. % src: frozen 05_protocol.tex
+The honest limit is scope: three seeds stabilise the mean forecast, not the tails of the seed distribution, and no claim in this report depends on those tails.
+
+\subsection{The Kogan Design: Replicate, then Dissolve}
+\label{sec:val-kogan}
+
+An audit that only ever dissolves has not been shown to measure anything, so the founding design is run in both directions. Chapter~\ref{ch:background} promised that the design of Kogan et al.~\cite{kogan2009predicting} would be reproduced on this benchmark and repaired one element at a time (Section~\ref{sec:bg-text}); this subsection delivers that programme. The ported object is the original's evaluation recipe, not its corpus or horizon: TF--IDF text features beside a single lagged-volatility control, log-volatility mean squared error, year-by-year out-of-sample scoring and naive observation-level inference. The single text arm is the project's archived TF--IDF ridge recipe, so that each rung's movement is attributable to a single repair. % src: results/tables/kogan_dissolve.md (scope block)
+The design manufactures the published-style positive at full strength in sample: adding text lifts $R^2$ from 0.250 to 0.381, 0.312 to 0.455 and 0.336 to 0.495 at $h{=}5/10/20$, at naive $t$ statistics of $+42.9$ to $+47.4$ (a deliberate, labelled look-ahead; Table~\ref{tab:app-kogan-ladder}(a)). % src: results/tables/kogan_dissolve.md (in-sample arm)
+Out of sample, however, it finds nothing: the pooled year-by-year gain is $-0.68$ per cent (not significant) at $h{=}5$ and significantly negative at the longer horizons ($-4.85$ and $-7.65$ per cent, rung L0). % src: results/tables/kogan_dissolve.md (L0)
+The repairs move the verdict in both directions, so they must be read in order. Substituting the recalibrated-HAR combiner makes text look \emph{better}, not worse ($+3.33/+3.48/+5.92$ per cent, significant under day-clustered inference): the weak single-control baseline was itself so miscalibrated that text was being charged for the control's error. The day-clustering repair leaves the gains identical and only shrinks the statistics. % src: results/tables/kogan_dissolve.md (L2/L3)
+Adding the firm-identity term flips all three horizons significantly negative ($-1.04/-4.12/-6.71$ per cent, rung L4). % src: results/tables/kogan_dissolve.md (L4)
+The maximal pool leaves two of the three negative, with one honest exception. The $h{=}20$ cell reverses to $+0.20$ per cent (Holm $.0045$ in its own three-cell family): a single-arm ladder cell on a shrunken row support, not a conjunction survivor, the same model--channel cell sitting at $-8.09$ per cent on the committed firm-identity rung. % src: results/tables/kogan_dissolve.md (L5); TECHNICAL_SUPPLEMENT.md Table S13 caption
+What the published-style design reads as disclosure signal is, on this panel, price-baseline weakness plus firm identity.
+
+The complementary direction runs the project's cascade off panel, on the original study's own 10-K management-discussion corpus, 1996--2006, at their 12-month horizon. The re-fetched corpus is integrity-checked: 30{,}474 filings from 7{,}207 registrants, per-year counts matching the published census (Table~\ref{tab:app-kogan-corpus}). % src: results/tables/kogan_corpus_audit.md (G-K0/row consistency)
+The re-run reproduces the published gain at 7.9 times its size: $+9.54$ per cent of mean squared error against the published $+1.21$, with four of six test years agreeing in sign. That clears the registered factor-of-ten gate, though a stricter same-order-of-magnitude gate would have fired the falsification branch. The rung being re-priced is if anything \emph{more} favourable to text than the original. % src: results/tables/kogan_corpus_audit.md (G-K1)
+The cascade applies recalibration, a leave-one-out per-registrant identity term (the primary of two pre-declared readings), filing-date-clustered inference and Holm. Six of ten test years survive before the placebo gate. The gate then fails in six of ten splits, because the ported convention makes the text arm a single joint model rather than a combiner over the reference, so shuffled text retains a structural edge (the 13-of-50 draws above). The placebo-gated survivor count is 3 of 10 test years: 1998, 2000 and 2003. % src: results/tables/kogan_corpus_audit.md (fired branch; placebo table)
+On the founding corpus the protocol certifies a genuine text effect in a minority of years, so it does not only kill. On the present panel the identical design's apparent positive dissolves at the identity rung. The size of the shortcut is a property of the panel and the baseline, not a constant of disclosure text. Neither direction touches the original's cross-sectional detection claim; the dissolve concerns incremental forecast value only.
+
+\section{Statistical Validity}
+\label{sec:val-statistical}
+
+A null is only as informative as the test's sensitivity, and a count is only as solid as the conventions it is computed under. The audit's statistics are calibrated from three sides.
+
+\subsection{Power Calibration and Minimum Detectable Effects}
+\label{sec:val-power}
+
+The calibration design of Section~\ref{sec:design-inference} injects the registered firm-orthogonal oracle signal into the text forecast and re-runs the ladder. The injection coefficient is bisected per cell so that the realised improvement hits the target exactly (tolerance 0.02 percentage points; all 207 cell-level calibrations converged). Cells whose real effect already exceeds the target therefore have signal \emph{removed} down to it (40, 37 and 32 of 69 by effective injection; Section~\ref{app:res-detect}). Each recovery count is a power estimate at one fixed effect size, never a claim about any real effect's size. % src: results/tables/signal_injection_power.csv (cells with kappa1 < 0, equivalently har0_rel above target, at 0.3/0.5/1.0%: 40/37/32 of 69; the .md headline column counts delta < 0, giving 50/47/42, which differs in the ten cells with g1 < 0); results/tables/omnibus_m1.md (kappa<0 cells: 40/37/32)
+Because the signal is demeaned within firm, the firm-identity rung cannot absorb it mechanically. Recovery runs 12/20/41 of 69 at the primary rung, 7/11/20 at the firm-identity rung, 6/12/19 at the maximal pool, and 2/6/13 through the full conjunction. % src: results/tables/signal_injection_power.md headline (recovery at 0.3/0.5/1.0%)
+At 0.3 per cent (roughly the scale of the surviving 8-K residual) the conjunction recovers 2 of 69, so Chapter~\ref{ch:results}'s empty conjunction cannot distinguish absence from effects below about half a per cent. The report never asks it to. % src: results/tables/signal_injection_power.md headline
+
+The per-cell minimum detectable effects place each null beside what its own test could see: the median MDE is 0.82 per cent of reference QLIKE (interquartile range 0.37--1.27), with channel-horizon medians of 1.07/0.84/1.27 per cent on long-form and 0.44/0.46/0.96 on event-driven filings. % src: results/tables/signal_injection_power.md MDE table
+Against these thresholds the real effects (spanning $-3.86$ to $+5.92$ per cent) sit at or above their own cell's MDE in 40 of 69 cells and below it in 29; 4 of the 38 detected cells lie below their prospective MDE, as expected of a planning quantity that is not a significance bound. % src: results/tables/signal_injection_power.md (observed effects vs detectability)
+Part of the width is the label itself: a range-based comparison prices the estimator noise in the label's intraday component at 54.8/43.8/34.9 per cent of that component's variance at $h{=}5/10/20$, capping attainable out-of-sample $R^2$ on it at 0.452/0.562/0.651 even under perfect knowledge of the latent variance. % src: TECHNICAL_SUPPLEMENT.md S14; results/tables/label_noise_budget.md
+Finally, the pooled test aggregates power a median cell lacks: averaging the daily reference-minus-challenger loss differentials across all 69 cells (positive favours text, reversing the per-cell DM sign) and testing the single series day-clustered gives $t = +8.29$ ($p = 3.8\times10^{-16}$ over 996 days; long-form subfamily $+6.90$, event-driven $+4.57$; Table~\ref{tab:app-omnibus}). % src: results/tables/omnibus_m1.md
+The injected-signal rejection rate runs 0.10/0.46/0.68/1.00/1.00 at levels of 0.1 to 1.0 per cent, with an implied 80 per cent-power MDE of 0.375 per cent (analytic counterpart 0.302). % src: results/tables/omnibus_m1.md (power calibration)
+The pooled micro-increment is comfortably above that threshold: \emph{detectable}, not merely unrejected. Detection is not attribution, however; the identity instruments of Section~\ref{sec:res-identity} price roughly half of the surviving 8-K increment as who filed. Figures~\ref{fig:val-power}--\ref{fig:val-power-b} draw the calibration.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F9_power_mde_label_noise__a.pdf}
+\caption[What the null is powered to see: detection counts per rung]{(a) What the null is powered to see: cells detected out of 69 at each rung of the reference ladder, on the real data and with a firm-orthogonal signal injected at 0.3\%, 0.5\% and 1.0\% relative QLIKE; all sixteen counts are printed in the key. Seed-ensemble basis, volatility-unit QLIKE, day-clustered inference; the injection is an oracle calibration device, never a forecast. Panel~(a)'s three rungs are Holm-corrected in their own families; the conjunction intersects them.} 
+\label{fig:val-power}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F9_power_mde_label_noise__b.pdf}
+\caption[Real improvement against minimum detectable effect, and the label's noise ceiling]{What the null is powered to see, continued from Figure~\ref{fig:val-power}. (b): each cell's real improvement over the recalibrated HAR against its own 80\%-power minimum detectable effect. (c): the close-to-close label's variance split into the component shared with a range-based estimator of the same window and the label's own estimator noise, with the implied $R^2$ ceiling on the right axis. Seed-ensemble basis, volatility-unit QLIKE, day-clustered inference; fill in (b) is Holm detection, (c) carries none.} 
+\label{fig:val-power-b}
+\end{figure}
+
+\subsection{Convention, Proxy and Panel Perturbations}
+\label{sec:val-perturb}
+
+The same frozen text forecasts are next pushed through legitimate alternative conventions, one at a time. The perturbations bound the sensitivity of the reference ladder, not of the text models: price references, recalibration and combiner weights are refit wherever labels or rows change; the text arms stay fixed. Rescoring under variance-unit QLIKE (which re-estimates nothing; only the loss changes) tightens every rung: 38 genuine cells become 20 (Holm-only 21, the gap being the placebo failure of Section~\ref{sec:val-placebo}), the firm-identity rung falls from 8 to 3 and the maximal pool from 9 to 2. The conjunction stays empty, the two survivor sets still disjoint. % src: results/tables/variance_unit_cascade.md; TECHNICAL_SUPPLEMENT.md S15 block (a)
+
+Relabelling with the range-based Parkinson estimator (Garman--Klass restated alongside) refits the price side on the new labels; the text arms, trained against close-to-close targets, are not retrained, an asymmetry conservative for text. The placebo-gated primary rung reads 19 under Parkinson and 21 under Garman--Klass against the committed 38. The conjunction is no longer empty: one cell under Parkinson, two under Garman--Klass (Table~\ref{tab:app-rangebased}). % src: results/tables/rangebased_cascade.md
+The three conjunction survivor sets are pairwise disjoint, however, so no cell clears the conjunction under every label proxy and the cross-proxy conjunction is 0 of 69. Part of the lower primary counts is power rather than signal, the median MDE rising from 0.823 to 0.913 and 1.018 per cent under the two relabellings. % src: results/tables/rangebased_cascade.md; TECHNICAL_SUPPLEMENT.md S15 block (b)
+The licence-free panel perturbation decomposes its own flip. Public-price coverage is 72.6/89.3/95.2 per cent of train/validation/test rows, but 97.3 per cent on firms still in the index against 31.5 on exiting firms. % src: results/tables/public_variant_cascade.md
+On the covered rows the conjunction moves from 0 to 1 (the same long-form dictionary cell at $h{=}10$) whether CRSP or public labels are used, so the flip is present when only the rows change and belongs to survivorship composition, not the label source. All 180 variance-unit standalone Holm verdicts are unchanged on both panels (Table~\ref{tab:app-public}). % src: results/tables/public_variant_cascade.md (A/B/C decomposition; 0/180 flips)
+Figures~\ref{fig:val-perturb}--\ref{fig:val-perturb-b} draw the four perturbation blocks; the last of them restates the deployable-weight erosion of Section~\ref{sec:res-residual}. The honest summary is that the headline counts are convention- and proxy-sensitive: by roughly half at the primary rung and at the one-to-two-cell scale at the conjunction. What no perturbation produces is a survivor that persists across conventions.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F11_ladder_perturbations__a.pdf}
+\caption[What moves the ladder: unit and label-proxy perturbations]{What moves the ladder: the first two of four perturbations applied to the same frozen text forecasts. Each redraws the four rungs (primary, firm identity, maximal pool, and the conjunction of all three) on a common axis out of 69 cells: (a) volatility- against variance-unit QLIKE, with the 8-K residual's Holm $p$ per horizon; (b) close-to-close against Parkinson and Garman--Klass relabellings, with the median 80\%-power MDE per proxy. Primary-rung bars are placebo-gated genuine counts (Holm-only counts as ticks), reference rungs Holm counts within their own 69-cell families, the conjunction their intersection.} 
+\label{fig:val-perturb}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F11_ladder_perturbations__b.pdf}
+\caption[What moves the ladder: panel composition and weight scheme]{What moves the ladder, continued from Figure~\ref{fig:val-perturb}: the last two of the same four perturbations. (c) redraws the same four rungs on the same axis, the full panel (key A) against publicly covered rows under CRSP labels (B) and under public labels (C), with coverage by stratum; bars, ticks and Holm families are as in Figure~\ref{fig:val-perturb}. Block (d), validation-frozen against expanding deployable combiner weights, is the one exception and draws no rungs: it carries the primary genuine count alone, at both the 75-cell deployable denominator and the 69-cell grid, with Holm inside the deployable families F9 and F10 rather than a 69-cell one.} 
+\label{fig:val-perturb-b}
+% caption numbers src: results/tables/deployable_combiner_quarters.csv (75 distinct
+% disclosure-model-horizon cells)
+\end{figure}
+
+\subsection{Two-Way Clustering and Joint Leaderboard Tests}
+\label{sec:val-joint}
+
+Loss and label conventions are one axis; the dependence the inference assumes is another. The two-way firm-and-day restatement computes the Cameron--Gelbach--Miller variance $V_{\text{firm}} + V_{\text{day}} - V_{\text{firm}\cap\text{day}}$ \cite{cameron2011twoway} with the day component identical to the primary Newey--West treatment and the intersection subtracted at lag zero only, which can only widen the standard errors. The median standard-error inflation is 1.18--1.22 across the three re-tested panels. % src: results/tables/twoway_cluster.md (method block; variance anatomy)
+No conclusion reverses; the counts shade down: the standalone census stays at 0 of 180 better with the worse-count easing from 155 to 152, the primary rung's genuine count moves from 38 to 27 on the ensemble basis (29 to 24 on the archived single-seed grid), and the firm-identity survivors fall from 8 to 5. % src: results/tables/twoway_cluster.md; frozen 06_results.tex tab:cascade (ensemble 27)
+The residual's behaviour ($h{=}5/10$ survive, $h{=}20$ attenuates) was already reported in Chapter~\ref{ch:results}. Multiplicity control is likewise auditable: the 15 pre-declared Holm families of Section~\ref{sec:design-inference} (from the 180-comparison standalone family down to the 3-cell earnings-window control) are enumerated family by family in Table~\ref{tab:app-holm-families}, each with the record that fixed its membership. Placebo gates apply after Holm within the same family. % src: results/tables/holm_families.md
+
+Holm, however, only controls error across the tests actually run, and a leaderboard invites selecting the best-looking challenger after the fact. Two joint tests close that loophole. Both run on losses aggregated to one value per model per trading day (matching the primary inference unit) with a stationary bootstrap over days, expected block length equal to the horizon, 2{,}000 draws \cite{politis1994stationary}, over the 18 loss-panels formed by the nine disclosure-by-horizon panels under each loss convention. % src: results/tables/row13_spa_mcs.md (spec)
+The superior-predictive-ability test \cite{hansen2005spa}, run against the text-and-fusion block as a class, returns a consistent $p$ of 1.000 in all 18 panels. Over the full alternative set it does reject HAR-RV in 9 of the 18, every rejection favouring a price model. % src: results/tables/row13_spa_mcs.md
+No pure-text model enters the 90 per cent model confidence set \cite{hansen2011mcs} in any panel, while price-carrying fusion models tie into the top set in 12: ties, not wins, since the SPA never rejects in their favour (Figures~\ref{fig:app-spa-mcs} and~\ref{fig:app-spa-mcs-b}). % src: results/tables/row13_spa_mcs.md
+Under inference that prices the whole leaderboard jointly, the standalone null of Chapter~\ref{ch:results} is therefore not an artefact of which pairwise tests were chosen.
+
+\section{Instrument Validity}
+\label{sec:val-instruments}
+
+The one positive finding that survives Chapter~\ref{ch:results} is read from an instruction-tuned language model, precisely the instrument class for which the background survey catalogued three threats: data contamination, elicitation fragility and instrument degeneracy (Section~\ref{sec:bg-prompted}).
+
+Contamination is bounded by two zero-content probes run through the same model, combiner and day-clustered inference as the full-text arm. A prompt reduced to the metadata header alone (form type, filing date, and the item codes where the form carries them) is significantly positive in 0 of 6 channel-horizon cells under Holm. At the two longer long-form horizons it is significantly \emph{worse} than the recalibrated HAR alone ($-0.49/-1.65$ per cent): whatever the full-text arm adds is not in that metadata. % src: results/tables/llm_contamination.md
+A prompt carrying the date and the ticker symbol but no text (pure firm recognition) reproduces 31--77 per cent of the full-text increment in the three cells where the denominator is well identified (a full-text increment above one per cent, Holm-significant). At long-form $h{=}20$ the probe alone ($+1.11$ per cent) exceeds the small full-text increment ($+0.27$ per cent), a nominal 405 per cent that is a small-denominator artefact rather than a measurement (Table~\ref{tab:app-contam-arms}; Figure~\ref{fig:app-elicitation-b}). % src: results/tables/llm_contamination.md
+Identity-and-era memory is therefore a real component, and the raw prompted-versus-HAR increment is never quoted as a text effect without this control. It is not the whole: with the same-model date-plus-ticker forecast placed \emph{inside} the reference, full text still adds in 6 of 6 cells under Holm (event-driven $+0.77/+0.68/+0.63$ per cent). % src: results/tables/llm_contamination.md
+The training-cutoff stratification of Section~\ref{sec:res-residual} closes the era side: post-cutoff point estimates exceed pre-cutoff ones in all six full-text cells. The post-cutoff increment is itself Holm-significant against HAR in five of six cells, and beyond the model's own identity forecast in three of six (Table~\ref{tab:app-cutoff}). Misplacing the approximate 2024-07 corpus boundary \emph{earlier} could only bias the post-cutoff stratum upward, a pattern inconsistent with memorised outcomes driving the increment. % src: results/tables/llm_contamination.md (section 3 stratum table; bottom line and caveat)
+The probes bound memorisation; they do not exclude it: a bound is not a proof.
+
+The cross-family replication of Section~\ref{sec:res-residual} rested on one healthy probe of five; the adjudicator is the forecaster-health screen (Figures~\ref{fig:val-health} and~\ref{fig:app-prompted-families}). The screen declares a probe run healthy when, at every horizon, its standalone variance-unit QLIKE stays below 4 and its \emph{modal share} (the fraction of the run's forecasts taking the single most common value after rounding to two decimals) stays below 60 per cent. % src: TECHNICAL_SUPPLEMENT.md S2/Table S11 (registered formula)
+Neither term reads the contrast under test. The screen is therefore orthogonal to the sign it adjudicates, and its thresholds were fixed in the registered analysis records before the final probe ran. % src: TECHNICAL_SUPPLEMENT.md S2 Figure S12 prose
+What it discards proves that orthogonality: the largest positive increment in the whole cross-family block (Gemma-3-27B at $+2.97$ per cent, $h{=}20$) is screened out, having cleared the registered 2{,}000-filing validation pilot (modal share 45.2 per cent) and then breached the ceiling on the full 8-K panel at 71 per cent. A filter selecting for agreement would never discard the study's largest supporting number. % src: TECHNICAL_SUPPLEMENT.md S2; results/tables/crossfamily_gemma27.md
+Four of the five probes fail: Yi-1.5-34B mode-collapses (variance-unit QLIKE 7.6--8.2 on 8-Ks), Phi-4-14B and Mistral-Small-24B breach the modal ceiling at up to 75.1 and 88.6 per cent, and Gemma-3-27B as above. The failed probes' increment signs are mixed, as orthogonality predicts. % src: TECHNICAL_SUPPLEMENT.md Table S11; S2
+The healthy instruments sit below the ceiling on the 8-K channel (Qwen3-32B at 49--50 per cent, Llama-3.1-70B at 40--51). The anchor family itself fails \emph{off} that channel, reaching 64.4 and 76.8 per cent modal share on long-form filings, one reason the surviving residual is scoped to 8-Ks. % src: TECHNICAL_SUPPLEMENT.md S2 and Figure S12 prose
+Against the objection that four probes merely disliked a prompt tuned on another family, an elicitation-fairness pilot gave two of them few-shot and format-hardened prompt adaptations on validation data. Mistral-Small-24B stayed dead in all three variants, and adaptation made Gemma-3-27B \emph{worse} than its base prompt (variance-unit QLIKE 10.3 and 6.0 against 3.7). The failure reads as a capability floor rather than prompt misfit. % src: TECHNICAL_SUPPLEMENT.md S3
+Throughout, a dead instrument is treated as uninformative, not disconfirming: a forecaster that emits one number for most documents says nothing about the residual in either direction.
+
+The gate is a ceiling; what the anchor emits below it is a separate question. On the cell carrying the residual (event-driven, $h{=}5$, 25{,}109 rows) it returns ten distinct values, two carrying 92.6 per cent of them: 0.22 at 49.3 per cent and 0.18 at 43.2. % src: results/tables/instrument_readout.md
+Mean realised volatility is higher in the 0.22 group in all ten HAR-RV deciles, the gap widening from $+0.0071$ in the lowest to $+0.0744$ in the highest but not monotonically; deciles are used because the flag tracks that forecast, its high side growing from 1{,}067 rows to 1{,}410 (Table~\ref{tab:app-instrument-readout}). % src: results/tables/instrument_readout.md
+No clustering, no Holm and no placebo enter it: a description of frozen forecasts, not a survivor claim. Figures~\ref{fig:app-item-geography}, \ref{fig:app-item-geography-b} and~\ref{fig:app-item-geography-c} cut the same panel by item code, this by the arm's own output.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=0.90\textwidth,height=0.83\textheight,keepaspectratio]{figures/F12_health_screen_orthogonality.pdf}
+\caption[The forecaster-health screen reads a run's own accuracy and dispersion, never the contrast under test]{The forecaster-health screen reads a run's own accuracy and dispersion, never the contrast under test. Panel (a): the screen's two gate terms --- modal share of the rounded forecast against standalone variance-unit QLIKE (log scale) --- for the five cross-family probes and the Qwen3-32B anchor, one marker per family-channel-horizon pair. The shaded quadrant is the registered pass region (modal share below 60 per cent, variance-unit QLIKE below 4), and the verdict attaches to a whole run, not a single marker. Panel (b): the volatility-unit increments over the recalibrated HAR that the screen adjudicates, failing runs crossed; the screen discards the block's largest positive (Gemma-3-27B, $+2.97$ per cent). Filled markers are 8-K runs, hollow long-form; the panels carry different QLIKE conventions and no number moves between them.} % caption src: TECHNICAL_SUPPLEMENT.md S2 Figure S12
+\label{fig:val-health}
+\end{figure}
+
+The remaining threat is that the surviving residual is a property of one prompt. Five elicitation arms were decoded on a 4{,}000-filing subsample: the base prompt, an identical-configuration repeat decode, two paraphrases and a thinking-mode variant. This family carries raw $p$ only and therefore licenses direction-stability statements, never survivor claims (off the primary Holm-gated basis). % src: results/tables/elicitation_sensitivity.md; TECHNICAL_SUPPLEMENT.md S5 Table S9
+At temperature zero, repeated decoding reproduces 94--97 per cent of forecasts exactly, with rank agreement above 0.92. % src: results/tables/elicitation_sensitivity.md
+The event-driven $h{=}5$ increment is then positive in all five arms, from $+0.63$ to $+1.13$ per cent over the recalibrated HAR, and raw-significant in all five. The long-form increment flips sign under paraphrase ($+3.14$ per cent under one paraphrase against $-3.77$ under the other at $h{=}20$) and is not rescued by the thinking-mode variant. % src: results/tables/elicitation_sensitivity.md
+At the individual-filing level the forecasts remain strongly prompt-dependent: cross-template rank agreement runs only 0.39--0.58. What is elicitation-stable is the sign of a panel-level loss difference, not the forecast for any particular document. % src: results/tables/elicitation_sensitivity.md
+The 8-K residual is thus the elicitation-robust object; the long-form apparent signal, which the identity controls of Chapter~\ref{ch:results} largely absorb, is prompt-fragile as well.
+
+The mask faces the opposite threat: removing content, not identity. If masking merely damaged the documents rather than removing identity, every arm's increment would fall. It does not: the fine-tuned arm's $h{=}5$ share is $0.02$, % src: results/tables/anon_share_ci.md
+and the exploratory long-form annex has masking \emph{raise} the increment at all three horizons (Section~\ref{sec:res-identity}). % src: results/tables/anon_annex_samelineage.md
+Firm-stable style survives the mask, which is why the pooled share is never an upper bound.
+
+\section{Reproducibility}
+\label{sec:val-repro}
+
+The strongest evidence that a study's numbers can be trusted is the record of what its own gates caught. Section~\ref{sec:design-engineering} described that machinery as designed; here it is reported as exercised. The fingerprint chain is the delivered half of that evidence: 240 production runs, 233 distinct configuration digests, the released re-hash script, the collapse of the 178 training-bearing runs to 18 distinct training fingerprints. % src: results/tables/config_fingerprints.md
+
+The gates are the other half. Before a derived arm's statistic may be cited, a rerun must reproduce the arm's committed predictions to a relative tolerance of $10^{-8}$, and the register of arms that failed is reported in full rather than curated. The long-form matched-swap replication lost all three of its arms: the FinBERT checkpoints had been destroyed in a disk cleanup, and retraining a stand-in would have violated that section's zero-training principle; the TF--IDF refit missed the anchor by a relative difference of 1.402; and the frozen-embedding head rebuild missed by $1.062\times10^{-5}$. Five orders of magnitude closer, it was retired all the same; a gate that bends for near-misses is not a gate. % src: TECHNICAL_SUPPLEMENT.md S19 register (c); results/tables/swap_longform_retirement.md
+The long-form anonymisation channel closed with zero executed arms for four separately recorded reasons: one arm failed its full-panel reproduction gate outright (exact-match rate 0.0, maximum absolute deviation 0.2846), one was excluded before execution because its committed single-seed unmasked increments are negative at every horizon ($-1.03/-3.13/-6.65$ per cent), so no identity share was defined, and two were dropped on documented compute scope. % src: TECHNICAL_SUPPLEMENT.md S19 register (c)
+The register names a common root cause for one of these ends, the long-form anonymisation exit, together with the event-driven anonymisation and swap TF--IDF arms. Early run metadata logged no package versions (an environment snapshot with a null package-freeze hash), leaving a June-era environment-and-cache pair unreconstructible. % src: TECHNICAL_SUPPLEMENT.md S19; frozen 10_limitations.tex
+The lesson is recorded rather than repaired: 171 of the 178 training-bearing runs write an environment snapshot. % src: release/config_hashes.csv against results/runs/*/
+ The three arms whose June-era snapshots lacked package versions were retired at their reproduction gates rather than rebuilt.
+
+Each retirement is a written record carrying the gate, its threshold and the deviation, so the \emph{absence} of a statistic is auditable and counts as evidence in neither direction. No statistic from the retired long-form swap replication appears anywhere in this report. % src: TECHNICAL_SUPPLEMENT.md S6, S19
+The same register prices two artefacts that resemble results (a 300-row configuration smoke test beside the real tuning grid, and the synthetic Yelp fixture of Section~\ref{sec:val-external}) as non-results, never quotable as evidence about a real panel; the fixture serves only as that section's machinery check. It also lists every evidence file that acquired a stale sibling during the baseline recalibration, naming the canonical copy so a superseded vintage cannot be cited by accident. % src: TECHNICAL_SUPPLEMENT.md S19 registers (b), (d)
+Correctness of the live pipeline remains guarded by the 186-test suite and the abort-on-drift generators of Section~\ref{sec:design-engineering}. % src: writing/dissertation/supporting/REPRODUCIBILITY.md
+
+The path is open to outsiders: to the released benchmark index of Section~\ref{sec:data-public} the repository adds the day-clustered evidence tables behind every claim, and the release the prompted arms' complete prompt templates, decoding configurations and raw generations (Table~\ref{tab:app-release}); together they audit every reported test without any licensed market data. The CRSP-derived rows that cannot be redistributed are regenerable exactly by the released scripted pipeline for any subscriber, with the licence-free variant pricing the remaining coverage gap. % src: frozen 12_reproducibility.tex
+
+\section{External Validity}
+\label{sec:val-external}
+
+The portability panels of Section~\ref{sec:data-portability} answer the suspicion that an audit dissolving most of what it touches manufactures nulls wherever it is pointed, by running the same ladder (chronological split, recalibrated reference, combination increment, entity-mean identity control, placebo and power gates) on two panels where the truth could well be different. Both keep their own conventions (squared-error loss, month- and call-date-clustered inference). Nothing in this section shares a denominator, loss or panel with the QLIKE percentages of Chapter~\ref{ch:results}. The SEC panel's survivor is prompted content; Yelp's survivors are the fitted content arms, and its prompted gain is identity.
+
+On the Yelp business-month panel the apparatus finds signal, and the identity control changes sign (Figures~\ref{fig:val-yelp}--\ref{fig:val-yelp-b}). Under the field-standard random 80/20 split, review text appears to cut mean squared error by 28.43 per cent at one month and 36.64 at three. Under the chronological split the same text \emph{alone} loses to the recalibrated autoregressive baseline by 24.70 and 35.29 per cent, the familiar inflation. The combination adds $+0.346$ and $+0.871$ per cent over that baseline (Table~\ref{tab:app-yelp}; Figure~\ref{fig:app-yelp-ladder}). % src: TECHNICAL_SUPPLEMENT.md S18; results/tables/yelp_cascade.md (row 1, naive pooled
+% random 80/20: +28.43 at h=1, +36.64 at h=3); results/tables/yelp_multiarm.md
+The identity rung then inverts the SEC experience: adding the entity mean \emph{costs} 10.58 per cent at one month and 9.48 at three, because a rating history already encodes the business. The identity control is not a free hygiene step; its sign and size are properties of the panel and its baseline. % src: TECHNICAL_SUPPLEMENT.md S18
+What survives the full reference (recalibrated autoregression plus entity mean) is a small content residual: $+0.365$ per cent (TF--IDF) and $+0.376$ per cent (frozen embeddings) at one month, two-way $p$ below $10^{-10}$, placebo-clean over 20 shuffle seeds. The three-month counterparts ($+0.612/+0.786$ per cent) are shown but not claimed, because their within-month swap diagnostic is borderline (mean $p=.047$) and the project's rule disqualifies such cells from prose claims. % src: results/tables/yelp_multiarm.md; TECHNICAL_SUPPLEMENT.md S18
+The prompted arm splits the other way: the Llama-3.1-70B residual is $+0.025$ and $+0.176$ per cent (not significant; marginal). Its zero-content probe (business name, city, categories and month) reproduces 149 and 103 per cent of the prompted combination increment, turning significantly harmful at one month once the entity mean enters the reference (DM $+5.65$). % src: results/tables/yelp_multiarm.md
+The field's remedy fixes only the half it can reach. An entity-disjoint split strips the fitted arm's training-set entity memory: on this narrower 1{,}926-business universe, TF--IDF's three-month combination increment falls from $+0.534$ per cent, $p=.012$, to $+0.152$, $p=.394$. It leaves the prompted zero-content probe significant at both horizons, its prior coming from a pretraining corpus no split of this panel can touch. % src: results/tables/yelp_entity_disjoint.csv; yelp_entity_disjoint.md Universe (1,926 businesses with zero-shot 70B predictions)
+That contrast is the claim, not either magnitude: the split reassigns rows and every effect is under 0.6 per cent; it measures nothing on the disclosure panel; and one domain and one prompted family show a mechanism, not the size of the blind spot.
+A synthetic fixture closes the loop on the machinery itself. On an injected data-generating process (200 entities, 19{,}171 events) with a planted content effect, the ladder recovers 68 per cent of the effect at one month (residual $+0.27$ against a text-oracle $+0.41$ per cent, inside the registered 0.25--1.10 recovery band). It invents no residual at three months, that horizon's registered criterion. % src: TECHNICAL_SUPPLEMENT.md S19 register (d); results/tables/yelp_cascade_synthetic.md
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F15_yelp_portability__a.pdf}
+\caption[Yelp five-rung ladder, one- and three-month horizons]{Portability: the Yelp panel, where the identity control is itself costly. (a) The five-rung ladder end to end at one- and three-month horizons, every bar annotated with its own reference (the five numbers are increments over three different baselines, never one series); the axis is linear inside the shaded band and logarithmic outside it, so a 0.365 per cent rung cannot be mistaken for a 28 per cent one. The hatched three-month content rung is swap-borderline and enters no claim. } % caption src: TECHNICAL_SUPPLEMENT.md S18 Figure S15
+\label{fig:val-yelp}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F15_yelp_portability__b.pdf}
+\caption[Yelp identity-controlled residual, four arms, both horizons]{Continued from Figure~\ref{fig:val-yelp}. (b) The identity-controlled residual for four arms at both horizons, on the Yelp panel, where the identity control is itself costly, with the entity-stage minimum detectable effect (0.08 per cent) drawn. The cross glyph marks the two rows whose DM points the wrong way, which is why it falls on the zero-content probe at one month but not at three and is shared with the prompted 70B arm at one month; the probe is therefore recorded as a diagnostic rather than a challenger by the panel's own note, carried above this part's legend, and not by a glyph of its own.} % caption src: TECHNICAL_SUPPLEMENT.md S18 Figure S15
+\label{fig:val-yelp-b}
+\end{figure}
+
+Yelp is the world where content survives the ladder; on the MAEC earnings-call panel a large published positive does not, and the audit must first \emph{reproduce} it before asking what survives (Figures~\ref{fig:val-maec}--\ref{fig:val-maec-b}). It does: under the published convention the fitted TF--IDF arm beats the raw past-volatility baseline in 12 of 12 panel-horizon cells, by 53.1, 38.0, 32.8 and 13.6 per cent of the raw pooled mean squared error at the four horizons (the prompted arm manages 4 of 12). % src: results/tables/maec_audit.md; TECHNICAL_SUPPLEMENT.md S8
+Repricing then removes all of it at the stated sensitivity: with a recalibrated price forecast and a same-ticker expanding mean in the reference, 0 of the 24 primary-alignment cells of Table~\ref{tab:app-maec} (three arms, four horizons, two references) survive Holm. The zero-text identity term alone absorbs 89--133 per cent of what text adds over it in the two informative arms (67--145 pooling both alignments). A probe carrying no transcript content matches or exceeds the full transcript at 3 of the 4 horizons: the SEC panel's identity-shortcut anatomy, in a corpus whose published effect is an order of magnitude larger, and the forecast-level counterpart of Yu et al.~\cite{yu2025samecompany}. % src: results/tables/maec_audit.md; TECHNICAL_SUPPLEMENT.md S8
+The nulls are bounded rather than over-read: every cell carries its own minimum detectable effect, and those run 3.0--12.8 per cent. The panel therefore rules out a residual the size of the published gain while explicitly \emph{not} ruling out a small one. The fitted arms' point estimates of $+1.9$ to $+4.6$ per cent read as a positive the design cannot resolve, and are reported as that. % src: results/tables/maec_audit.md; TECHNICAL_SUPPLEMENT.md S8
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F16_maec_reproduce_reprice__a.pdf}
+\caption[Portability: MAEC, the published convention reproduced]{(a) Portability: MAEC, the published convention reproduced. Raw past-volatility pooled MSE against text pooled MSE at four horizons for the TF--IDF and prompted arms, with each pair's percentage of the raw baseline; descriptive, entering no correction.} % caption src: TECHNICAL_SUPPLEMENT.md S8 Figure S16
+\label{fig:val-maec}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F16_maec_reproduce_reprice__b.pdf}
+\caption[Portability: MAEC, the identity-controlled residual repriced]{Continued from Figure~\ref{fig:val-maec}. (b) Portability: MAEC, repriced. The identity-controlled residual for all 24 primary-alignment cells, each with its date-block bootstrap interval and its own minimum detectable effect drawn as a symmetric band (2.97--12.80 per cent); every residual falls inside its own band and 0 of 24 clear Holm, so the panel bounds the published gain rather than demonstrating zero. } % caption src: TECHNICAL_SUPPLEMENT.md S8 Figure S16
+\label{fig:val-maec-b}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption[The validation ledger]{The validation ledger: one row per validity direction, in the order of Sections~\ref{sec:val-internal} to~\ref{sec:val-external}. Each count stands on the basis of the section that produced it, so no two rows share a denominator. The MAEC null is bounded rather than open: Section~\ref{sec:val-external} states the power it is absorbed within.}
+\label{tab:val-ledger}
+{\footnotesize\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.135\textwidth}>{\raggedright\arraybackslash}p{0.185\textwidth}>{\raggedright\arraybackslash}p{0.205\textwidth}>{\raggedright\arraybackslash}p{0.225\textwidth}>{\raggedright\arraybackslash}p{0.115\textwidth}@{}}
+\toprule
+Direction & Threat & Instrument & Verdict, as a count & Evidence \\
+\midrule
+Internal & Self-crediting apparatus & Label-shuffle placebo & 38 of 38 clean & Tabs.~\ref{tab:app-grid-ed}, \ref{tab:app-grid-lf} \\ % src: results/tables/m1_ensemble_primary.md
+Statistical & A test too weak & Signal injection & 2 of 69 at 0.3\% & Fig.~\ref{fig:val-power} \\ % src: results/tables/signal_injection_power.md
+Instrument & Identity memory & Zero-content probes & 6 of 6 add over them & Tab.~\ref{tab:app-contam-joint} \\ % src: results/tables/llm_contamination.md
+Reproducibility & Unregenerable numbers & The rerun gate & 3 of 3 swap arms retired & Sec.~\ref{sec:val-repro} \\ % src: results/tables/swap_longform_retirement.md
+External & Manufactured nulls & The ladder elsewhere & Yelp survives; 0 of 24 on MAEC & Tabs.~\ref{tab:app-yelp}, \ref{tab:app-maec} \\ % src: results/tables/yelp_multiarm.md; results/tables/maec_audit.md
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Three panels, one apparatus, three verdicts, the SEC panel's a bounded prompted-content residual. An instrument returning domain-specific splits of identity and content, and recovering a planted signal where one exists, is measuring, not manufacturing. The portability evidence shows the audit \emph{protocol} travels; each verdict stays scoped to its own panel, period and baseline.

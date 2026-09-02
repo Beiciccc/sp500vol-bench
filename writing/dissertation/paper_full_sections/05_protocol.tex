@@ -1,0 +1,33 @@
+\section{Experimental Protocol}
+\label{sec:protocol}
+
+\paragraph{Splits.}
+Every model, baselines included, shares strictly chronological splits by effective trading day: train 2010--2019, validate 2020--2021, test 2022--2025. Random $k$-fold is inadmissible here: the labels are \emph{forward} realised volatilities over $h\in\{5,10,20\}$ trading days, so shuffled folds place label-overlapping, near-duplicate observations on both sides of the split and destroy the regime structure a deployed forecaster must survive. The validation years deliberately isolate the COVID regime, stress-testing model selection under regime shift, while the test years span the 2022 rate-hike sell-off, 2023 banking stress, and 2024--2025 dispersion, so no conclusion is hostage to one environment.
+
+\paragraph{Losses and conventions.}
+We report MAE, RMSE, $R^2$, and QLIKE per model, horizon, and disclosure channel, never pooled across horizons. QLIKE, $\sigma^2/\hat\sigma^2-\ln(\sigma^2/\hat\sigma^2)-1$, is the primary loss: its forecast ranking is robust to noise in the realised-variance proxy and it penalises under-prediction of risk asymmetrically \citep{patton2011proxies}. Two unit conventions coexist and are disclosed wherever used: the standalone leaderboard evaluates QLIKE in variance units, whereas all incremental-value (combination) tables evaluate it in volatility units; absolute levels are never compared across conventions, and convention sensitivity is itself reported in Section~\ref{sec:results}.
+
+\paragraph{The incremental-value test.}
+Standalone accuracy cannot separate ``text carries information'' from ``text inherits volatility persistence,'' so our central instrument is a log-space nested combination. With $f_{\text{price}}$ a price-only forecast and $f_{\text{text}}$ a text-model forecast,
+\begin{align}
+f_R &= \exp\!\bigl(a + b\,\log f_{\text{price}}\bigr),\nonumber\\
+f_U &= \exp\!\bigl(a + b\,\log f_{\text{price}} + g\,\log f_{\text{text}}\bigr),
+\label{eq:m1}
+\end{align}
+where the weights are fit on the validation years \emph{only} and frozen on test. Recalibrating the reference is essential: a raw baseline would otherwise donate its own miscalibration to text as spurious credit. The credit assigned to text is the out-of-sample difference $\mathrm{QLIKE}(f_R)-\mathrm{QLIKE}(f_U)$, evaluated over a \textbf{69-cell grid} of disclosure channel (2) $\times$ text model $\times$ horizon (3). This grid is distinct from the \textbf{180 standalone comparisons} of challengers against HAR-RV; the two denominators are never mixed.
+
+\paragraph{The reference interval.}
+Because any single reference invites exactly the artefact of Section~\ref{sec:intro}, the protocol brackets text's credit with a \emph{reference interval}. The \emph{single recalibrated HAR} of Eq.~\eqref{eq:m1} is the upper bound---the most generous crediting rule. The \emph{firm-identity-augmented reference}, which refits $f_R$ on $[1,\ \log f_{\text{HAR}},\ \log \overline{\mathrm{RV}}^{\text{val}}_{\text{firm}}]$ where the last regressor is the firm's own mean validation-period realised volatility, is the lower bound---the most conservative rule, absorbing any ``signal'' that merely re-identifies which firm filed. The \emph{maximal price pool}, a validation-fitted log-space pool of five price models (HAR, SHAR, GARCH, EGARCH, ARIMA), closes the price side; an equal-weight variant of the pool is reported as a guard against the objection that the fitted pool overfits validation. A text increment counts as a finding only if it is robust across this interval.
+
+\paragraph{Inference.}
+Filings cluster in calendar time: 10--25 filings routinely land on the same trading day and share that day's market shock, so filing-level loss differentials are cross-sectionally dependent and observation-level HAC inference materially overstates precision---clustering roughly halves the $|\mathrm{DM}|$ statistics (median shrink factor 0.49). Our primary inference is therefore the \emph{day-clustered} Diebold--Mariano test \citep{diebold1995comparing}: loss differentials are averaged within each effective trading day and the DM statistic is computed on the daily series (794--996 days per panel), with Newey--West HAC at lag $h-1$ \emph{days} and the small-sample correction of \citet{harvey1997testing}. Multiplicity is handled by Holm correction within each 69-cell family \citep{holm1979simple}, and QLIKE differences carry day-block moving-bootstrap 95\% confidence intervals \citep{politis1994stationary}. As robustness we recompute all verdicts under two-way firm$\times$day clustered variances \citep{cameron2011twoway}, and report the Clark--West adjustment where forecasts are nested \citep{clarkwest2007}.
+
+\paragraph{Placebos and the ``genuine'' definition.}
+Two placebos police the pipeline. A \emph{label-shuffle} placebo (five permutation seeds) replaces the text forecast with a permuted copy: any apparent increment it produces is manufactured by the machinery, not the text. A \emph{within-date permutation}---shuffling text forecasts only among same-day filings, preserving all calendar information---together with a \emph{date-mean-text} combiner decomposes any surviving increment into a cross-sectional (which-firm) and a regime-timing (when) share. A cell is declared \textbf{genuine} iff its clustered DM is negative, its Holm-adjusted $p<.05$, and its label-shuffle placebo satisfies $|\mathrm{DM}|<2$.
+
+\paragraph{Seed policy.}
+The multi-seed C/D models are run with three seeds (2026, 2027, 2028); the C6 and D4 rows enter the grid as single-seed (2026) rows. For the three-seed models the declared primary object is the per-observation \emph{seed-ensemble} forecast---the mean of the three seeds' predictions---because single-seed cells are demonstrably fragile: 37 of 144 C/D cells flip DM sign across seeds, and of 14 seed-2026-genuine C/D cells only 5 hold in all three seeds. Single-seed (2026) results are reported as a robustness restatement alongside the full per-seed dispersion.
+
+\paragraph{Economic adjudication.}
+Finally, because statistical significance is not deployable value, every surviving increment is also adjudicated economically---inverse-variance portfolio $\Delta$Sharpe, VaR backtests, and a utility-based management fee---as defined with the results in Section~\ref{sec:results}.
+

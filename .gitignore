@@ -1,0 +1,163 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Virtual envs
+.venv/
+venv/
+env/
+ENV/
+
+# uv
+uv.lock.bak
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# planning agent session-local settings
+.c[l]aude/
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb_checkpoints
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Data — never commit raw EDGAR, market data, processed sets.
+# Use /* so the directories themselves can hold a tracked .gitkeep.
+data/raw/*
+data/interim/*
+data/market/*
+data/processed/*
+data/universe/*
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/market/.gitkeep
+!data/processed/.gitkeep
+!data/universe/.gitkeep
+# Membership table is a core benchmark artifact — commit it (small).
+!data/universe/README.md
+!data/universe/sp500_membership.parquet
+!data/universe/crsp_cik_links.parquet
+!data/universe/sp500_membership_raw.csv
+!data/universe/sp500_membership_raw_unresolved.csv
+!data/universe/sp500_cik_candidates.csv
+!data/universe/historical_cik_overrides.csv
+# Sample data is small and committed for tests / spike
+!data/sample/
+!data/sample/**
+!data/README.md
+
+# Model checkpoints — too large for GitHub's 100 MB per-file limit.
+# The glob used to be results/runs/*/checkpoints/, one level too shallow: a
+# nested dry-run tree put 14 FinBERT checkpoints at
+# results/runs/row3_grid_dryrun/<run>/checkpoints/*.pt, 418 MB each, and they
+# were swept into a commit by git add -A and made the branch unpushable.
+**/checkpoints/
+**/*.ckpt
+**/*.pt
+**/*.bin
+# neural model.pkl is GB-scale (C4 = 1.7G); never commit
+results/runs/*/model.pkl
+# but DO commit per-run metrics, predictions, configs
+!results/runs/*/config.yaml
+!results/runs/*/metrics.json
+!results/runs/*/predictions.parquet
+!results/runs/*/env.json
+
+# Reference materials (Leeds templates, supervisor profile) — not part of code
+Prepare/
+
+# LaTeX build artefacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.lot
+*.lof
+writing/*/main.pdf
+writing/*/_minted-*/
+
+# Cloud cost logs (may contain account-identifying info)
+results/cost_logs/
+
+# Local notes
+NOTES.md
+SCRATCH.md
+
+# External reference data (L-M dictionary etc) — large, downloaded separately
+data/external/
+
+# SEC ticker cache (regenerable via universe.load_sec_ticker_map)
+data/universe/sec_company_tickers.json
+
+# E1 inference manifest: 133MB (>GitHub 100MB cap), deterministically regenerable via
+# run_inference.py build-manifest from A2 predictions + text cache
+results/e1_llm_forecast/manifest_valtest.parquet
+writing/paper/AuthorKit27/
+writing/paper/*.aux
+writing/paper/*.bbl
+writing/paper/*.blg
+writing/paper/*.log
+writing/paper/*.out
+writing/paper/*.synctex.gz
+writing/paper/main.pdf
+writing/paper/c[0-9].log
+writing/paper/[cp]b.log
+writing/paper/p[0-9].log
+reference_papers/comparables/high/
+reference_papers/comparables/medium/
+data/box_final_sp500vol_data/
+results/second_domain/yelp_run1/yelp_panel.parquet
+dist/
+
+# macOS AppleDouble sidecars. 184 of these reached the public repository
+# through a bulk sync before this line existed; they are junk to every reader.
+._*
+.DS_Store
+
+# The scrub list names the very strings it removes; it must never travel.
+scripts/release/_scrub.tsv

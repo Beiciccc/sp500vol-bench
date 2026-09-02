@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel superseded runs on the same branch so PRs don't queue
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: pytest (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --extra dev --extra viz
+
+      - name: Run pytest (fast tests only — no network/GPU/slow)
+        run: uv run pytest tests/ -v -m "not slow and not gpu and not network"
+
+  lint:
+    name: ruff + mypy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies (dev only — skip torch for speed)
+        run: |
+          uv sync --extra dev
+
+      # The library and its tests are held to the full rule set.  scripts/ is
+      # one-off analysis code, kept as it was run: it is checked for the errors
+      # that would make it wrong -- undefined names, redefinitions, syntax --
+      # and not for style, because restyling code whose outputs are frozen
+      # would rewrite files the report depends on for no gain.
+      - name: Ruff lint (library and tests)
+        run: uv run ruff check src/ tests/
+
+      - name: Ruff lint (analysis scripts, correctness only)
+        run: uv run ruff check scripts/ --select F821,F811,E9
+
+      - name: Ruff format check (library and tests)
+        run: uv run ruff format --check src/ tests/
+
+      - name: Mypy
+        run: uv run mypy src/sp500vol/ || true
+        # `|| true` for now — strict mypy will be ramped up later.
+        # Remove once full type coverage is in place.

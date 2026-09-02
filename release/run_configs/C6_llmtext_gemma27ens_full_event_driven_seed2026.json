@@ -1,0 +1,19 @@
+{
+  "clip_range": [
+    0.03,
+    3.0
+  ],
+  "llm": "unsloth/gemma-3-27b-it",
+  "model_id": "C6_llmtext_gemma27ens",
+  "note": "3-seed ensemble of the prereg-B2 fourth family (bf16, no quantization) 8-K forecaster. Per-observation ARITHMETIC MEAN of prediction_realised_vol across vLLM seeds 2026+2027+2028, inner-joined on (ticker,accession,horizon_days) \u2014 identical convention to m1_ensemble_primary.ensemble_text, C6_llmtext_llama70ens and C6_llmtext_mistral24ens. VAL+TEST only.",
+  "seeds_used": [
+    "2026",
+    "2027",
+    "2028"
+  ],
+  "stats": {
+    "n_filings": 39322,
+    "n_rows": 117407,
+    "n_seeds": 3
+  }
+}

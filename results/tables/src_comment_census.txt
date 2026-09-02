@@ -1,0 +1,27 @@
+# Census of `% src:` source comments in the compiled dissertation
+total_source_comments= 868
+files_carrying_them= 12
+first_source_names_a_file_the_repository_carries= 799
+first_source_is_withheld_under_licence= 54
+  of_those_under_release_the_licence_safe_core= 42
+first_source_is_not_in_the_archive= 1
+no_path_named= 14
+  no_path_citation= 10
+  no_path_git_history= 3
+  no_path_own_chapters= 1
+
+chapters/01_introduction.tex= 22
+chapters/02_background.tex= 26
+chapters/03_datasets_and_experimental_design.tex= 91
+chapters/04_results.tex= 150
+chapters/05_validation.tex= 86
+chapters/06_conclusions.tex= 37
+appendices/A_external_materials.tex= 54
+appendices/B_ethics.tex= 13
+appendices/C_full_results.tex= 281
+appendices/D_hyperparams.tex= 96
+summary.tex= 7
+nomenclature.tex= 5
+
+# not in the archive, by named path
+     1  configs/models/B1..B4.yaml

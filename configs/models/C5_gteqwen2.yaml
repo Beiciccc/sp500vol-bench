@@ -1,0 +1,44 @@
+# C5 (gte-Qwen2-7B-instruct) — frozen decoder-LLM embedding probe.
+# Modern-LLM lineage 2 of 3: MTEB-top instruction-tuned embedding model on the
+# Qwen2 decoder. Encoder FROZEN; only the per-horizon head trains on cached
+# embeddings. Robustness control against the Qwen3-Embedding-8B primary.
+
+defaults:
+  - /base
+  - _self_
+
+model_id: C5_gteqwen2
+model_class: sp500vol.models.neural_text.qwen_llm.C5LLMProbe
+strategy: C5_gteqwen2
+
+encoder:
+  pretrained: Alibaba-NLP/gte-Qwen2-7B-instruct
+  max_length: 4096          # frozen 7B; A100-40G-safe. Tune up to 8192 at smoke.
+
+llm:
+  instruction: "Represent this corporate financial disclosure for forecasting the issuing firm's future stock-return volatility"
+  normalize_emb: true
+  encode_batch_size: 8
+  cache_embeddings: true
+
+head:
+  hidden_dim: 128
+  dropout: 0.1
+
+training:
+  optimizer: adamw
+  lr: 1.0e-4
+  weight_decay: 0.01
+  batch_size: 512
+  mixed_precision: bf16
+  warmup_ratio: 0.06
+  max_epochs: 40            # head-only probe (cached embeddings) is cheap; generous cap + early stop guards against underfit (vs fine-tune 15)
+  early_stopping: true
+  es_patience: 3
+  es_min_delta: 0.0
+  log_target: true
+  tokenizer_threads: 24            # pin RAYON for the up-front 7B-encode tokenise
+
+compute:
+  required_gpu: A100_40G
+  estimated_hours_per_seed: 0.5

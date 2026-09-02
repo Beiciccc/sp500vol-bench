@@ -1,0 +1,327 @@
+"""Appendix figure FP3 — the joint tests, panel by panel.
+
+Pairwise Diebold-Mariano controls error only across the pairs actually tested.
+Hansen's superior-predictive-ability test and the model confidence set answer
+the aggregate data-snooping objection instead: is HAR-RV beaten by the BEST of
+the whole leaderboard, and which models cannot be separated from the best.
+
+  (a) 90 % model-confidence-set membership, every model against every one of
+      the 18 loss x disclosure x horizon panels.  The whole text block is
+      empty in all 18;
+  (b) the SPA consistent p-value for each panel, against the full alternative
+      set and against the text-and-fusion block alone.
+
+Sources
+-------
+results/tables/row13_spa_mcs.csv          per-model, per-panel MCS membership
+results/tables/row13_spa_mcs_panels.csv   per-panel SPA p-values and counts
+"""
+import os
+import sys
+import textwrap
+
+import numpy as np
+import pandas as pd
+
+ANALYSIS = "scripts/analysis"
+sys.path.insert(0, ANALYSIS)
+
+from supp_style import (apply_style, gate, BLUE, SKY, VERM, VERM_TXT,  # noqa: E402
+                        GREEN, YELLOW, PURPLE, GREY, LIGHT, TAB, REPO)
+import diss_style as ds  # noqa: E402
+
+import matplotlib.pyplot as plt  # noqa: E402
+from matplotlib.patches import Rectangle  # noqa: E402
+
+# ---------------------------------------------------------------- evidence
+cells = pd.read_csv(os.path.join(TAB, "row13_spa_mcs.csv"))
+pans = pd.read_csv(os.path.join(TAB, "row13_spa_mcs_panels.csv"))
+
+DISC = ["long_form", "event_driven", "combined"]
+DISC_LAB = {"long_form": "Long-form (10-K/Q)", "event_driven": "Event-driven (8-K)",
+            "combined": "Combined"}
+HS = [5, 10, 20]
+LOSSES = [("qlike", "Q"), ("se", "SE")]
+
+PANELS = [(d, h, ln) for d in DISC for h in HS for ln, _ in LOSSES]
+
+ORDER = [
+    ("price", "A1_hv", "A1  historical volatility"),
+    ("price", "A2_har_rv", "A2  HAR-RV  (benchmark)"),
+    ("price", "A3_garch", "A3  GARCH"),
+    ("price", "A4_egarch", "A4  EGARCH"),
+    ("price", "A5_arima", "A5  ARIMA"),
+    ("price", "A6_harq", "A6  HARQ"),
+    ("price", "A6_shar", "A6  semivariance HAR"),
+    ("price", "A7_harx_vix", "A7  HAR-X with VIX"),
+    ("text", "B1_bow_ridge", "B1  bag-of-words ridge"),
+    ("text", "B2_tfidf_ridge", "B2  TF-IDF ridge"),
+    ("text", "B3_lm_linear", "B3  Loughran-McDonald linear"),
+    ("text", "B4_lm_features", "B4  Loughran-McDonald features"),
+    ("text", "C1_bert_s1", "C1  BERT"),
+    ("text", "C2_finbert_s1", "C2  FinBERT"),
+    ("text", "C3_roberta_s1", "C3  RoBERTa"),
+    ("text", "C4_longformer", "C4  Longformer"),
+    ("text", "C5_e5mistral", "C5  E5-Mistral embeddings"),
+    ("text", "C5_gteqwen2", "C5  gte-Qwen2 embeddings"),
+    ("text", "C5_qwen3", "C5  Qwen3 embeddings"),
+    ("text", "C6_llmtext", "C6  prompted Qwen3-32B"),
+    ("text", "C6_llmtext_llama70", "C6  prompted Llama-3.1-70B"),
+    ("fusion", "D1_concat_mlp", "D1  concat MLP"),
+    ("fusion", "D2_gated_fusion", "D2  gated fusion"),
+    ("fusion", "D3_e5mistral", "D3  price + E5-Mistral"),
+    ("fusion", "D3_gteqwen2", "D3  price + gte-Qwen2"),
+    ("fusion", "D3_qwen3", "D3  price + Qwen3"),
+    ("fusion", "D4_llmfused", "D4  price + prompted LLM"),
+]
+BLOCK_COL = {"price": BLUE, "text": VERM, "fusion": PURPLE}
+
+idx = cells.set_index(["disclosure", "horizon", "loss", "model"])
+
+
+def member(model, panel):
+    d, h, ln = panel
+    try:
+        return bool(idx.loc[(d, h, ln, model), "in_mcs90"])
+    except KeyError:
+        return None                      # the model was not run on that panel
+
+
+counts = cells.groupby("block")["in_mcs90"].sum().to_dict()
+n_text_cells = int((cells.block == "text").sum())
+spa_reject = int((pans.spa_p_consistent < 0.05).sum())
+tf_all_one = int((pans.spa_textfusion_p_consistent == 1.0).sum())
+panels_with_fusion = int((pans.mcs90_fusion > 0).sum())
+
+# ------------------------------------------------------------------- gate
+gate(
+    {"n_panels": 18, "n_text_cells": 222, "text_in_mcs": 0,
+     "fusion_in_mcs": 24, "price_in_mcs": 73, "spa_rejects_full_set": 9,
+     "spa_textfusion_p_is_one": 18, "panels_with_a_fusion_member": 12},
+    {"n_panels": int(len(pans)), "n_text_cells": n_text_cells,
+     "text_in_mcs": int(counts.get("text", 0)),
+     "fusion_in_mcs": int(counts.get("fusion", 0)),
+     "price_in_mcs": int(counts.get("price", 0)),
+     "spa_rejects_full_set": spa_reject,
+     "spa_textfusion_p_is_one": tf_all_one,
+     "panels_with_a_fusion_member": panels_with_fusion},
+)
+
+# ------------------------------------------------------------------ canvas
+apply_style(9)
+fig = plt.figure(figsize=ds.canvas(7.55))
+gs = fig.add_gridspec(2, 1, height_ratios=[4.15, 1.00],
+                      left=0.335, right=0.985, top=0.900, bottom=0.135,
+                      hspace=0.46)
+axM = fig.add_subplot(gs[0])
+axS = fig.add_subplot(gs[1])
+
+# column x positions: a gap between disclosure groups
+xs, x = [], 0.0
+for gi in range(3):
+    for hi in range(3):
+        for li in range(2):
+            xs.append(x)
+            x += 1.0
+        x += 0.6
+    x += 1.1
+xs = np.array(xs)
+
+ys = np.arange(len(ORDER))[::-1].astype(float)
+# a gap between blocks
+gap = {"price": 0.0, "text": -0.7, "fusion": -1.4}
+ys = np.array([ys[i] + gap[ORDER[i][0]] for i in range(len(ORDER))])
+
+for yi, (blk, mid, lab) in zip(ys, ORDER):
+    axM.axhline(yi, color=LIGHT, lw=0.45, zorder=0)
+    for xi, panel in zip(xs, PANELS):
+        m = member(mid, panel)
+        if m is None:
+            # The cross carries the caveat ("not run on that disclosure"), so it
+            # must not be the faintest ink on the panel.  At LIGHT it printed at
+            # the same tone as the row rule it sits on and a step paler than the
+            # dot, i.e. the mark with a meaning read as chrome.  Colour only: the
+            # marker size and position are untouched, so no geometry moves.
+            axM.plot([xi], [yi], marker="x", ms=3.4, color="#8C8C8C", mew=1.0,
+                     zorder=3)
+        elif m:
+            axM.add_patch(Rectangle((xi - 0.36, yi - 0.36), 0.72, 0.72,
+                                    facecolor=BLOCK_COL[blk], edgecolor="none",
+                                    zorder=4))
+        else:
+            axM.plot([xi], [yi], marker=".", ms=1.7, color="#B8B8B8",
+                     zorder=3)
+
+# block bands
+for blk, col in (("text", VERM), ("price", BLUE), ("fusion", PURPLE)):
+    sel = [i for i, o in enumerate(ORDER) if o[0] == blk]
+    lo, hi = ys[sel].min(), ys[sel].max()
+    axM.add_patch(Rectangle((xs[0] - 0.85, lo - 0.62),
+                            xs[-1] - xs[0] + 1.7, hi - lo + 1.24,
+                            facecolor="none", edgecolor=col, lw=0.7,
+                            alpha=0.55, zorder=1))
+
+axM.set_yticks(ys)
+axM.set_yticklabels([o[2] for o in ORDER], fontsize=8.9)
+for tick, o in zip(axM.get_yticklabels(), ORDER):
+    tick.set_color(GREY)
+axM.set_xticks(xs)
+axM.set_xticklabels([lab for _ in range(9) for _, lab in LOSSES], fontsize=8.9)
+axM.set_xlim(xs[0] - 0.9, xs[-1] + 0.9)
+axM.set_ylim(ys.min() - 0.95, ys.max() + 0.95)
+axM.tick_params(axis="both", length=0)
+for sp in ("left", "bottom"):
+    axM.spines[sp].set_visible(False)
+
+# horizon and disclosure headers
+for gi, d in enumerate(DISC):
+    grp = xs[gi * 6:(gi + 1) * 6]
+    axM.text(grp.mean(), ys.max() + 2.05, DISC_LAB[d], ha="center",
+             va="center", fontsize=8.9, color=GREY)
+    for hi, h in enumerate(HS):
+        pair = grp[hi * 2:hi * 2 + 2]
+        axM.text(pair.mean(), ys.max() + 1.15, f"{h}", ha="center",
+                 va="center", fontsize=8.9, color=GREY)
+    axM.plot([grp[0] - 0.5, grp[-1] + 0.5],
+             [ys.max() + 1.62, ys.max() + 1.62], color=GREY, lw=0.6,
+             clip_on=False)
+
+axM.text(xs[0] - 1.5, ys.max() + 1.15, "horizon, days:", ha="right",
+         va="center", fontsize=8.9, color=GREY, clip_on=False)
+# This count is set inside the plotting area, where it runs through two columns
+# of the dot grid and over two row rules.  The white halo it used to carry did
+# not "keep the cells readable": it painted three of the 222 cells out entirely
+# (Combined/20 Q and SE on C2 FinBERT, Combined/20 SE on C3 RoBERTa), leaving
+# blanks in the one panel whose whole point is that every text cell can be
+# inspected.  Halo off, and the label set below the marker layer, so those dots
+# print over the glyphs and stay countable.  It stays vermillion because that is
+# the text block's own colour, so the reader can see which block is counted.
+# Pulled 0.35 units inside the right limit, so it cannot widen the tight bbox.
+ds.annot(axM, xs[-1] + 0.55,
+         ys[[o[0] for o in ORDER].index("text")] - 6.0,
+         f"0 of {n_text_cells}\ntext cells", size=8.9, color=VERM_TXT,
+         ha="right", va="center", halo=False, zorder=2.6)
+
+# ------------------------------------------------------------ (b) SPA strip
+p_full = []
+p_tf = []
+for d, h, ln in PANELS:
+    r = pans[(pans.disclosure == d) & (pans.horizon == h) & (pans.loss == ln)]
+    p_full.append(float(r.spa_p_consistent.iloc[0]))
+    p_tf.append(float(r.spa_textfusion_p_consistent.iloc[0]))
+p_full = np.array(p_full)
+p_tf = np.array(p_tf)
+
+axS.axhspan(0.0008, 0.05, color=LIGHT, alpha=0.55, lw=0, zorder=0)
+axS.axhline(0.05, color=GREY, ls="--", lw=0.8, zorder=2)
+for xi, pf in zip(xs, p_full):
+    axS.plot([xi, xi], [0.0009, pf], color=GREY, lw=0.7, zorder=2)
+    axS.plot([xi], [pf], marker="o", ms=5.0, zorder=4,
+             mfc=BLUE if pf < 0.05 else "white", mec=BLUE, mew=1.1)
+axS.plot(xs, p_tf, marker="D", ms=4.4, ls="none", mfc="white", mec=VERM,
+         mew=1.1, zorder=4)
+axS.set_yscale("log")
+axS.set_ylim(0.0009, 2.6)
+axS.set_yticks([0.001, 0.01, 0.05, 1.0])
+axS.set_yticklabels(["0.001", "0.01", "0.05", "1.0"], fontsize=9.0)
+axS.set_xticks(xs)
+axS.set_xticklabels([lab for _ in range(9) for _, lab in LOSSES], fontsize=8.9)
+axS.set_xlim(xs[0] - 0.9, xs[-1] + 0.9)
+axS.set_ylabel("SPA consistent $p$", fontsize=8.9)
+axS.tick_params(axis="x", length=0)
+axS.plot([], [], marker="o", ms=5.0, ls="none", mfc=BLUE, mec=BLUE,
+         label="vs. the full alternative set")
+axS.plot([], [], marker="D", ms=4.4, ls="none", mfc="white", mec=VERM,
+         label="vs. the text and fusion block only")
+# The band between the (b) heading and the axes is 44 px tall in the render, and
+# at y = 1.02 the legend's own ink sat at its very top: the heading's descenders
+# ended on the row where the legend's ascenders began, so the key read as a
+# wrapped second title line, with ~20 px of idle white left below it.  Anchored
+# 0.045 axes-heights (~8 px) lower the key sits in the middle of that band, a
+# clear gap under the heading and a clear gap over the axes, and it is grouped
+# with the panel it explains.  Only the anchor's y moves: frameon is off in the
+# shared style, so the box's bottom edge crossing the top spine draws nothing,
+# and the ink stays far above the p = 1.0 diamonds (axes fraction 0.88).  The
+# saved box's top is set by (a)'s heading and its bottom by the note, neither of
+# which the legend touches, so no printed point size changes.
+axS.legend(loc="lower left", fontsize=8.9, handletextpad=0.35, borderpad=0.25,
+           labelspacing=0.25, ncol=2, columnspacing=1.4,
+           bbox_to_anchor=(0.0, 0.975))
+
+# ---------------------------------------------------------- panel headings
+fig.canvas.draw()
+
+
+def heading(ax, text, dy):
+    fig.text(0.004, ax.get_position().y1 + dy, text, fontsize=9.2, color=GREY,
+             ha="left", va="bottom")
+
+
+heading(axM, "(a)  90 % model-confidence-set membership, all 18 panels: "
+             "filled = in the set", 0.070)
+# "panel by panel" restates what the eighteen labelled columns and the caption
+# already say; what the panel did NOT say is who is on trial and which way the
+# axis runs, so a p-value inside the grey band had no direction on the page.
+# The benchmark is A2 HAR-RV and the null is "HAR-RV is not inferior to the best
+# challenger", so a small p means HAR-RV is beaten (row13_spa_mcs.py: "benchmark
+# = A2 HAR-RV", H0 "HAR-RV is not inferior to the best challenger"; the caption
+# reports the same rejection in 9 of 18 panels).  The replacement is 74
+# characters against (a)'s 77 in the same face at the same size from the same
+# left edge, so the heading block cannot reach further right than (a)'s already
+# does, and "filled = in the set" in (a) sets the "=" idiom this reuses.
+heading(axS, "(b)  Hansen's superior-predictive-ability test: small $p$ = "
+             "HAR-RV is beaten", 0.030)
+
+NOTE = (
+    "Q = QLIKE in volatility units, SE = squared error. A filled square means "
+    "the model is in that panel's 90 % set; a dot means it was run on the panel "
+    "and excluded; a cross means it was not run on that disclosure. Membership "
+    "means 'cannot be separated from the best model', not 'beats HAR-RV'. "
+    "In (b), a filled circle marks p < 0.05."
+)
+# Basis statement, not argument: recessive ink and a hairline above it, so the
+# definitions of Q/SE/square/dot/cross and the "membership is not victory"
+# clause read as apparatus rather than as another data label.  Every word is
+# kept; only the ink and the separator change, neither of which is geometry.
+# 1.34 line spacing is preserved -- ds.note() would tighten it to 1.32.
+# The closing clause declares (b)'s second encoding channel: the circle's fill,
+# which is the only thing separating "rejects" from "does not reject" at
+# Combined/10/SE, whose p = 0.0525 sits on the dashed line.  It lands on the
+# block's short last line (19 -> 59 characters against a 92-character wrap), so
+# the note keeps its four lines and its width, and no geometry moves.
+ntxt = fig.text(0.004, 0.006, textwrap.fill(NOTE, 92), fontsize=8.9,
+                color=ds.INK2, ha="left", va="bottom", linespacing=1.34)
+
+# The rule is measured off the block's own rendered box and cut to its width, so
+# it cannot push the tight bounding box outwards in either direction.
+fig.canvas.draw()
+_nb = ntxt.get_window_extent(fig.canvas.get_renderer()).transformed(
+    fig.transFigure.inverted())
+fig.lines.append(plt.Line2D([_nb.x0, _nb.x1], [_nb.y1 + 0.011] * 2,
+                            transform=fig.transFigure, color=ds.RULE,
+                            linewidth=0.5, zorder=0.5))
+
+# (b) repeats (a)'s eighteen columns but was labelled only "Q SE" nine times, so
+# naming a group meant tracing a column up past (a)'s tick row, the (b) heading
+# and the legend to (a)'s header.  The three disclosure names are set in the
+# strip the figure already leaves between (b)'s tick labels and the note rule --
+# 13.3 pt of white space that is inside the saved box in both directions, with
+# the labels well inside their own groups' columns, so neither the width nor the
+# height of the tight bbox changes and no printed point size moves.  Measured
+# off the rendered boxes rather than guessed, for the same reason the rule is.
+_rend = fig.canvas.get_renderer()
+_inv = fig.transFigure.inverted()
+_tick_y0 = min(t.get_window_extent(_rend).transformed(_inv).y0
+               for t in axS.get_xticklabels())
+_band_y = 0.5 * ((_nb.y1 + 0.011) + _tick_y0)
+DISC_SHORT = {"long_form": "Long-form", "event_driven": "Event-driven",
+              "combined": "Combined"}
+for gi, d in enumerate(DISC):
+    grp = xs[gi * 6:(gi + 1) * 6]
+    _xc = _inv.transform(axS.transData.transform((grp.mean(), 1.0)))[0]
+    fig.text(_xc, _band_y, DISC_SHORT[d], ha="center", va="center",
+             fontsize=8.9, color=GREY)
+
+ds.finish(fig, "FP3_joint_spa_mcs", max_render_pt=595.0,
+          note="appendix figure: MCS membership matrix and SPA p-values over "
+               "the 18 loss x disclosure x horizon panels")

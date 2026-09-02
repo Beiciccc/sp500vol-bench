@@ -1,0 +1,66 @@
+\section{Stress Tests}
+\label{sec:ablations}
+
+The controls cascade of Section~\ref{sec:results} leaves one survivor: a $+0.2$--$0.5\%$ QLIKE residual in a handful of event-driven 8-K cells for the prompted 32B LLM (C6) at the conservative end of the reference interval. We stress-test that residual, and the apparatus around it, against six rival explanations: input curation, memorisation, family idiosyncrasy, prompt choice, baseline choice, and input strategy. Table~\ref{tab:stress} collects the key contrasts; all increments are vol-unit QLIKE improvements from the M1 combination protocol.
+
+\begin{table}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\caption{Stress tests of the prompted-LLM increment: relative QLIKE improvement (\%) of the augmented over the reference combination (vol-unit; positive = text helps; single recalibrated-HAR reference unless stated). $^{**}$: day-clustered DM${}<0$, raw $p<.05$. LF = long-form, ED = event-driven. Panel A holds the input fixed to byte-identical curated excerpts (final row: standard-input C5 for reference); Panel B deletes the filing text (date-only, date{+}ticker) or adds the same-model date{+}ticker forecast to the reference (beyond identity); Panel C swaps the LLM family under an identical protocol.}
+\label{tab:stress}
+\begin{tabular}{@{}llrrr@{}}
+\toprule
+ & Arm & $h{=}5$ & $h{=}10$ & $h{=}20$ \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{A: Input parity (LF, identical excerpts)}} \\
+ & C6 prompted Qwen3-32B & $+1.79^{**}$ & $+2.25^{**}$ & $+0.27^{**}$ \\
+ & C5x embed., same excerpts & $-0.32$ & $-3.74$ & $-4.12$ \\
+ & C5 embed., standard input & $-1.02$ & $-3.10$ & $-6.39$ \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{B: Contamination arms (Qwen3-32B)}} \\
+LF & date-only & $-0.00$ & $-0.49$ & $-1.65$ \\
+LF & date{+}ticker & $+0.55^{**}$ & $+0.83^{**}$ & $+1.11^{**}$ \\
+LF & text beyond identity & $+1.50^{**}$ & $+1.95^{**}$ & $+0.17^{**}$ \\
+ED & full text & $+1.21^{**}$ & $+1.00^{**}$ & $+0.66^{**}$ \\
+ED & date{+}ticker & $+0.94^{**}$ & $+0.71$ & $+0.01$ \\
+ED & text beyond identity & $+0.77^{**}$ & $+0.68^{**}$ & $+0.63^{**}$ \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{C: Cross-family (vs.\ single HAR)}} \\
+LF & Yi-1.5-34B & $-0.64$ & $-2.71$ & $-9.86$ \\
+ED & Yi-1.5-34B & $+0.37$ & $+0.07$ & $-0.62$ \\
+ED & Phi-4-14B & $+0.38$ & $+0.18$ & $-0.12$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Prompting vs.\ Pooling at Input Parity}
+\label{sec:ab-parity}
+
+A natural objection to the prompting-vs-embedding dissociation is that C6 reads curated excerpts while the embedding probes read standard inputs, so curation rather than mechanism could explain the gap. The C5x control removes the confound: the same-lineage Qwen3 embedder \citep{qwen3_2025} is run on the byte-identical excerpts fed to the C6 prompt, with the same ridge head as C5. Against the single recalibrated-HAR reference on long-form, prompted C6 adds $+1.79/+2.25/+0.27\%$ ($h{=}5/10/20$; 3 of 3 genuine cells), while embeddings of the \emph{same excerpts} lose $-0.32/-3.74/-4.12\%$ (0 of 3) and the seed-ensemble-primary C5 on standard input loses $-1.02/-3.10/-6.39\%$ (0 of 3); C5x and C6 are single runs by design. Pooled embeddings of the same text from the same lineage do not carry what the prompt extracts: the dissociation is mechanism, not curation. Two disciplines apply: the comparison fixes input, not parameter count (32B decoder versus 8B embedder), so the claim is same-lineage, not same-size; and the firm-identity control of Section~\ref{sec:results} later reattributes much of these long-form increments, so parity speaks to extraction mechanism, not net text value.
+
+\subsection{Contamination Controls}
+\label{sec:ab-contamination}
+
+A prompted LLM may remember which firms are volatile, what a given era was like, or realised outcomes themselves. Three arms bound each channel under the full protocol. A \emph{date-only} prompt (no text, no ticker) is significantly positive in 0 of 6 cells---on long-form $h{=}10/20$ it is significantly \emph{worse} than the reference alone---so neither the prompting scaffold nor era information in the date manufactures the increment. A \emph{date{+}ticker} prompt (identity and era memory, zero filing content) reproduces 31--77\% of the full-text increment in the three well-identified cells, and at long-form $h{=}20$ identity memory alone ($+1.11\%$) \emph{exceeds} the full-text increment ($+0.27\%$): a naive C6-versus-HAR comparison must never be read as a text effect. Yet the increment is not reducible to identity: with the same model's date{+}ticker forecast added to the reference, full text still adds in 6 of 6 cells under Holm. Finally, splitting the test period at 2024-07 (the approximate Qwen3 training-data boundary) shows the full-text increment Holm-significant on post-cutoff filings in 5 of 6 cells, with point estimates \emph{larger} post- than pre-cutoff in 6 of 6---a pattern inconsistent with memorised test-era outcomes; the one failure is the cell already non-significant on the full test set. Identity memory inflates naive readings, but the residual is not memorised outcomes.
+
+\subsection{Cross-Family Replication}
+\label{sec:ab-family}
+
+Re-running the identical manifest, prompts, and protocol with two further instruction LLMs tests whether the residual is a property of the disclosures or of one family. It does not replicate. Qwen3-32B is positive-significant in 6 of 6 cells against the single-HAR reference; Yi-1.5-34B \citep{yi_2024} produces no significant positive cell anywhere and is negative on every long-form cell; Phi-4-14B \citep{phi4_2024}, run on the event-driven subset, is indistinguishable from zero. Yi's 4K context binds on long-form excerpts but not on 8-Ks (median ${\sim}930$ tokens), so the event-driven non-replication is not a context artefact. We stop short of a stronger conclusion: both alternates are smaller and older than Qwen3-32B, and both mode-collapse ($\geq$73\% of forecasts on a single value), so the finding is that the increment \emph{does not replicate across families}---not proof that it is family-specific. Either reading weighs against banking the residual.
+
+\subsection{Elicitation Sensitivity}
+\label{sec:ab-elicitation}
+
+Perhaps the near-null is just a bad prompt. Five elicitation arms on a deterministic 4{,}000-filing stratified subsample---two repeat decodes, two independent paraphrases, and a chain-of-thought (``thinking'') variant---answer this. Repeat decoding is nearly deterministic: 94--97\% of forecasts exact-equal across repeats, Spearman $\rho>0.92$, mean relative difference 0.6--1.1\% under temperature-0 batched inference \citep{kwon2023vllm}, so within-template noise is negligible. Across templates, individual forecasts are strongly prompt-dependent ($\rho$ 0.39--0.58), but the quantity that matters is the cell-level increment: the event-driven $h{=}5$ increment is positive in \emph{all five} arms ($+0.63$ to $+1.13\%$, significant in most), whereas the long-form increment flips sign under paraphrase ($+2.32\%$ versus $-0.44\%$ at $h{=}5$; $+5.95$ versus $-2.16$ at $h{=}10$) and thinking mode does not rescue it. No tested elicitation yields a robust long-form gain; the surviving 8-K residual is the one elicitation-robust object---consistent with its being the only cell family that also survives the identity controls.
+
+\subsection{Stronger---and Weaker---Single Baselines}
+\label{sec:ab-baselines}
+
+Could a better single price model dissolve the question? Replacing HAR with the semivariance HAR \citep{pattonsheppard2015shar} strengthens the baseline by $+1.09$--$4.17\%$ QLIKE (variance-unit, leaderboard convention; clustered-significant at every disclosure$\times$horizon), yet the incremental-value verdicts are unchanged: text models that survive against A2 survive against SHAR with near-identical increments, and those that fail, fail. Upgrading the single reference does not change the story; only the maximal pool does (Section~\ref{sec:results}). HARQ \citep{bollerslev2016harq} is unstable in our log-space pipeline, requiring the BPQ insanity filter on extreme test points; we disclose rather than lean on it. The converse experiment is more instructive: against a naive realised-volatility persistence baseline, the same text models that lose to HAR with DM statistics of $+12.2$ to $+18.5$ merely \emph{tie} (all differences non-significant). A study benchmarking against persistence would report text ``matching'' a plausible baseline: weak baselines manufacture apparent text value---the failure mode this benchmark is built to expose.
+
+\subsection{Input Strategy Is Not the Binding Constraint}
+\label{sec:ab-input}
+
+The long-form standalone failure is not for want of input engineering. Across a five-strategy sweep---512-token truncation, mean-pooled chunks, attention over chunks, a hierarchical encoder, and native 4{,}096-token processing---the chunking schemes are horizon-inconsistent against truncation, and only the Longformer's native long context \citep{beltagy2020longformer} beats truncation at every horizon on QLIKE-DM; the same-lineage C4-versus-C3 contrast (Longformer derives from RoBERTa; \citealp{liu2019roberta}) isolates context length as the active ingredient. Yet every strategy still loses to price, so input strategy is not the binding constraint. A section ablation (TOC-skip extraction validated at 100\% recovery of substantive heads) locates the long-form signal chiefly in the MD\&A and risk-factor sections, though the remainder still contributes---distributed, not localised. The training-side diagnosis of why the learned models fail---they overfit rather than underfit, reaching train $R^2$ of 0.30--0.65 against HAR's 0.17--0.31 before collapsing out of sample---is taken up in Section~\ref{sec:discussion}.
+

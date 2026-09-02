@@ -1,0 +1,35 @@
+\section{Experimental Protocol}
+\label{sec:protocol}
+
+% Figure: the incremental-value audit, vNext — playbook-spec four-panel design
+% (generator: scripts/analysis/fig1_vnext.py; author-generated rich-color icon
+% PNGs in figures/icons/ are normalised at build time: bbox-cropped, 6%-padded,
+% 256px, colors kept — COLORFUL_ICONS mode; darkest icon tone vs panel tint
+% audited >= 3:1 for all 14 assets).
+% All text >= 25px = 7.04pt at \textwidth; ladder carries Holm survivors per rung.
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/figure1_vnext}
+\caption{The incremental-value audit. \ding{172} \emph{Point-in-time benchmark}; \ding{173} \emph{Task \& model spectrum}; \ding{174} \emph{Reference ladder}: a raw baseline manufactures an ``apparent text gain''; text is credited only beyond stronger references, with Holm survivors per rung on the ladder (Table~\ref{tab:cascade}); \ding{175} \emph{Inference \& validity gates}.}
+\label{fig:protocol}
+\end{figure*}
+
+\paragraph{Splits, losses, conventions.}
+Every model shares the strictly chronological splits of Table~\ref{tab:dataset} (validation spans COVID); random $k$-fold is inadmissible: \emph{forward} $h$-day labels leak across shuffled folds. QLIKE (lower is better) is the primary loss, per model, horizon, and channel, never pooled across horizons: ranking-robust to proxy noise, asymmetric in penalising risk under-prediction \citep{patton2011proxies}.
+
+\paragraph{The incremental-value test.}
+Standalone accuracy cannot separate ``text carries information'' from ``text inherits volatility persistence,'' so our central test nests price and text forecasts in log space,
+\begin{equation}
+f_{R,U} = \exp\!\bigl(a + b\,\log f_{\text{price}}\ [\,{+}\ g\,\log f_{\text{text}}\,]\bigr),
+\label{eq:m1}
+\end{equation}
+where the bracketed text term enters the augmented $f_U$ only, and all weights are fit on the validation years \emph{alone}, frozen on test; without recalibration a raw baseline donates its own miscalibration to text as spurious credit. Text's credit is the out-of-sample $\mathrm{QLIKE}(f_R)-\mathrm{QLIKE}(f_U)$ over a \textbf{69-cell grid} (15 long-form plus 8 event-driven challengers $\times$ 3 horizons), distinct from the \textbf{180 standalone comparisons}: 20 challengers over 9 disclosure$\times$horizon panels (long-form, event-driven, combined), of which 3 are price (A3--A5) and 17 text/fusion, the latter forming the 153-comparison variance-unit verdict family. A6, A7, C5x, C6 and D4 sit outside this standalone set. \textbf{Counting convention:} unless tagged inline (variance-unit, single-seed, two-way, deployable), every count uses this primary basis: seed-ensemble forecasts, vol-unit QLIKE for combination cells, validation-frozen weights, these two denominators. The standalone leaderboard (Technical Supplement) reports variance-unit QLIKE; levels are never compared across the two unit conventions. Off-basis restatements (e.g.\ the 38$\to$20 variance-unit tightening) live in Table~\ref{tab:cascade} and the Limitations only.
+
+\paragraph{The reference interval.}
+The audit brackets text's credit with a \emph{reference interval} (Figure~\ref{fig:protocol}), counting an increment only if robust across it: the recalibrated HAR of Eq.~\eqref{eq:m1} (upper bound, most generous); the \emph{firm-identity-augmented reference}, refitting $f_R$ on $[1,\ \log f_{\text{HAR}},\ \log \overline{\mathrm{RV}}^{\text{val}}_{\text{firm}}]$ to absorb any ``signal'' that merely re-identifies which firm filed (lower bound); and the \emph{maximal price pool}, a validation-fitted log-space pool of five price models (HAR, SHAR, GARCH, EGARCH, ARIMA; an equal-weight variant guards against fitted-pool overfitting), closing the price side.
+
+\paragraph{Inference.}
+Filings cluster in calendar time, so observation-level HAC overstates precision (10--25 per trading day share one shock; clustering roughly halves $|\mathrm{DM}|$). Our primary inference is therefore the \emph{day-clustered} Diebold--Mariano test \citep{diebold1995comparing}: differentials averaged within each trading day, DM on the daily series (794--996 days per panel), Newey--West HAC at lag $h-1$ \emph{days} with \citet{harvey1997testing}'s correction, and Holm within each 69-cell family \citep{holm1979simple}; the residual's 12-cell family is C6 $\times$ 2 channels $\times$ 3 horizons $\times$ 2 references. We also attach day-block bootstrap intervals \citep{politis1994stationary}, recompute under two-way firm$\times$day clustering \citep{cameron2011twoway}, and report Clark--West adjustments for nested forecasts \citep{clarkwest2007} (single-seed basis: adding at Holm-$p<.05$ in 44 of 69 cells day-clustered, 50 observation-level). Finally, the protocol ships its own power calibration: an oracle firm-orthogonal signal injected at known effect sizes measures each control's recovery rate, and a per-cell minimum detectable effect accompanies every null count.
+
+\paragraph{Placebos, seeds, economics.}
+A \emph{label-shuffle} placebo (five seeds) replaces the text forecast with a permuted copy: any increment it yields is machinery, not text. A \emph{within-date permutation} with a \emph{date-mean-text} combiner decomposes a surviving increment into cross-sectional (which-firm) and regime-timing (when) shares. A cell is \textbf{genuine} iff its clustered DM $<0$, Holm-adjusted $p<.05$, and label-shuffle placebo $|\mathrm{DM}|<2$. Every C/D model except C6 and D4 runs seeds 2026--2028, with the per-observation \emph{seed-ensemble} forecast the primary; single-seed \emph{trained} cells are fragile (37 of 144 C/D cells flip DM sign across seeds; of 14 seed-2026-genuine cells only 5 hold in all three). C6 and D4 enter as single-seed (2026) rows: both are prompted arms with no training seed to vary (D4 fuses price \emph{inside} the prompt; repeat decodes 94--97\% exact-equal; Stress Tests), so each row is unchanged on either seed basis. Surviving increments are also adjudicated economically, by inverse-variance portfolio $\Delta$Sharpe, VaR backtests, a utility fee (Results).

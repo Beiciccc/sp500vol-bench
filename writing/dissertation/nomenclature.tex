@@ -1,0 +1,190 @@
+% ---------------------------------------------------------------------------
+% Nomenclature.  Front matter, placed after the List of Figures.
+%
+% Every entry is lifted from the place the report already defines it: the arm
+% codes and the text-handling codes from the model matrix (Table
+% tab:model-matrix and its caption), the counting vocabulary from the primary
+% basis table (tab:res-basis) and from the reference-ladder and inference
+% subsections of Chapter 3, and each abbreviation from its own first use.
+% Nothing here may say anything the chapter does not; if a definition changes
+% there, it changes here too.
+%
+% Provenance.  No number in this file is new: every one is a transcription of
+% a chapter table or equation, so each group carries a single src comment on
+% its own line naming that source, rather than a per-row evidence file.
+%
+% Format.  Five grouped tabulars rather than one long alphabetical list: the
+% arm codes, the text-handling codes, the abbreviations, the notation and the
+% vocabulary are five different kinds of lookup, and a reader arrives wanting
+% one of them, not all five.  Plain tabulars rather than a longtable, because
+% longtable is not loaded and config.tex is not this file's to edit; the page
+% break falls between groups instead, which is where it should fall anyway.
+% Splitting the 31-row abbreviation tabular so that it too could break was
+% tried and reverted: it filled page one but left page two a sixth emptier,
+% and it ended page one on a list with no closing rule.
+%
+% \noindent has to sit after \singlespacing, not before it.  setspace's
+% \singlespacing forces vertical mode, which discards a \noindent issued ahead
+% of it and lets the tabular start an indented paragraph 17 pt too wide.
+%
+% This list carries no \caption and is not a numbered table, so it does not
+% enter the List of Tables.  Like the Summary, the Acknowledgements, the List
+% of Tables and the List of Figures it takes a \pdfbookmark and no \toc entry.
+% ---------------------------------------------------------------------------
+
+\chapter*{Nomenclature}
+% book's \chapter* leaves the previous \markboth standing, so without this the
+% running head on this list's later pages reads LIST OF FIGURES.
+\markboth{\MakeUppercase{Nomenclature}}{\MakeUppercase{Nomenclature}}
+
+Model arms are named throughout by the codes of the model matrix
+(Table~\ref{tab:model-matrix}), and every headline count is read against the
+primary basis (Table~\ref{tab:res-basis}). The entries below transcribe those two
+tables' own definitions, together with the terms fixed in
+Sections~\ref{sec:design-ladder} and~\ref{sec:design-inference}; the chapter
+that defines a term remains the authority on it.
+
+\vspace{2mm}
+\noindent\textbf{Arm codes.} The four blocks of the model matrix.
+\par\nobreak
+\vspace{1mm}
+% src: chapters/03_datasets_and_experimental_design.tex, Table tab:model-matrix (ID and Model columns, transcribed)
+{\small\singlespacing
+\noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.09\textwidth}>{\raggedright\arraybackslash}p{0.87\textwidth}@{}}
+\toprule
+A1 & Naive historical volatility \\
+A2 & HAR-RV (primary baseline) \\
+A3 & GARCH(1,1) \\
+A4 & EGARCH \\
+A5 & ARIMA on log-RV \\
+A6 & SHAR and HARQ ($\times$2): realised semivariance, and the correction for measurement error in the realised-variance regressor \\
+A7 & HAR-X, point-in-time log VIX \\
+\midrule
+B1 & Bag-of-words + ridge \\
+B2 & TF--IDF + ridge \\
+B3 & Loughran--McDonald dictionary, linear \\
+B4 & Loughran--McDonald + engineered features \\
+\midrule
+C1 & BERT-base \\
+C2 & FinBERT \\
+C3 & RoBERTa-base \\
+C4 & Longformer-4096 \\
+C5 & Frozen LLM embeddings ($\times$3) \\
+C5x & Qwen3-Emb.-8B, input parity, long-form \\
+C6 & Prompted Qwen3-32B \\
+\midrule
+D1 & Concatenation MLP \\
+D2 & Gated fusion \\
+D3 & Price + C5 embedding ($\times$3) \\
+D4 & Price + C6 forecast, in-prompt \\
+\bottomrule
+\end{tabular}\par
+}
+
+\vspace{3mm}
+\noindent\textbf{Text handling.} How a model meets a document, from the same matrix.
+\par\nobreak
+\vspace{1mm}
+% src: chapters/03_datasets_and_experimental_design.tex, Table tab:model-matrix caption (text-handling key, transcribed)
+{\small\singlespacing
+\noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.13\textwidth}>{\raggedright\arraybackslash}p{0.83\textwidth}@{}}
+\toprule
+S1 & Truncation to the first 512 tokens \\
+S2 & Chunk-mean pooling \\
+S3 & Learned chunk attention \\
+S4 & Hierarchical chunk encoder \\
+S5 & Native 4{,}096-token context \\
+\midrule
+full text & Untruncated document (classical vectorisers) \\
+4{,}096 tok. & The length the three frozen embedders were run at, an A100-40G budget rather than a model limit \\
+excerpts & The curated excerpts read by the prompted arm (risk and MD\&A items for 10-K and 10-Q, head truncation otherwise; 8-K in full to a character budget) \\
+\bottomrule
+\end{tabular}\par
+}
+
+\vspace{3mm}
+\noindent\textbf{Abbreviations.}
+\par\nobreak
+\vspace{1mm}
+% src: each entry from its own first use in chapters/02_background.tex, chapters/03_datasets_and_experimental_design.tex or chapters/04_results.tex
+{\small\singlespacing
+\noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.11\textwidth}>{\raggedright\arraybackslash}p{0.85\textwidth}@{}}
+\toprule
+10-K & Annual report \\
+10-Q & Quarterly report \\
+8-K & Current report, announcing a material event within days of its occurrence \\
+ARIMA & Autoregressive integrated moving average (arm A5, fitted to log RV) \\
+CCM & CRSP/Compustat-Merged, the WRDS-maintained crosswalk between CRSP securities and Compustat/SEC registrants \\
+CIK & Central Index Key, the SEC's identifier for a registered filer \\
+CRSP & Center for Research in Security Prices \\
+DM & Diebold--Mariano, the test for equal forecast accuracy \\
+EDGAR & The SEC's public full-text disclosure archive \\
+EGARCH & Exponential GARCH (arm A4) \\
+GARCH & Generalised autoregressive conditional heteroskedasticity (arm A3) \\
+GPU & Graphics processing unit; training cost is reported in GPU-hours \\
+HAC & Heteroskedasticity- and autocorrelation-consistent, the variance estimator the DM test uses \\
+HAR & Heterogeneous autoregressive \\
+HAR-RV & The heterogeneous autoregressive model of realised volatility (arm A2) \\
+HARQ & HAR corrected for measurement error in the realised-variance regressor (arm A6, beside SHAR) \\
+HAR-X & HAR augmented with the point-in-time log VIX (arm A7) \\
+LLM & Large language model \\
+MAEC & The published earnings-call corpus used as an external portability panel \\
+MCS & Model confidence set \\
+MD\&A & Management's discussion and analysis, the narrative results section of a 10-K or 10-Q \\
+MDE & Minimum detectable effect: the smallest relative QLIKE improvement a cell's test would detect with 80 per cent power \\
+MLP & Multilayer perceptron \\
+PERMNO & CRSP's permanent security identifier, stable across ticker changes and renames \\
+QLIKE & The quasi-likelihood loss, $y/f - \ln(y/f) - 1$ for proxy $y$ and forecast $f$ \\
+RV & Realised volatility \\
+SEC & United States Securities and Exchange Commission \\
+SHAR & Realised-semivariance HAR (arm A6) \\
+SPA & Superior predictive ability, Hansen's joint test \\
+TF--IDF & Term frequency--inverse document frequency, a word-weighting scheme that discounts ubiquitous words \\
+VIX & The market's option-implied volatility index \\
+WRDS & Wharton Research Data Services \\
+\bottomrule
+\end{tabular}\par
+}
+
+\vspace{3mm}
+\noindent\textbf{Notation.}
+\par\nobreak
+\vspace{1mm}
+% src: chapters/03_datasets_and_experimental_design.tex, Eq. eq:data-rv and Eq. eq:m1 with the prose that defines their terms
+{\small\singlespacing
+\noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.13\textwidth}>{\raggedright\arraybackslash}p{0.83\textwidth}@{}}
+\toprule
+$h$ & Forecast horizon in trading days, $h \in \{5, 10, 20\}$ (one week, two weeks, one month) \\
+$\mathrm{RV}_{i,d,h}$ & Forward realised volatility for firm $i$ at effective trading day $d$ over horizon $h$, Equation~\eqref{eq:data-rv} \\
+$f_{\text{price}}$ & The HAR-RV forecast entering the combination, Equation~\eqref{eq:m1} \\
+$f_{\text{text}}$ & The text arm's forecast entering the combination \\
+$f_R$ & The reference forecast: the recalibrated HAR, Equation~\eqref{eq:m1} without the text term \\
+$f_U$ & The augmented forecast: the same equation with the text term \\
+$a, b, g$ & The combination weights, fitted on the validation years alone and frozen before the test years are touched \\
+\bottomrule
+\end{tabular}\par
+}
+
+\vspace{3mm}
+\noindent\textbf{The report's vocabulary.}
+\par\nobreak
+\vspace{1mm}
+% src: chapters/04_results.tex Table tab:res-basis; chapters/03_datasets_and_experimental_design.tex sec:design-ladder and sec:design-inference
+{\small\singlespacing
+\noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.13\textwidth}>{\raggedright\arraybackslash}p{0.83\textwidth}@{}}
+\toprule
+arm & A named experimental or audit unit, registered under a version-control tag before it ran and then either admitted to the evidence base or retired at a stated gate (Section~\ref{app:external:process}). Most arms are a row of the model matrix; the anonymisation, swap and probe arms are not. \\
+basis point & One hundredth of one per cent, the unit the performance fee is quoted in. \\
+basis & The primary basis of Table~\ref{tab:res-basis}: seed-ensemble forecasts, volatility-unit QLIKE for combination cells, validation-frozen weights, and the two denominators below. \\
+merged-grid & The rows every rung of the ladder shares, so that a cell's increments over different references are compared on one sample. \\
+off-basis & A number computed under some other convention. Each is tagged inline with the departure it makes: single-seed, observation-level, variance-unit, merged-grid, two-way clustered or deployable. \\
+channel & The disclosure stream a panel is built from: long-form (10-K and 10-Q), event-driven (8-K), or the two combined. \\
+cell & One challenger crossed with one horizon on one channel, the unit of the 69-cell combination grid. \\
+denominator & The population a count is taken out of. Two are fixed in Section~\ref{sec:design-ladder} and recur throughout: the 69-cell combination grid, and the 180 standalone comparisons. \\
+cascade & The reference ladder run end to end on one panel, each rung scoring the augmented forecast against that rung's own, stronger reference rather than against the rung below, so the rung counts are independent re-scorings and not a series. Used of the second-domain panels and of the appendix re-runs, where the ladder is applied rather than defined. \\
+rung & One complete re-run of the 69-cell grid against a stronger reference. The four rungs are the recalibrated HAR, the firm-identity-augmented reference, the maximal price pool, and the full conjunction of all three, as Section~\ref{sec:design-ladder} defines them; the cell-by-cell figure of Chapter~\ref{ch:results} draws a fifth column, the pool-and-identity conjunction, between the third and the fourth. \\
+gate & A pre-declared pass/fail condition a run or a result must clear before it counts: convergence gates on training curves, reproduction gates on committed statistics, and the placebo gate on every credited cell. \\
+genuine & A cell is declared genuine only if its clustered DM is negative, its Holm-adjusted $p < .05$, and its label-shuffle placebo lies inside $|\mathrm{DM}| < 2$. \\
+\bottomrule
+\end{tabular}\par
+}

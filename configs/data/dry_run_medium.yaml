@@ -1,0 +1,57 @@
+# Medium dry-run before full SP500Vol-Bench ingestion.
+# Covers more tickers and multiple years while still fitting on a laptop.
+
+defaults:
+  - _self_
+
+name: dry_run_medium
+description: "25 large liquid S&P 500 firms x 2021-2023 for ingestion robustness checks."
+
+universe:
+  source: explicit
+  tickers:
+    - AAPL
+    - MSFT
+    - NVDA
+    - AMZN
+    - GOOGL
+    - META
+    - GOOG
+    - TSLA
+    - AVGO
+    - ADBE
+    - CSCO
+    - INTC
+    - AMD
+    - COST
+    - PEP
+    - CMCSA
+    - NFLX
+    - QCOM
+    - TMUS
+    - AMGN
+    - TXN
+    - INTU
+    - ISRG
+    - BKNG
+    - SBUX
+
+date_range:
+  start: "2021-01-01"
+  end: "2023-12-31"
+
+forms:
+  - 10-K
+  - 10-Q
+  - 8-K
+
+edgar:
+  cache_root: ./data/raw
+  max_concurrency: 4
+  rate_limit_per_sec: 6
+
+market:
+  source: crsp
+  cache_root: ./data/market
+  crsp_store: ./data/market/crsp/daily_returns.parquet      # OHLCV (split-adjusted DlyClose)
+  returns_store: ./data/market/crsp/market_returns.parquet  # log1p(DlyRet) total return

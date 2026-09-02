@@ -1,0 +1,20 @@
+{
+  "clip_range": [
+    0.03,
+    3.0
+  ],
+  "llm": "models/Yi-1.5-34B-Chat",
+  "model_id": "C6_llmtext_yi34",
+  "note": "Generative-LLM realised-vol forecaster (E1). Zero-shot prompting, one JSON forecast per filing covering h=5/10/20. VAL+TEST only (no training; M1 combiner needs val+test only). Text-only prompt (C-block comparable).",
+  "on_missing": "rv22",
+  "prompt_cap_tokens": 6000,
+  "stats": {
+    "clipped_rate": 0.0033,
+    "clipped_rows": 118,
+    "n_filings": 11907,
+    "n_rows": 35635,
+    "parse_fail_rate": 0.0,
+    "parse_fail_rows": 0
+  },
+  "variant": "c6_text"
+}

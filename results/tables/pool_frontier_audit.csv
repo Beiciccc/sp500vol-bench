@@ -1,0 +1,25 @@
+disc,h,pool,n_members,qlike_test,max_abs_weight,weights,dm_vs_pool5,p_vs_pool5,better_than_pool5
+long_form,5,pool5 (paper),5,0.11744442357261445,0.47328234142293873,A2_har_rv=+0.38;A6_shar=+0.47;A3_garch=-0.07;A4_egarch=+0.27;A5_arima=+0.02,,,
+long_form,5,pool6 +HARQ,6,0.11817264845618684,0.6500487441727343,A2_har_rv=-0.25;A6_shar=+0.47;A3_garch=-0.07;A4_egarch=+0.25;A5_arima=+0.01;A6_harq=+0.65,-0.1636869475144699,0.8700194064430077,False
+long_form,5,pool6 +HARX,6,0.11252571766347186,1.0041226574175988,A2_har_rv=-0.53;A6_shar=+0.18;A3_garch=-0.01;A4_egarch=+0.32;A5_arima=+0.01;A7_harx_vix=+1.00,-1.3548562409199494,0.17585018043833678,False
+long_form,5,pool7 (all),7,0.1141740990403189,1.2049623826827245,A2_har_rv=-1.20;A6_shar=+0.18;A3_garch=-0.01;A4_egarch=+0.31;A5_arima=-0.01;A6_harq=+0.69;A7_harx_vix=+1.01,-0.9783888754955683,0.32818115944135023,False
+long_form,10,pool5 (paper),5,0.0856353741087057,1.0183209050590882,A2_har_rv=+0.24;A6_shar=+1.02;A3_garch=-0.04;A4_egarch=+0.18;A5_arima=-0.19,,,
+long_form,10,pool6 +HARQ,6,0.08652202438455418,1.022721514762063,A2_har_rv=-0.50;A6_shar=+1.02;A3_garch=-0.04;A4_egarch=+0.16;A5_arima=-0.20;A6_harq=+0.74,0.162809683888412,0.8707112798008256,False
+long_form,10,pool6 +HARX,6,0.0768792199744833,1.046900249578825,A2_har_rv=-0.81;A6_shar=+0.76;A3_garch=+0.01;A4_egarch=+0.23;A5_arima=-0.16;A7_harx_vix=+1.05,-3.1711463168836485,0.0015789546653451445,True
+long_form,10,pool7 (all),7,0.07846123105053583,1.5732119166515801,A2_har_rv=-1.57;A6_shar=+0.76;A3_garch=+0.01;A4_egarch=+0.22;A5_arima=-0.17;A6_harq=+0.77;A7_harx_vix=+1.05,-2.567219396354935,0.010440760550166291,True
+long_form,20,pool5 (paper),5,0.07305092570285074,1.652143031093454,A2_har_rv=-0.48;A6_shar=+1.65;A3_garch=+0.06;A4_egarch=-0.05;A5_arima=-0.13,,,
+long_form,20,pool6 +HARQ,6,0.07353226268854528,1.6590437467579475,A2_har_rv=-1.25;A6_shar=+1.66;A3_garch=+0.06;A4_egarch=-0.07;A5_arima=-0.12;A6_harq=+0.76,-0.3946589856777024,0.6932047222397267,False
+long_form,20,pool6 +HARX,6,0.07249493820722484,1.640904259439036,A2_har_rv=-0.52;A6_shar=+1.64;A3_garch=+0.06;A4_egarch=-0.05;A5_arima=-0.13;A7_harx_vix=+0.04,-5.775615665920594,1.1155260703266116e-08,True
+long_form,20,pool7 (all),7,0.07294961183222566,1.6468925618912298,A2_har_rv=-1.29;A6_shar=+1.65;A3_garch=+0.06;A4_egarch=-0.07;A5_arima=-0.12;A6_harq=+0.76;A7_harx_vix=+0.05,-1.3289184870156894,0.1842716047667792,False
+event_driven,5,pool5 (paper),5,0.12326885849386289,1.2833977121137303,A2_har_rv=-0.28;A6_shar=+1.28;A3_garch=+0.27;A4_egarch=+0.07;A5_arima=-0.16,,,
+event_driven,5,pool6 +HARQ,6,0.12297676862877206,1.284773367865371,A2_har_rv=-0.54;A6_shar=+1.28;A3_garch=+0.27;A4_egarch=+0.07;A5_arima=-0.16;A6_harq=+0.25,-7.3596084201172465,3.85706739751083e-13,True
+event_driven,5,pool6 +HARX,6,0.12261576224883278,1.278350584099791,A2_har_rv=-1.28;A6_shar=+0.99;A3_garch=+0.22;A4_egarch=+0.17;A5_arima=-0.13;A7_harx_vix=+1.11,-1.0613124109661105,0.28880548312954907,False
+event_driven,5,pool7 (all),7,0.12239616853935492,1.4682140026147357,A2_har_rv=-1.47;A6_shar=+1.00;A3_garch=+0.22;A4_egarch=+0.17;A5_arima=-0.12;A6_harq=+0.19;A7_harx_vix=+1.10,-1.300557373236146,0.19371114308328918,False
+event_driven,10,pool5 (paper),5,0.08687148408001943,1.6516130262311528,A2_har_rv=-0.49;A6_shar=+1.65;A3_garch=+0.27;A4_egarch=+0.05;A5_arima=-0.27,,,
+event_driven,10,pool6 +HARQ,6,0.08658272966814076,1.653912203141438,A2_har_rv=-0.76;A6_shar=+1.65;A3_garch=+0.27;A4_egarch=+0.05;A5_arima=-0.26;A6_harq=+0.25,-8.15853250267133,1.022203473042967e-15,True
+event_driven,10,pool6 +HARX,6,0.08446694067620902,1.3877374361013661,A2_har_rv=-1.39;A6_shar=+1.39;A3_garch=+0.23;A4_egarch=+0.13;A5_arima=-0.22;A7_harx_vix=+0.99,-2.574271046250053,0.010189533342633323,True
+event_driven,10,pool7 (all),7,0.08425417934886423,1.601837761026843,A2_har_rv=-1.60;A6_shar=+1.39;A3_garch=+0.23;A4_egarch=+0.13;A5_arima=-0.21;A6_harq=+0.21;A7_harx_vix=+0.98,-2.869646014587548,0.004196734489391064,True
+event_driven,20,pool5 (paper),5,0.0633555671133328,1.8209495763803984,A2_har_rv=-0.67;A6_shar=+1.82;A3_garch=+0.21;A4_egarch=+0.07;A5_arima=-0.29,,,
+event_driven,20,pool6 +HARQ,6,0.06308743323249154,1.816236156316729,A2_har_rv=-0.92;A6_shar=+1.82;A3_garch=+0.20;A4_egarch=+0.06;A5_arima=-0.27;A6_harq=+0.24,-8.083205611590378,1.848397133814744e-15,True
+event_driven,20,pool6 +HARX,6,0.06323059259439066,1.8134033921387718,A2_har_rv=-0.69;A6_shar=+1.81;A3_garch=+0.20;A4_egarch=+0.07;A5_arima=-0.28;A7_harx_vix=+0.03,-4.68429144846867,3.2054222133335466e-06,True
+event_driven,20,pool7 (all),7,0.06302908169731901,1.8126914312203806,A2_har_rv=-0.93;A6_shar=+1.81;A3_garch=+0.20;A4_egarch=+0.06;A5_arima=-0.27;A6_harq=+0.24;A7_harx_vix=+0.01,-8.951039976528275,1.7312464109715839e-18,True

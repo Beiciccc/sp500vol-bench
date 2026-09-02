@@ -1,0 +1,55 @@
+\section{Models}
+\label{sec:methods}
+
+Every model maps a filing (plus price context for fusion) to forward log realised volatility. Table~\ref{tab:models} organises the spectrum in four blocks. Price baselines (A), classical text (B), neural/LLM text (C), fusion (D).
+
+\paragraph{Price frontier (A), classical text (B).}
+A2 HAR-RV \citep{corsi2009har} is the \emph{primary baseline} for all significance tests; A6 realised-semivariance HAR (SHAR, \citealp{pattonsheppard2015shar}) and A7 HAR-X with point-in-time log VIX \citep{blair2001forecasting} broaden the price side. Block~B feeds full text to lexical and dictionary vectorisers \citep{kogan2009predicting,loughran2011liability}, controlling for whether any neural effect is merely surface lexical statistics.
+
+\paragraph{Encoders and long-document strategies (C1--C4, S1--S5).}
+Because every long-form filing exceeds 4{,}096 tokens, how a fixed-context encoder meets the document is a first-class axis (S1--S5; Table~\ref{tab:models}). The S1--S4 sweep runs on FinBERT \citep{araci2019finbert} while C1/C3/C4 vary the encoder; C4-vs-C3 isolates long context on one lineage.
+
+\paragraph{Frozen embeddings and prompting (C5, C5x, C6).}
+C5 encodes each filing with three frozen 7--8B embedders under light ridge/MLP heads. C5x applies Qwen3-Embedding-8B to the \emph{byte-identical} curated excerpts C6 reads, so any C6-versus-C5x gap is attributable to elicitation, not curation. C6 elicits a numeric forecast from Qwen3-32B \citep{qwen3_2025} under offline vLLM \citep{kwon2023vllm}: temperature~0, JSON output, over the curated excerpts of Table~\ref{tab:models} (decoding configuration: Technical Supplement). Repeat decodes are 94--97\% exact-equal (Stress Tests). Five cross-family replications test whether any increment generalises beyond Qwen3, each screened for forecaster health before its reading counts (Stress Tests).
+
+\paragraph{Price--text fusion (D).}
+D1 concatenates price features with the FinBERT \texttt{[CLS]} embedding; D2 learns a scalar gate modulating text conditional on the price state; D3 fuses price with each frozen C5 family, D4 with the C6 forecast.
+
+\begin{table}[t]
+\centering
+{\small
+\setlength{\tabcolsep}{2pt}%
+\begin{tabular}{@{}llll@{}}
+\toprule
+ID & Model & Inputs & Text in. \\
+\midrule
+A1--A2 & Naive hist.\ vol.; HAR-RV & price & --- \\
+A3--A7 & GARCH, EGARCH, ARIMA, & price & --- \\
+ & SHAR, HAR-X (log VIX) & (+VIX) & \\
+\midrule
+B1 & Bag-of-words\,+\,ridge & text & full \\
+B2 & TF--IDF\,+\,ridge & text & full \\
+B3 & L--M dictionary, linear & text & full \\
+B4 & L--M\,+\,engineered & text & full \\
+\midrule
+C1 & BERT-base & text & S1--S2 \\
+C2 & FinBERT & text & S1--S4 \\
+C3 & RoBERTa-base & text & S1 \\
+C4 & Longformer-4096 & text & S5 \\
+C5 & Frozen LLM embed.\ ($\times$3) & text & nat. \\
+C5x & Qwen3-Emb.-8B (parity) & text & exc. \\
+C6 & Prompted Qwen3-32B & text & exc. \\
+\midrule
+D1 & Concat-MLP & price+text & S1 \\
+D2 & Gated fusion & price+text & S1 \\
+D3 & Price\,+\,C5 embedding & price+text & nat. \\
+D4 & Price\,+\,C6 forecast & price+text & exc. \\
+\bottomrule
+\end{tabular}
+}
+\caption{Model matrix. Text input: full = untruncated text; S1 truncation-512, S2 chunk-mean, S3 chunk-attention, S4 hierarchical, S5 native 4{,}096; nat.\ = embedder's native context; exc.\ = curated C6-prompt excerpts (10-K/10-Q Items 1A/7/7A, else head truncation; 8-K full text).}
+\label{tab:models}
+\end{table}
+
+\paragraph{Training and seeds.}
+Each model fits one independent submodel per horizon under squared-error loss, with one recipe fixed across every fine-tuned Block~C/D run (AdamW $8\times10^{-5}$, effective batch 128, 6\% warmup, $\le$15 epochs, validation early stopping with best-epoch restore; frozen-embedding heads: a head-only analogue), so comparability rather than per-model tuning is the design goal; the regime is overfitting (train $R^2$ far above HAR's, test negative).

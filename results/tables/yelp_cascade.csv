@@ -1,0 +1,11 @@
+tag,row,arm,reference,h,mse,delta_rel_pct,dm_p,note
+REAL,1,naive pooled-split text (random 80/20; field design),pooled mean,1,0.42586638403841715,28.43086977371873,,"identity share (entity-mean-only, zero text) = 139% of the apparent gain"
+REAL,2,chronological text-alone (log-recalibrated),recalibrated AR f_R,1,0.4924291122935632,-24.70239515852615,3.0078617048770703e-35,DM +34.88
+REAL,3,AR + text combiner f_U,recalibrated AR f_R,1,0.393518804145553,0.34558032463656846,2.5803983086508734e-06,DM -5.35; two-way p=0.0000
+REAL,4,"AR + entity-mean (identity control, zero text)",recalibrated AR f_R,1,0.43666661651130995,-10.581140727251361,3.0041777605752897e-19,DM +14.74; chrono identity share -3062% of row-3 gain
+REAL,5,AR + entity-mean + text (RESIDUAL text increment),AR + entity-mean f_Re,1,0.43507205227210755,0.3651674249664333,9.546217635923472e-17,DM -12.65; two-way p=0.0000; placebo mean DM +1.31 (mean p=0.363)
+REAL,1,naive pooled-split text (random 80/20; field design),pooled mean,3,0.2981368410003965,36.63811728662089,,"identity share (entity-mean-only, zero text) = 148% of the apparent gain"
+REAL,2,chronological text-alone (log-recalibrated),recalibrated AR f_R,3,0.3537363208125258,-35.294323716489984,2.232719238121521e-33,DM +33.35
+REAL,3,AR + text combiner f_U,recalibrated AR f_R,3,0.25918029623538386,0.8707310030796295,2.257958818277903e-07,DM -6.09; two-way p=0.0000
+REAL,4,"AR + entity-mean (identity control, zero text)",recalibrated AR f_R,3,0.2862530858241637,-9.483859529550516,2.5725741302791564e-09,DM +7.40; chrono identity share -1089% of row-3 gain
+REAL,5,AR + entity-mean + text (RESIDUAL text increment),AR + entity-mean f_Re,3,0.2845013926079615,0.6119386315640389,1.7137648019291997e-24,DM -20.54; two-way p=0.0000; placebo mean DM +0.34 (mean p=0.457)

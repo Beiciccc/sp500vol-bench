@@ -1,0 +1,4 @@
+{
+  "model_id": "B6_textchange",
+  "note": "E3 Lazy-Prices textual-change probe: Ridge on [change_score(=1-TFIDF cosine vs previous same-form filing, IDF fit on train docs only), jaccard_change(=1-bottom-k minhash Jaccard on word 5-shingles, k=256), log_len_ratio, 10-K dummy]; gap<550d; log-vol target, per-horizon ridge CV + exp retransform clipped to [0.02,5.0] (B2 conventions); no-prev docs imputed with train means (fraction=0.0474); ridge alphas={5: 100.0, 10: 100.0, 20: 100.0}; splits inherited from A2_har_rv long_form."
+}

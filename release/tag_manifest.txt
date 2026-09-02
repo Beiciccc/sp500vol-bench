@@ -1,0 +1,58 @@
+# Tag manifest for SP500Vol-Bench
+#
+# READ THIS FIRST IF YOU FOUND THIS FILE IN THE PUBLIC MIRROR.
+# The public mirror is a sanitised rebuild with a single squashed commit and
+# no tags, so none of the commits listed below resolve there. This file is a
+# record of the tagged history in the working repository, not an index into
+# the mirror. The working repository is private because its history carries
+# the author's machine paths and contact details; read access is available to
+# examiners on request, and the tags below can be checked out there.
+#
+# Regenerate with:
+#   for t in $(git tag); do printf '%-24s %-10s %-12s %s
+' "$t" \
+#     "$(git rev-parse --short $t^{commit})" \
+#     "$(git log -1 --format=%cs $t^{commit})" \
+#     "$(git for-each-ref --format='%(creatordate:short)' refs/tags/$t)"; done
+#
+# Columns: tag name, the commit it pins, that commit's date, the date the tag
+# was written. Annotation messages are deliberately omitted: this manifest
+# exists to make the pre-registration families checkable, not to republish
+# drafting notes.
+#
+# tag                      commit     commit date  tagged
+  hpo-prereg-v1.0          0ae69461   2026-07-13   2026-07-13
+  hpo-prereg-v1.1          cf284ef9   2026-07-14   2026-07-14
+  prereg-rfa-v1.0          acbcd3fa   2026-07-15   2026-07-15
+  prereg-rfa-v1.1          9c900cb8   2026-07-15   2026-07-15
+  prereg-rfa-v1.2          11132fab   2026-07-15   2026-07-15
+  hpo-pretest-v1.0         4894113e   2026-07-15   2026-07-15
+  prereg-maec-v1.0         502652f2   2026-07-15   2026-07-15
+  prereg-maec-v1.1         6d236503   2026-07-15   2026-07-15
+  prereg-maec-v1.2         6e4586d6   2026-07-15   2026-07-15
+  prereg-cd-v1.0           e495ceeb   2026-07-15   2026-07-15
+  prereg-ea-v1.0           429526b7   2026-07-15   2026-07-15
+  prereg-ea-v1.1           f9fbbbc1   2026-07-15   2026-07-15
+  prereg-ea-v1.2           f8d85931   2026-07-15   2026-07-15
+  prereg-ea-v1.3           ff2959d2   2026-07-15   2026-07-15
+  prereg-h-v1.0            3fa360b6   2026-07-16   2026-07-16
+  prereg-ea-v1.4           6013d7a3   2026-07-16   2026-07-16
+  prereg-ea-v1.5           08778e91   2026-07-16   2026-07-16
+  prereg-ea-v1.6           8650901f   2026-07-16   2026-07-16
+  prereg-rfa-v1.3          e7ff4043   2026-07-16   2026-07-16
+  prereg-ef-v1.0           c4aa2e87   2026-07-17   2026-07-17
+  prereg-kc-v1.0           8e39165f   2026-07-17   2026-07-17
+  prereg-ef-v1.1           c1cf2d31   2026-07-17   2026-07-17
+  pre-revert-R30           474804fb   2026-07-26   2026-07-26
+  pre-narrative-pass       f9bce53a   2026-07-28   2026-07-28
+  dissertation-june-draft  6907be12   2026-08-01   2026-08-01
+  manuscript-full-v1.0     a06162d6   2026-07-06   2026-08-28
+
+# 26 tags: 21 pre-registrations in eight families, one pre-test protocol
+# (hpo-pretest-v1.0) and four writing milestones.
+#
+# One rename, recorded rather than hidden: the writing milestone now called
+# manuscript-full-v1.0 was renamed on 2026-08-28 from an earlier name. The
+# commit it pins is unchanged (a06162d6, 2026-07-06), so its commit-date
+# column carries the milestone's real date while its 'tagged' column shows
+# the rename. No pre-registration tag was renamed, re-pointed or re-dated.

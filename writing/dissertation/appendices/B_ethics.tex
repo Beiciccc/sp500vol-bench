@@ -1,0 +1,75 @@
+% ============================================================================
+% Appendix B ground-up rebuild (W3, 2026-08-02). Expands Section 1.4
+% (sec:intro-ethics); must never contradict it. Every number carries a
+% same-line evidence comment per the blueprint's verification protocol.
+% June draft retired: its "seventeen overrides", "28 runs", "tens of
+% GPU-hours" and "single non-significant DM case" are all dead (dossier
+% Part 2, Appendices block).
+% ============================================================================
+\chapter{Legal, Social, Ethical and Professional Issues}
+\label{app:ethics}
+
+This appendix records the full assessment summarised in Section~\ref{sec:intro-ethics}, which it expands rather than amends. The project involves no human participants, but obligations do arise from licensed and rate-limited data sources, from reporting forecasting results where misinterpretation has financial consequences, and from the energy the model fleet consumed.
+
+\section{Human Participants and Personal Data}
+
+\textbf{The unit of analysis is the firm.} No participants were recruited, no surveys or interviews conducted, and no personal data collected or processed as research material. Every benchmark row is keyed by a security identifier, a registrant identifier and a trading day; no natural person is a unit of observation, and no statistic in this report is computed for an individual.
+
+Filings do name people (signing officers, directors, executives quoted in event announcements) because statute requires companies to publish those names. They enter the corpus as incidental tokens inside documents already public by legal obligation; the project never extracts, indexes or links them, nor makes any individual the subject of an inference. The anonymisation arm of Section~\ref{sec:res-identity} does the opposite of profiling: it masks every firm name, ticker symbol, executive name, product name and registrant identifier in all 112{,}528 event-driven documents before re-scoring the text; its treatment audit reports that all but one document carries at least one mask and 9.48 per cent of characters are masked on average. % src: results/anon/mask_stats.json (n_docs 112528, docs_with_any_mask_pct 99.99911 = 112,527 of 112,528, mean_mask_char_frac 0.09483); results/tables/anon_arm.md rounds the first of these to "100.0% with >=1 mask"
+Identifying language is a confound to be removed, never a variable of interest.
+
+The University's ethical-review procedures attach to research involving human participants, human tissue or personal data; studying corporate entities through public statutory disclosures and licensed market data engages none of them. That conclusion was reached by documented assessment at the project-scoping stage (the ethical-review screening worked through with the supervisor, and its outcome recorded), rather than by assuming that public data is self-exempting.
+
+The instrument that part of the screening was conducted under is the UK General Data Protection Regulation, read with the Data Protection Act 2018, which is what gives the term personal data its meaning here: information relating to an identified or identifiable living individual. The screening put that definition to the research material. What the project collects, stores and analyses is corporate disclosure and licensed market data, organised by firm and by trading day, so nothing in it relates to an individual as a unit of observation. The executive names that statute obliges companies to publish inside those filings were weighed at the same point rather than passed over: they stay as unextracted tokens in documents already public by legal obligation, no individual is made the subject of an inference, and the anonymisation arm masks them in the event-driven copy it re-scores. The outcome recorded was that the University's procedures for research involving personal data are not engaged. That is a screening assessment rather than a compliance determination. It rests on what the material is and on how the project handles it, not on an exemption sought or granted.
+
+\section{Data Licensing and Lawful Access}
+
+\textbf{SEC EDGAR.} The disclosure corpus was retrieved from EDGAR \cite{sec2024edgar}, a free public service whose fair-access policy requires automated clients to identify themselves and to stay within published request-rate limits, so that bulk retrieval does not degrade the service for others. The ingestion pipeline satisfies both by construction rather than by manual restraint: every request declares a user-agent naming the researcher and a contact address; the rate is throttled below the published ceiling of ten requests per second, with exponential back-off on transient errors; and every response is written to a resumable, retry-safe ledger, so no document is fetched twice. That cache later guarantees byte-identical text to every model in the study, % src: results/tables/event_driven_text_cache_validation.txt
+so courteous retrieval and reproducible measurement proved to be one engineering decision.
+
+\textbf{CRSP via WRDS.} Daily stock data, index-membership records and the CRSP/Compustat-Merged link table came from the University of Leeds subscription to Wharton Research Data Services \cite{crsp2026data}, under a licence permitting academic research use but barring redistribution of the raw data and of per-row quantities derived from it. That bar determines the shape of the release (Section~\ref{sec:data-public}; Appendix~\ref{app:external}). Withheld are the daily return series, the realised-volatility labels, the price features and the per-row model predictions. Released are the 144{,}129-filing accession index, the split definition, a datasheet, the fingerprints of all 240 production runs, and the aggregate day-clustered evidence tables behind every claim made here. % src: release/DATA_CARD.md; results/tables/config_fingerprints.md
+The withheld rows are exactly regenerable from the released scripts by any licence holder. A licence-free variant rebuilds prices from public sources at 72.6, 89.3 and 95.2 per cent coverage of training, validation and test rows; % src: results/tables/public_variant_cascade.md
+the attribution wording CRSP and WRDS require is carried in the data card.
+Two files that an earlier staging of this release did carry, the membership
+intervals and the point-in-time link windows, are withheld. They are per-row
+CRSP-derived records: they hold CRSP PERMNOs and CRSP dates, and the link windows
+exist precisely to append a CRSP identifier to a series that is not
+CRSP's. % src: crsp_restricted/membership_intervals.csv (permno, CRSP dates, source=crsp_wrds_2010_2025); crsp_restricted/cik_links_pit.csv (permno, cik, link windows)
+Four clauses reach them. The grant is for internal use, which expressly excludes
+further dissemination of the data in electronic form; the subscriber may not
+publish or release the data files or the data contained in them outside the
+subscribing institution; no derivation from them may be disseminated in
+computer-readable form; and CRSP identifiers may not be appended to any other
+data series, with any product linking to CRSP data through them requiring a
+separate redistribution agreement. The platform's terms of use bar creating
+derivative works of the proprietary material, which is defined to include data,
+without advance written consent, and carry no exception for identifiers, for
+extracts or for research replication. The qualifier those clauses attach --- that
+the subscriber's own statement of use may provide otherwise --- does not reach
+this case, because redistribution is routed to a separate agreement rather than to
+that statement. Withholding costs the study nothing: the ingestion script rebuilds
+both files exactly from a CRSP subscription, on the same footing as the withheld
+returns and labels, and both remain available to an examiner inside the
+institution the subscription covers. % src: CRSP Standard Data Subscription Agreement clauses 1.2, 1.3, 2.1 and 5.3; WRDS Terms of Use section 2; crsp_restricted/README.md; scripts/ingest_wrds.py
+What cannot be shared is made rebuildable, and its coverage cost is priced rather
+than concealed.
+
+\textbf{External panels.} The portability panels of Section~\ref{sec:data-portability} are public corpora used on their own terms: the Yelp Open Dataset \cite{yelp2024dataset}, in the snapshot taken on 28 July 2026, under its academic licence, which permits non-commercial academic research and bars redistribution, so the project releases the porting scripts and aggregate results rather than the reviews. The MAEC earnings-call corpus \cite{maec2020} is used as published, likewise not redistributed.
+
+\section{Social and Professional Issues}
+
+Financial forecasting research carries a specific social hazard: overstated predictive claims mislead readers into believing a model has economic value it lacks, and lend unearned authority to fragile systems. Every model here is a research artefact built to answer a scientific question --- not a trading system, not investment advice --- and the report says so plainly. The guard against misreading is the report's own arithmetic: no challenger beats the price baseline in any of the 180 standalone comparisons under squared error or volatility-unit QLIKE. % src: results/tables/dm_pairwise_clustered.md (squared error, 0 of 180); results/tables/variance_unit_standalone180.csv (better_qlike_vol_holm 0 of 180; under variance units 7 favour a challenger, every one a GARCH-family price arm)
+The residual that does survive the identity-aware reference is reported beside its economic pricing (no significant portfolio gain in any of that arm's six cells, one of eighteen grid-wide). % src: results/tables/firm_identity_ensemble.md; results/tables/portfolio_econ.csv
+A small statistical residual therefore cannot be mistaken for a tradable edge.
+
+A second obligation follows from publication bias: a literature tilted towards positive findings rewards searching for a favourable specification and reporting only that. The project was scoped so that a rigorous, reproducible answer counts as success whatever its sign, and the resulting bounded, largely null verdict is reported without softening. No arm was dropped because its results were unwelcome; arms that failed their reproduction gates carry written retirement records rather than disappearing silently; test families were fixed before the statistics were computed; and every null ships the minimum effect it could have detected, so that absence of evidence is never presented as evidence of absence. The reproducibility duty is discharged by the machinery of Section~\ref{sec:design-engineering}: 240 fingerprinted runs (233 distinct digests) with a released re-hashing script, 186 automated tests, and generators that abort when a source table drifts. % src: results/tables/config_fingerprints.md; writing/dissertation/supporting/REPRODUCIBILITY.md
+
+\section{Environmental Cost}
+
+Training and prompting large models consumes energy, and transparent reporting of compute is part of responsible practice. The 144 fixed-recipe production runs of the fine-tuned, frozen-embedding and fusion fleet --- sixteen arms at three seeds by three disclosure channels --- consumed 590.4 GPU-hours on NVIDIA A100-SXM4-40GB hardware (566.7 for Block~C and 23.6 for Block~D), of which the single long-context arm accounts for 254.7, some 43 per cent of that total. % src: results/tables/cost_accuracy.md (basis note: "C/D: 3 seeds x 3 disclosures = 9 runs"; sixteen C/D arm rows)
+That figure is a floor rather than the project's whole GPU consumption. The hyper-parameter search ran 63 further trials whose summaries record no runtime, and the anonymisation regenerations retrained on GPU outside the cost record as well; neither is convertible into hours from what was kept. % src: results/hpo/{T1a,T1c,T3d2lf,T4} (63 distinct trial directories, no timing field in summary.json); results/tables/anon_arm.md (c2 GPU retraining under the identical recipe)
+That total excludes prompted large-language-model inference, which has no row in the cost record and is reported as excluded rather than silently absorbed. % src: TECHNICAL_SUPPLEMENT.md compute-scope note (cost_accuracy.csv carries no C6/C5x/D4 row)
+No facility-level energy or carbon measurement was taken, so no kilowatt-hour or emissions figure is claimed: the GPU-hour total is what the project recorded. Inventing a conversion would violate the evidence discipline the report observes elsewhere.
+
+Several decisions reduced avoidable computation: one-off parsing into a shared text cache every model reads, cached EDGAR responses, validation early stopping with best-epoch restore in place of a fixed epoch budget, and a fingerprinted run store that never repeats a completed run merely to recover a number. One decision deliberately increases cost: three replicate seeds for every fine-tuned arm, roughly tripling the fleet's energy. That is an explicit trade of energy for reliability: 37 of 144 single-seed cells flip the sign of their test statistic across seeds, % src: frozen 05_protocol.tex; results/tables/seed_aggregate.md
+so the cheaper campaign would have been the unreliable one. Reporting the total is itself part of the obligation, since it states the cost of reproduction in advance.

@@ -1,0 +1,20 @@
+{
+  "clip_range": [
+    0.03,
+    3.0
+  ],
+  "llm": "models/Qwen3-32B",
+  "model_id": "C6_dateonly",
+  "note": "Generative-LLM realised-vol forecaster (E1). Zero-shot prompting, one JSON forecast per filing covering h=5/10/20. VAL+TEST only (no training; M1 combiner needs val+test only). Text + HAR lags in prompt (D-block comparable).",
+  "on_missing": "rv22",
+  "prompt_cap_tokens": 6000,
+  "stats": {
+    "clipped_rate": 0.0,
+    "clipped_rows": 0,
+    "n_filings": 51229,
+    "n_rows": 153042,
+    "parse_fail_rate": 0.0,
+    "parse_fail_rows": 0
+  },
+  "variant": "c6_dateonly"
+}

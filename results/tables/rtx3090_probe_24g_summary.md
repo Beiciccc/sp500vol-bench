@@ -1,0 +1,14 @@
+# RTX 3090 24G Probe Summary
+
+Selection rule: successful batch with true `torch.cuda.max_memory_allocated()` closest to 22GB; if next integer batch OOMs, the lower safe batch is the production-safe boundary.
+
+| model | safe_batch@24G | torch_peak_GB | nvidia_smi_peak_GB | 3090_step_s | final_steps | first_oom | note |
+|---|---:|---:|---:|---:|---:|---:|---|
+| C1_bert_s1 | 72 | 22.223 | 22.831 | 1.251254 | 300 |  |  |
+| C2_finbert_s1 | 72 | 22.223 | 22.831 | 1.25313 | 300 |  |  |
+| C3_roberta_s1 | 72 | 22.391 | 22.995 | 1.199814 | 30 |  |  |
+| C2_finbert_s2 | 4 | 19.802 | 20.663 | 0.903121 | 30 | 5 | next tested batch 5 OOM; chunk_count=16 long 10-K |
+| C2_finbert_s3 | 4 | 19.804 | 20.665 | 0.903772 | 30 | 5 | next tested batch 5 OOM; chunk_count=16 long 10-K |
+| C2_finbert_s4 | 4 | 19.909 | 20.78 | 0.905313 | 30 | 5 | next tested batch 5 OOM; chunk_count=16 long 10-K |
+| D1_concat_mlp | 72 | 22.223 | 22.833 | 1.268134 | 30 |  |  |
+| D2_gated_fusion | 72 | 22.223 | 22.833 | 1.26887 | 30 |  |  |

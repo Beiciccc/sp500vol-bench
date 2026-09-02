@@ -1,0 +1,85 @@
+\pagenumbering{roman}
+\frontcover
+% The titlepage environment resets the page counter at its close, so without
+% this the title page and the page after it are both numbered i and hyperref
+% emits a duplicate page.i destination.
+\setcounter{page}{2}
+\clearpage
+\pdfbookmark[0]{Submitted Items and Declaration}{fm:declaration}
+\noindent The candidate confirms that the following have been submitted.\\[4mm]
+\begin{center}
+\begin{tabular}{|p{52mm}|p{38mm}|p{52mm}|}
+\hline
+\textbf{Items} & \textbf{Format} & \textbf{Recipient(s) and Date} \\\hline
+Deliverable 1 (SP500Vol-Bench: accession index, split definition, datasheet, licence-free variant) & Data (repository) & Supervisor, Assessor (31/08/26) \\\hline
+Deliverable 2 (audit protocol, registered analysis records, aggregate evidence tables, power calibration) & Data (repository)\newline / Report & Supervisor, Assessor (31/08/26) \\\hline
+Deliverable 3 (run-fingerprint chain for all 240 production runs, with verification script) & Code (repository) & Supervisor, Assessor (31/08/26) \\\hline
+Deliverable 4 (code repository: regeneration pipeline and test suite) & Code (repository) & Supervisor, Assessor (31/08/26) \\\hline
+Deliverable 5 (this dissertation) & Report & SSO (31/08/26) \\\hline
+\end{tabular}
+\end{center}
+\vspace{3mm}
+% The Format column says "repository"; without the address that is a
+% direction with no destination, and this page is where the delivery is
+% asserted. Appendix A carried the only other copy of the URL, 68 printed
+% pages away.
+\noindent Deliverables 1 to 4 are shared through the public repository at
+\url{https://github.com/Beiciccc/sp500vol-bench}, inventoried in
+Appendix~\ref{app:external}.
+\vspace{5mm}
+
+\noindent Type of project: \textbf{Empirical Investigation}\\[8mm]
+\noindent The candidate confirms that the work submitted is their own and the appropriate credit has been given where reference has been made to the work of others.\\[4mm]
+\noindent I understand that failure to attribute material which is obtained from another source may be considered as plagiarism.\\[10mm]
+% Signature.  Drop a transparent PNG at figures/signature.png and it is set on
+% the rule; with no such file the blank rule is typeset exactly as before, so
+% the build never depends on a file that is not in the repository.  It is put
+% here rather than annotated onto main.pdf because every gated rebuild
+% regenerates that file and would silently discard an annotation.
+\begin{flushright}
+(Signature of Student)
+\IfFileExists{figures/signature.png}{%
+  % The image is cropped to the ink, and the baseline of "Kun Zhang" sits at
+  % 48 per cent of its height -- the rest is the descender of the g.  Dropping
+  % it by 52 per cent of 22.1mm therefore lands that baseline on the rule and
+  % lets the descender hang below it, as a signature on a line does.  Zero
+  % height and depth so the front matter's layout does not move.
+  \makebox[50mm][c]{\raisebox{-11.5mm}[0pt][0pt]{%
+    \includegraphics[width=42mm,keepaspectratio]{figures/signature.png}}}%
+  \hspace*{-50mm}\rule{50mm}{1pt}%
+}{%
+  \rule{50mm}{1pt}%
+}
+\end{flushright}
+\vfill
+\begin{center}\textcopyright~\session~The University of Leeds and~\fullname\end{center}
+\clearpage
+\begin{dissertationsummary}
+\pdfbookmark[0]{Summary}{fm:summary}
+\input{summary.tex}
+\end{dissertationsummary}
+\clearpage
+\pdfbookmark[0]{Acknowledgements}{fm:acknowledgements}
+\begin{center}\textbf{Acknowledgements}\end{center}
+\input{acknowledge.tex}
+\clearpage
+\pdfbookmark[0]{Contents}{fm:contents}
+\tableofcontents
+\clearpage
+\pdfbookmark[0]{List of Tables}{fm:listoftables}
+\listoftables
+\clearpage
+\pdfbookmark[0]{List of Figures}{fm:listoffigures}
+\listoffigures
+\clearpage
+% Nomenclature. The official template (Prepare/template-2/prelude.tex) runs
+% declaration, Summary, Acknowledgements, contents, optional lists, arabic; it
+% neither prescribes nor forbids a nomenclature list, so this sits after the
+% List of Figures. It is roman-numbered front matter and costs no main-text
+% page. Like the Summary, the Acknowledgements and the two lists it takes a
+% \pdfbookmark and no table-of-contents entry, and it is not a numbered table,
+% so it stays out of the List of Tables.
+\pdfbookmark[0]{Nomenclature}{fm:nomenclature}
+\input{nomenclature.tex}
+\clearpage
+\pagenumbering{arabic}

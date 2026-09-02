@@ -1,0 +1,4 @@
+{
+  "model_id": "C5x_qwen3exc",
+  "note": "P1 control: Qwen3-Embedding-8B on the exact C6 curated excerpts (1A/7/7A else head), last-token pool + L2, ridge head (log target + Duan smearing). Isolates input-curation from the prompting mechanism."
+}

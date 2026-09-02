@@ -1,0 +1,38 @@
+\section{SP500Vol-Bench}
+\label{sec:dataset}
+
+\textbf{SP500Vol-Bench} is a survivorship-free, point-in-time benchmark aligning SEC disclosures to forward realised volatility for the S\&P~500 over 2010--2025. No information available after a filing's publication influences its features, labels, splits, or entity mappings.
+
+\paragraph{Firm universe.}
+The universe is the point-in-time S\&P~500 membership from the CRSP index-constituents file (WRDS) \citep{crsp2026data}: 914 membership intervals, 832 PERMNOs, 884 tickers. A static present-day list would introduce \emph{survivorship bias}, which bites hardest here, exiting firms being disproportionately high-volatility; the CRSP file retains delisted members' full history.
+
+\paragraph{Point-in-time entity linking.}
+CRSP identifies securities by PERMNO; EDGAR identifies filers by CIK, and the mapping is \emph{time-varying}: after a merger a PERMNO continues under a new CIK. We resolve PERMNO$\to$CIK through the CRSP/Compustat-Merged (CCM) link table across each spell's valid windows. CCM alone is insufficient: its company header reflects the \emph{current} registrant, so it can point an acquired firm's historical PERMNO at the successor's CIK, under which the original firm filed nothing, silently dropping the distressed and reorganised firms and re-introducing survivorship bias. A manual audit produced 31 successor-CIK link-window overrides covering 23 firms (verified against live EDGAR), recovering $\approx$2{,}000 filings a naive CCM join would lose. After overrides, all 832 resolve.
+
+\paragraph{Corpus, labels, and alignment.}
+Using the resolved CIK we parse \textbf{144{,}443 filings} from EDGAR \citep{sec2024edgar}; 144{,}129 align to the benchmark, giving 431{,}245 filing-by-horizon rows (below $3\times$: the longest horizons truncate at the sample end), of which 427{,}429 survive feature--label joins into the modelled panel (Table~\ref{tab:dataset}). We keep the two disclosure channels separate throughout, so long-document modelling is never conflated with disclosure type: \emph{Long-form} (10-K\,+\,10-Q), where every filing exceeds a 4{,}096-token context, and \emph{event-driven} (8-K), where truncation is essentially lossless (Table~\ref{tab:dataset}). The target is annualised forward realised volatility over $h\in\{5,10,20\}$ trading days ($\ln\mathrm{RV}$). Realised-volatility labels use daily close-to-close log returns; QLIKE rankings are robust to the coarser proxy \citep{patton2011proxies}, every price baseline shares it, and a range-based rerun (Parkinson primary; text predictions frozen) \emph{strengthens} the price side: HAR rank-1 among single references in 3 of 6 panels (Results). Each filing maps to its \emph{effective trading day}: acceptances at or after the 16:00\,ET close, or on non-trading days, roll to the next session, keeping the overnight reaction out of the label window. Backward-looking price features end at the last close \emph{strictly before} the filing; an automated no-look-ahead audit reports zero violations, including the 23 override firms.
+
+\paragraph{Reproducibility.} The licence-safe core, the regeneration pipeline and the full release manifest ship as supplementary material and in a public repository; only CRSP-derived rows are withheld under licence. Every evidence table reproduces its committed anchors at machine precision, and arms that could not reproduce were retired and are reported (Limitations).
+
+\begin{table}[t]
+\centering
+{\small
+\begin{tabular}{lrr}
+\toprule
+ & Long-form & Event-driven \\
+ & (10-K/10-Q) & (8-K) \\
+\midrule
+Filings & 31{,}601 & 112{,}528 \\
+Modelled rows (after joins) & 94{,}237 & 333{,}192 \\
+\quad train (2010--2019) & 58{,}602 & 215{,}785 \\
+\quad val (2020--2021) & 11{,}849 & 42{,}565 \\
+\quad test (2022--2025) & 23{,}786 & 74{,}842 \\
+\midrule
+Median length & 29{,}278 & $<$512 \\
+Share $>$ 4{,}096 tok. & 100\% & --- \\
+\bottomrule
+\end{tabular}
+}
+\caption{SP500Vol-Bench summary. Modelled rows: filing-by-horizon observations after feature--label joins \mbox{($h\in\{5,10,20\}$)}; splits chronological by effective trading day, day-inclusive; lengths in wordpiece tokens.}
+\label{tab:dataset}
+\end{table}

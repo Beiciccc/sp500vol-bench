@@ -1,0 +1,959 @@
+\chapter{Configurations and Run Commands}
+\label{app:hyperparams}
+
+
+% Figure and table captions in this appendix are set at footnotesize, single
+% spaced, as they were when these figures lived in their own appendix; moving
+% them must not change how they print.
+\captionsetup{font={footnotesize,singlespacing}}
+Chapter~\ref{ch:data} states the experimental design in prose; this appendix gives
+the fields, so that a reader can reconstruct any arm rather than take the design
+on trust. Every value below carries a source comment naming where it was
+read. Most name the version-controlled configuration layer
+(\texttt{configs/base.yaml}, \texttt{configs/models/*.yaml},
+\texttt{configs/hpo\_arm.yaml}) or the released per-run \texttt{config.json}
+preimages listed in Appendix~\ref{app:external}; the rest name the run store,
+the evidence tables, or the code that fixes a semantic no configuration file
+records. All can be checked mechanically against the repository. % src: the 88 source comments in this file, by first path: 28 results/tables/, 16 configs/, 14 results/runs/, 8 scripts/experiments/, 8 release/raw_generations/, 5 release/run_configs/, 9 elsewhere (src/, scripts/analysis/, results/hpo/, release/ documents)
+
+\FloatBarrier
+\section{Shared Defaults and the One Training Recipe}
+\label{app:hyperparams:recipe}
+
+All arms inherit \texttt{configs/base.yaml}: the pinned chronological splits
+(train 2010--2019, validation 2020--2021, test 2022--2025, assigned by effective
+trading day and day-inclusive on both boundaries), horizons $h \in \{5,10,20\}$
+with metrics computed per horizon, the three disclosure subsets, a log
+realised-volatility target, and default seed 2026.
+
+One recipe, fixed before the production campaign, governs every fine-tuned
+Block~C/D run: AdamW; learning rate $8\times10^{-5}$ (the pilot-era
+$1\times10^{-5}$ linearly scaled to the unified effective batch); weight decay
+0.01; effective batch \textbf{128}, reached physically or by gradient
+accumulation; linear warmup over the first 6\% of steps then decay; bfloat16
+mixed precision; at most 15 epochs with validation early stopping (patience 3,
+minimum delta 0) and best-epoch restore; squared-error loss on the log target;
+and a regression head of one hidden layer of width 128 with dropout 0.1. % src: configs/models/C*.yaml,D1,D2 training block; TECHNICAL_SUPPLEMENT.md Table S8(a)
+Document text is pre-tokenised once and cached across horizons, epochs and seeds.
+
+Frozen-embedding arms C5 and D3 use the head-only analogue: encoder weights
+are never updated, each filing is encoded once and its embedding cached and
+reused across seeds, horizons, splits and the C5/D3 pair, and only the head
+trains. It runs at learning rate $1\times10^{-4}$, batch 512, epoch cap 40,
+with the same warmup, early-stopping, precision and loss settings. C5x is the
+parity arm and
+trains nothing at all: a frozen encoder feeding a closed-form ridge head, so its
+released configuration carries no training block and no training fingerprint. % src: configs/models/C5_*.yaml, D3_*.yaml
+The larger cap is affordable precisely because the encoder is frozen.
+
+That this is genuinely one recipe is machine-checkable rather than asserted: of
+the 240 fingerprinted production runs, the 178 that carry a training block
+collapse to 18 distinct training digests, clustered by model family, one of which
+covers 53 of the 54 frozen-embedding runs; the odd one out,
+\texttt{C5\_qwen3\_full\_long\_form\_seed2026}, carries a digest of its own. % src: results/tables/config_fingerprints.csv (54 run ids with prefix C5\_ or D3\_, all carrying a training digest, over two distinct values: 53 and 1)
+Table~\ref{tab:app-settings} tabulates only the fields that vary.
+
+\begin{table}[htbp]
+  \centering
+  \caption[Per-arm settings that vary across the fixed recipe]{Per-arm settings.
+    Every field not shown is the shared recipe of
+    Section~\ref{app:hyperparams:recipe}. ``Batch'' gives physical batch
+    $\times$ accumulation steps. The four Block~B arms are ridge regressions and
+    their configurations record no length, rate, batch or epoch field.
+    Source: \texttt{configs/models/*.yaml}; \texttt{release/run\_configs/}.}
+  \label{tab:app-settings}
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}llrlr@{}}
+    \toprule
+    Arm & Checkpoint or class & Max len. & Batch & Epochs \\
+    \midrule
+    B1--B4 & ridge over lexical/dictionary features & --- & --- & --- \\
+    \midrule
+    C1 S1 & \texttt{bert-base-uncased} & 512 & $128\times1$ & 15 \\
+    C1 S2 & \texttt{bert-base-uncased}, chunk mean & 512 & $8\times16$ & 15 \\
+    C2 S1 & \texttt{ProsusAI/finbert} & 512 & $128\times1$ & 15 \\
+    C2 S2 & \texttt{ProsusAI/finbert}, chunk mean & 512 & $8\times16$ & 15 \\
+    C2 S3 & \texttt{ProsusAI/finbert}, chunk attention & 512 & $8\times16$ & 15 \\
+    C2 S4 & \texttt{ProsusAI/finbert}, hierarchical & 512 & $8\times16$ & 15 \\
+    C3 S1 & \texttt{roberta-base} & 512 & $128\times1$ & 15 \\
+    C4 S5 & \texttt{allenai/longformer-base-4096} & 4{,}096 & $4\times32$ & 15 \\
+    C5 & \texttt{Qwen/Qwen3-Embedding-8B} (frozen) & 4{,}096 & 512 & 40 \\
+    C5 & \texttt{Alibaba-NLP/gte-Qwen2-7B-instruct} & 4{,}096 & 512 & 40 \\
+    C5 & \texttt{intfloat/e5-mistral-7b-instruct} & 4{,}096 & 512 & 40 \\
+    C5x & Qwen3-Embedding-8B on C6 excerpts & 4{,}096 & ridge head & --- \\
+    C6 & Qwen3-32B, prompted, no training & 8{,}192 & --- & --- \\
+    \midrule
+    D1 & FinBERT $\oplus$ price, concatenation MLP & 512 & $128\times1$ & 15 \\
+    D2 & FinBERT $\oplus$ price, gated & 512 & $128\times1$ & 15 \\
+    D3 & each frozen C5 embedder $\oplus$ price & 4{,}096 & 512 & 40 \\
+    D4 & Qwen3-32B, price lags in prompt & 8{,}192 & --- & --- \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Learning rates follow the block: $8\times10^{-5}$ for every fine-tuned arm of
+the fixed recipe and $1\times10^{-4}$ for every head-only arm. The two
+ASHA-tuned arms of Section~\ref{app:hyperparams:asha} depart from it, as that
+section reports. % src: configs/models/*.yaml; TECHNICAL_SUPPLEMENT.md Table S8(a)
+
+\FloatBarrier
+\section{Per-Block Specifics}
+\label{app:hyperparams:blocks}
+
+\paragraph{Block~A.} A1 carries the trailing 22-day realised volatility forward
+and has no fitted parameters. A2 HAR-RV is a \emph{pooled panel} OLS, one fit per
+horizon within each disclosure channel rather than one per firm
+(\texttt{fit\_per\_firm: false}), on the log of
+realised volatility at lags 1, 5 and 22. Duan smearing on retransformation
+makes the prediction target the mean rather than the median. % src: configs/models/A2_har_rv.yaml; results/runs/A2_har_rv_full_{long_form,event_driven,combined}_seed2026
+A3 and A4 fit GARCH(1,1) and EGARCH(1,1) per firm on log returns up to filing
+time, normal innovations, minimum history 100 observations; A5 fits ARIMA(1,0,1)
+per firm on log trailing realised volatility, minimum history 60. % src: configs/models/A3_garch.yaml, A4_egarch.yaml, A5_arima.yaml
+A6 carries two arms under A2's conventions: SHAR splits the daily lag into
+signed semivariances, and HARQ shrinks the weight on that lag where it is
+imprecisely measured. A7
+adds the point-in-time log VIX (the last close strictly before the effective
+trading day) to the same pooled log-space fit. % src: release/run_configs/A6_shar_*.json, A6_harq_*.json, A7_harx_vix_*.json
+
+\paragraph{Why A2 is pooled.} A2 is the primary baseline for every significance
+test in the study, so the decision to fit it across firms rather than firm by firm
+deserves an argument and not only a configuration flag. The configuration is where
+the reason was first written down: the flag sits beside the annotation that
+per-firm estimation overfits short panels. % src: configs/models/A2_har_rv.yaml (fit_per_firm annotation)
+Two concessions come before the argument. The field documents what the estimator
+does rather than switching it. A per-firm-slope HAR was also never fitted: the
+estimator implements one pooled fit, or one fit per horizon, so no per-firm
+variant appears among the executed arms. % src: src/sp500vol/models/price/har_rv.py (HARRV.fit)
+The four points below therefore bound that omission instead of closing it by
+head-to-head comparison.
+
+First, the panel is short per firm. The long-form training split holds 19{,}668
+filings from 702 distinct filers, an average of 28 filings each, and 187 of those
+filers contribute 16 filings or fewer. % src: release/split_definition.md (19,668 long-form train filings); release/accession_index.csv (distinct cik and per-filer counts, form 10-K/10-Q, split=train)
+Because the fit is one per horizon, a filer's sample at a single horizon is
+roughly its filing count. A per-firm HAR would then spend four parameters on a
+couple of dozen noisy observations, where the pooled fit spends the same four on
+the whole channel. Thin firm-level coverage shows up elsewhere in the evidence:
+only 62.9 per cent of firms have any validation rows, which is why the
+firm-identity reference falls back to a global validation mean for the rest. Those
+covered firms do carry 91.5 per cent of long-form and 91.9 per cent of
+event-driven test rows, so the sparsity is in the firm count and not in the
+evaluation weight. % src: results/tables/firm_identity_control.md (firms with val rows; test-row coverage)
+The per-firm arms that were executed carry fallbacks for the same reason, A3 and
+A4 requiring 100 observations of history and A5 requiring 60 before they will
+estimate at all. % src: configs/models/A3_garch.yaml, A4_egarch.yaml, A5_arima.yaml; src/sp500vol/models/price/garch.py, arima.py fallback paths
+
+Second, the per-firm price fits the design does contain lose to pooled A2 under
+two of the three loss conventions. A3 to A5 are estimated firm by firm and are the
+three price challengers of the 180-comparison standalone census, contributing 27
+comparisons over nine disclosure-by-horizon panels. Under the census convention of squared error, none
+of the 27 favours the per-firm challenger and 23 are significantly worse than
+pooled A2 after Holm correction; under volatility-unit QLIKE, none favours it and
+15 are significantly worse. % src: results/tables/variance_unit_standalone180.csv (A3--A5 rows: better_se_holm 0, worse_se_holm 23, better_qlike_vol_holm 0, worse_qlike_vol_holm 15)
+Under variance-unit QLIKE, seven of the 27 do favour the challenger, every one a
+GARCH-family arm, six of them A3 and the seventh A4 at long-form $h=5$. A3's
+own long-form margin points the same way at the two shorter horizons and the
+other way at $h{=}20$, and is significant at none. % src: results/tables/variance_unit_standalone180.csv (better_qlike_var_holm; A3 long_form dm_qlike_var_clu -1.685/-0.792/+0.182 with holm 0.185/0.858/1.000)
+Firm-by-firm estimation of a price model therefore buys nothing dependable on
+this panel: it wins under one of three loss conventions and inside one model
+family.
+
+Third, the firm effect that pooling omits is supplied to the reference in
+restricted form, and the consequence is measured. The firm-identity rung refits
+the reference on the constant, the log HAR forecast and the log of each firm's own
+mean validation realised volatility. That is one extra parameter whose coefficient
+is shared across firms, a restricted firm effect rather than a free intercept per
+firm, and it enters the reference rather than the text model. Against it the 38 of
+69 cells that count as genuine under the single recalibrated HAR fall to 8 of 69,
+and 38 of the 45 long-form cells turn negative. % src: results/tables/m1_ensemble_primary.md (38 of 69 genuine); results/tables/firm_identity_ensemble.md (8 of 69; 38 of 45 long-form negative)
+A per-firm HAR would give the reference more than this rung does, at the cost of
+the degrees of freedom just counted. What the rung establishes is that the cheap
+version of that information removes most of the cells that looked incremental.
+
+Fourth, the strongest rung of the ladder already contains per-firm price fits. The
+maximal price reference is a validation-fitted log-space pool of five price
+models, three of which (GARCH, EGARCH and ARIMA) are the firm-by-firm arms of this
+block. Against it 9 of 69 cells survive Holm. % src: results/tables/maximal_reference_ensemble.md
+The reference interval reported in Chapter~\ref{ch:results} is therefore bracketed
+by references that do carry firm-specific price dynamics, whatever the HAR member
+of the pool carries.
+
+Two properties of the wider design bear on the same objection. The reference is
+recalibrated on the validation years before any text term is added, at a mean
+slope of 1.10 across the six channel-horizon cells. % src: results/tables/recal_slope_logspace.md
+% (log-space b of Eq. 1; the level-space slope FAMILY 3 reports on the same rows
+% averages 1.44, mean of 1.508/1.447/1.269/1.495/1.562/1.334)
+The pooled fit's systematic under-response is therefore corrected rather than
+left for text to repair.
+And the direction of any residual weakness is known: a weaker price reference
+credits text with more, so whatever pooling costs the reference inflates the most
+generous rung's count of apparent increments rather than suppressing it. The
+study's verdict rests on the stronger rungs, where the reference carries both the
+firm term and the per-firm price fits.
+
+\paragraph{Block~B.} B1 uses bag-of-words counts over 5{,}000 features with a
+lower-case alphabetic token pattern of length $\geq 2$; B2 uses TF--IDF over
+1--2-grams, 5{,}000 features, sublinear term-frequency scaling and the same token
+pattern; B3 uses Loughran--McDonald Master Dictionary category proportions; B4
+adds four engineered statistics (log token count, mean word length, mean sentence
+length, punctuation density). % src: configs/models/B1..B4.yaml
+All four fit ridge regression per horizon on the log target, with the penalty
+chosen by five-fold cross-validation on mean fold squared error over
+$\{0.1, 1, 10, 10^2, 10^3, 10^4\}$ for the two vectoriser arms and
+$\{10^{-3}, 10^{-2}, 0.1, 1, 10, 10^2\}$ for the low-dimensional dictionary arms.
+The folds carry a fixed shuffle state, so selection is deterministic. % src: src/sp500vol/models/classical_text/{bow_ridge,lm_linear,_fit_utils}.py
+
+\paragraph{Block~C encoders.} S1 truncates to the first 512 tokens. S2--S4 split
+the document into 512-token chunks with stride 256, keeping at most 8 chunks, and
+run at physical batch 8 with 16 accumulation steps. S3 adds attention pooling of
+width 128 over the chunk embeddings and S4 a one-layer, eight-head chunk-level
+transformer encoder above them. % src: configs/models/C2_finbert_s{2,3,4}.yaml
+C4 reads 4{,}096 tokens natively at physical batch 4 with 32 accumulation steps
+and pre-tokenises in batches of 128, because tokenising 4{,}096-token windows of
+$\sim$29{,}000-token documents on the fly would starve the card. % src: configs/models/C4_longformer.yaml;
+% frozen 03_dataset.tex Table 1 (long-form median 29,278 wordpiece tokens)
+
+\paragraph{C5 and C5x.} The three frozen embedders encode at maximum length
+4{,}096 in encode batches of 8, L2-normalising the pooled embedding, under one
+shared instruction: \emph{``Represent this corporate financial disclosure for
+forecasting the issuing firm's future stock-return volatility''}. % src: configs/models/C5_*.yaml
+C5x is the input-parity control: the same Qwen3-Embedding-8B encoder over the
+byte-identical curated excerpts C6 reads, last-token pooling with L2
+normalisation, and a ridge head on the log target with Duan smearing. It runs on
+long-form only, as a single run. % src: release/run_configs/C5x_qwen3exc_full_long_form_seed2026.json; scripts/analysis/c5x_input_parity.py
+
+\paragraph{C6 prompted decoding.} Qwen3-32B is served offline under vLLM in
+bfloat16: temperature 0, thinking mode explicitly disabled (otherwise the output
+budget is consumed by the reasoning trace), 8{,}192-token context with prompts
+capped at 6{,}000 tokens, at most 120 new tokens, and guided JSON decoding against
+the schema \verb|{vol_5d, vol_10d, vol_20d}| where the installed engine exposes
+it, degrading to regular-expression parsing otherwise. % src: scripts/experiments/e1_llm_forecast/run_inference.py; TECHNICAL_SUPPLEMENT.md S5
+A parse failure triggers exactly one retry pass carrying an explicit re-format
+instruction at temperature 0.2. One call per filing returns all three horizons.
+The \emph{curated excerpt} is defined mechanically: for 8-K filings the full text,
+truncated only if it exceeds the $\sim$21{,}200-character excerpt budget. For
+10-K filings it is Items 1A, 7 and 7A from the parsed section index and for 10-Q
+filings Part~I Item~2 with Part~II Item~1A, used only when the concatenated
+sections exceed 2{,}000 characters (below which the index holds
+table-of-contents stubs). Otherwise the full document is head-truncated. % src: scripts/experiments/e1_llm_forecast/prompt.py
+Forecasts are clipped to $[0.03, 3.00]$ annualised and a missing decode falls back
+to trailing 22-day realised volatility. The shipped event-driven run records
+39{,}322 filings and 117{,}407 rows at a 0.00\% parse-failure and 0.00\% clipping
+rate. % src: release/run_configs/C6_llmtext_full_event_driven_seed2026.json stats block
+The prompted arms train nothing, so only validation and test filings are ever
+sent to the model.
+
+\paragraph{Block~D.} D1 and D2 project price features and the FinBERT
+\texttt{[CLS]} embedding to width 128 and then either concatenate them or combine
+them through a learned gate, one weight per projected dimension rather than one
+scalar; both read S1 512-token text at physical batch
+128 without accumulation. % src: configs/models/D1_concat_mlp.yaml, D2_gated_fusion.yaml
+D3 substitutes each frozen C5 embedding for the FinBERT branch under the
+head-only recipe. D4 places the three HAR lags inside the C6 prompt and decodes
+identically; its clipping rate is 0.07\% (88 of 117{,}407 rows). % src: release/run_configs/D4_llmfused_full_event_driven_seed2026.json
+
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F2_model_spectrum_and_compute__a.pdf}
+% caption numbers src: results/tables/seed_aggregate.csv (panel a, long_form slice: r2_mean, r2_std, n_seeds); results/tables/compare_full_long_form_test.md (the A2 HAR-RV R-squared triple, absent from seed_aggregate.csv); results/tables/cost_accuracy.csv (panel b, all 25 arms)
+\caption[The model spectrum, and what the fine-tuning budget bought]{
+The model
+spectrum, and what the fine-tuning budget bought. 
+Panel~(a): long-form
+standalone $R^2$ for all fifteen text-only challengers at $h=5$, 10 and 20
+(45 arm-by-horizon cells), as the mean over the seeds trained. Whiskers are at
+$\pm$1 across-seed standard deviation where three seeds exist, open markers
+where a single deterministic fit was made. Every one of the 45 lies left of
+zero, from $-0.0149$ to $-0.4682$. % src: results/tables/seed_aggregate.csv (long_form slice, r2_mean over the 15 text arms x 3 horizons; extremes C5_qwen3 h=20 and B1_bow_ridge h=5)
+Below the rule sit the five single price arms carrying a committed long-form
+$R^2$ row, of which HAR-RV alone is positive at every horizon
+($+0.0890/+0.1210/+0.2080$). Those five are \emph{not} the five members of the
+maximal price pool; the panel says so. % src: results/tables/compare_full_long_form_test.md (A2 row); results/tables/seed_aggregate.csv (A1, A3, A4, A5 long_form rows)
+The HAR-RV triple is the comparison table's reading, which predates the
+smearing retransformation; the paragraph below sets it beside the committed
+fit, whose long-form $R^{2}$ is higher at every horizon. % src: git 16c9d69^ against results/runs/A2_har_rv_full_long_form_seed2026/metrics.json (r2 0.0890/0.1210/0.2080 against 0.1694/0.1808/0.2640)
+}
+\label{fig:app-model-spectrum}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F2_model_spectrum_and_compute__b.pdf}
+% caption numbers src: results/tables/seed_aggregate.csv (panel a, long_form slice: r2_mean, r2_std, n_seeds); results/tables/compare_full_long_form_test.md (the A2 HAR-RV R-squared triple, absent from seed_aggregate.csv); results/tables/cost_accuracy.csv (panel b, all 25 arms)
+\caption[The model spectrum, and what the fine-tuning budget bought (b)]{Continued from Figure~\ref{fig:app-model-spectrum}. The model
+spectrum, and what the fine-tuning budget bought. 
+Panel~(b): the same spectrum against recorded training compute, GPU-hours on a
+broken logarithmic axis with the nine zero-cost arms in their own band,
+against best long-form test QLIKE. Basis: means of the per-seed metrics over seeds
+2026--2028 for every trained encoder and fusion arm, single deterministic fits
+for the bag-of-words and price arms; the denominator of panel~(a) is 45 text
+cells, the price block being drawn separately.
+}
+\label{fig:app-model-spectrum-b}
+\end{figure}
+
+Figures~\ref{fig:app-model-spectrum} and~\ref{fig:app-model-spectrum-b} make two points that do not survive
+compression into a leaderboard. The first is that the whiskers of panel~(a)
+are the reason the primary basis of this report is a seed ensemble rather than
+any single run. At the frozen E5-Mistral arm at $h=20$ the across-seed
+standard deviation is $0.2346$ against a mean of $-0.1369$, so several
+whiskers cross zero even though no mean does. % src: results/tables/seed_aggregate.csv (long_form C5_e5mistral h=20: r2_mean, r2_std)
+The second is that the panel must not be read as ``the price baseline wins''.
+Several price arms sit below several text arms on $R^2$ while sitting above
+them on QLIKE (ARIMA reads $-0.0816/+0.0206/+0.0666$, GARCH
+$-0.2256/-0.1374/-0.2316$, EGARCH $-0.3057/-0.2156/-0.2306$ and historical
+volatility $-1.3398/-0.7557/-0.3235$). % src: results/tables/seed_aggregate.csv (A1, A3, A4, A5 long_form r2_mean by horizon)
+HAR-RV, the reference the whole
+study is built against, is not the QLIKE-strongest price model, semivariance
+HAR being better in all nine channel-horizon panels (variance-unit QLIKE-DM $-3.7$ to $-13.5$, observation-level and uncorrected, off the primary basis on all three counts). % src: results/tables/stronger_baselines.md (DM_q -3.735 to -13.504; "DM on the common (kept) test sample", no clustering and no Holm column)
+That is what motivates closing the reference interval with a pool of price
+models rather than nominating one, and it is the subject of
+Section~\ref{app:res-frontier}.
+
+What the figure does not show is incremental value. A poor standalone
+forecaster can still remove loss beyond a recalibrated reference, which is the
+object of the 69-cell combination grid and of neither panel here; no bar or
+marker in Figures~\ref{fig:app-model-spectrum} and~\ref{fig:app-model-spectrum-b} entitles any cell to a survivor
+count. The two panels also carry different quantities on different scales and
+share no axis. The horizontal position inside the zero-GPU band is a
+de-collision offset carrying no information, every arm in that band standing
+at zero recorded GPU-hours with its CPU wall-clock seconds printed beneath.
+The unit of panel~(b)'s QLIKE axis is not declared in its own source file,
+which is why the axis is labelled as recorded. That last point is worth
+closing, because the two committed tables feeding the two panels disagree
+about the reference arm: the cost artefact records long-form test QLIKE
+$0.5564/0.4618/0.2970$ while the standalone comparison table records
+$0.7439/0.5794/0.3577$. % src: results/tables/cost_accuracy.csv (A2_har_rv row); results/tables/compare_full_long_form_test.md (A2_har_rv row)
+Both vintages are printed on the artefact and no comparison is made across the
+panels. The first of the two is the \emph{raw} HAR-RV forecast's variance-unit
+QLIKE, which the combination grid records to six decimal places as $0.556448$
+at long-form $h=5$; the recalibrated reference on the identical 7{,}951 rows
+reads $0.510892$, so the vintage that matches is the uncombined one. The
+second vintage is not that forecast under a different QLIKE convention: on the
+same 7{,}951 rows it records MAE 0.1071, RMSE 0.1610 and $R^{2}$ 0.0890 where
+the run's own committed metrics read 0.1058, 0.1537 and 0.1694, so it differs
+on every metric and not only on the loss parameterisation. What separates the
+two is one retransformation constant, and the repository settles it. All twelve
+long-form figures of the comparison table reproduce, to every printed digit,
+the metrics of an A2 run directory the run store no longer holds: nineteen
+pre-rerun price and classical-text directories were removed on 2026-06-20, and
+the removed A2 long-form directory is stamped 2026-06-08 where the committed
+one is stamped 2026-06-22. % src: git 16c9d69 (2026-06-20, removal of nineteen pre-rerun baseline run directories); git 16c9d69^:results/runs/A2_har_rv_full_long_form_seed2026/metrics.json (test mae 0.107125/0.092738/0.077786, rmse 0.160975/0.156841/0.116420, r2 0.089036/0.120980/0.207980, qlike 0.743903/0.579353/0.357670) and env.json (2026-06-08T06:32:29Z) against the committed env.json (2026-06-22T18:28:32Z)
+The two prediction files carry the same 94{,}237 rows, and joined row by row
+their accession, ticker, effective trading day, split label,
+realised-volatility label and all three HAR features differ by exactly zero, so
+neither the sample, the split boundaries, the features nor the label
+moved. % src: results/runs/A2_har_rv_full_long_form_seed2026/predictions.parquet against git 16c9d69^ of the same path (94,237 rows joined on accession-horizon-split; maximum absolute difference exactly 0.0 on label\_realised\_vol and feature\_rv\_1d/5d/22d; both carry train 2010-02-04--2019-12-23, val 2020-01-03--2021-12-23, test 2022-01-05--2025-12-23)
+Their forecasts differ by a single multiplicative constant per horizon, steady
+across all 94{,}237 rows to within $7\times10^{-12}$: $1.145059$, $1.100559$
+and $1.076655$ at $h=5$, 10 and 20. % src: results/runs/A2_har_rv_full_long_form_seed2026/predictions.parquet against git 16c9d69^ of the same path (ratio of prediction\_realised\_vol, committed over removed, by horizon: minimum and maximum 1.1450585053373699/1.14505850534382, 1.1005586502880067/1.1005586502918845, 1.0766552112791599/1.07665521128133)
+A constant ratio leaves the fitted slopes untouched, and those three numbers
+are the smearing factors \cite{duan1983smearing}, recovered to eleven decimal
+places as the mean ratio of label to forecast over the earlier fit's own
+19{,}559, 19{,}543 and 19{,}500 training rows. % src: git 16c9d69^:results/runs/A2_har_rv_full_long_form_seed2026/predictions.parquet (split=train, mean of label\_realised\_vol over prediction\_realised\_vol by horizon: 1.1450585053379911, 1.1005586502884068, 1.0766552112794519)
+The comparison table therefore records this same pooled fit on this same data
+\emph{before} the smearing retransformation
+specified above was written; the committed run is
+stamped four minutes before the commit that adds it. % src: git a5feeff (2026-06-22 19:32:58 +0100, "Duan smearing retransformation for A2 HAR-RV baseline"), which also regenerated seven evidence tables including the DM and forecast-combination families
+
+Three competing explanations are ruled out rather than left open. The loss
+convention is not the difference: each vintage's predictions, passed through
+the single metric function the repository has carried unchanged since its first
+commit, reproduce that vintage's own committed MAE, RMSE, $R^{2}$ and QLIKE,
+and that function squares its volatility inputs, so both readings are
+variance-unit even though neither source table says so. % src: src/sp500vol/evaluation/metrics.py (all\_metrics squares before qlike; one commit on the path); both predictions.parquet vintages recomputed through it
+The seed is not the difference, both configurations recording seed 2026 over a
+deterministic least-squares fit. The pooling flag is not the difference either,
+although the two configurations do disagree about it: the earlier declares
+\texttt{fit\_per\_firm: true} and the current \texttt{false}, but no file under
+\texttt{src/} or \texttt{scripts/} reads that field, and the earlier run's saved
+model holds one coefficient vector per horizon and none per firm, so the flag
+recorded a description that was wrong rather than an estimator that
+changed. % src: config.json of both vintages; \texttt{fit\_per\_firm} occurs in configs/models/A2\_har\_rv.yaml and in no source file; git 16c9d69^:results/runs/A2\_har\_rv\_full\_long\_form\_seed2026/model.pkl (coefficients keyed 5/10/20 only)
+
+Two consequences follow, and both are stated because the reference is what
+every one of the 180 comparisons is measured against. The first is that the
+correction runs against this report's own interest: retransformation raises the
+forecast level, so the committed fit is the better of the two on every metric
+--- long-form test $R^{2}$ rises from $0.0890$ to $0.1694$ --- and the price
+reference the results must clear is therefore the harder one. The second is
+that the superseded figures are confined. Eight committed files carry them,
+every one a comparison table, and the only file in the code base that reads any
+of them is the generator of Figures~\ref{fig:app-model-spectrum}
+and~\ref{fig:app-model-spectrum-b}; the tables carrying the pairwise tests, the
+combination grid and the identity ladder were all regenerated after the
+correction and are dated after it. % src: results/ and release/ searched for A2\_har\_rv rows carrying the pre-correction QLIKE values (8 files: compare\_full\_\{long\_form,event\_driven,combined\}\_test.\{md,txt\}, compare\_runs\_full\_long\_form\_test.txt, release/aggregate\_results/compare\_full\_\{long\_form,event\_driven\}\_test.md); scripts/analysis/diss\_appendix\_figs/F2\_model\_spectrum\_and\_compute\_diss.py; last-commit dates 2026-06-16 for the comparison table against 2026-07-04 for dm\_pairwise\_clustered.csv and m1\_ensemble\_primary.csv
+What the two panels disagree about is thus a dated correction, not an
+unexplained discrepancy; each artefact is still printed as recorded, and no
+number crosses between them.
+The undeclared unit is why
+Figures~\ref{fig:app-compute-accuracy} and~\ref{fig:app-compute-accuracy-b} label an axis
+Figures~\ref{fig:app-model-spectrum} and~\ref{fig:app-model-spectrum-b} deliberately leave unlabelled.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/FP4_compute_accuracy__a.pdf}
+% caption numbers src: results/tables/cost_accuracy.csv (all 25 arms: gpu_hours_total, per-horizon long-form QLIKE, best_qlike, on_pareto_frontier); results/tables/cost_accuracy.md (block totals); Spearman computed in the generator over the 16 GPU-consuming arms
+\caption[The efficiency frontier and the GPU-hour budget]{
+The efficiency
+frontier and the GPU-hour budget. 
+Panel~(a) plots each of the 25 arms of the
+efficiency artefact as its best long-form test QLIKE against the GPU-hours its
+runs consumed, on a symmetric-logarithmic axis so the nine CPU arms can be
+drawn at exactly zero. The Pareto frontier is a single point (GARCH, 0.2686
+QLIKE at zero GPU-hours), and among the sixteen arms that did spend GPU time
+the Spearman rank correlation between hours spent and loss is $+0.76$
+($p = 0.0006$): the more expensive arms are the \emph{worse} ones. % src: results/tables/cost_accuracy.csv (on_pareto_frontier; Spearman over the 16 arms with gpu_hours_total > 0)
+}
+\label{fig:app-compute-accuracy}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/FP4_compute_accuracy__b.pdf}
+% caption numbers src: results/tables/cost_accuracy.csv (all 25 arms: gpu_hours_total, per-horizon long-form QLIKE, best_qlike, on_pareto_frontier); results/tables/cost_accuracy.md (block totals); Spearman computed in the generator over the 16 GPU-consuming arms
+\caption[The efficiency frontier and the GPU-hour budget (b)]{Continued from Figure~\ref{fig:app-compute-accuracy}. The efficiency
+frontier and the GPU-hour budget. 
+Panel~(b) shows where the 590.4 GPU-hours went, arm by arm on a logarithmic
+axis, each row labelled with that arm's accuracy rank out of 25. The single
+long-context arm consumes 254.7 hours, 43.1 per cent of the training budget,
+and ranks sixteenth, while each of the three price-plus-embedding fusions
+consumes 0.2 hours and ranks in the top eight. % src: results/tables/cost_accuracy.csv (C4_longformer 254.715 h at rank 16; D3 arms 0.20-0.21 h at ranks 6-8); results/tables/cost_accuracy.md (566.7 h for block C, 23.6 for block D, 590.4 combined)
+Basis: cost is total GPU-hours over all runs of an arm (three seeds by
+three disclosure channels for the encoder and fusion blocks). Accuracy
+is the minimum over $h=5$, 10 and 20 of long-form test QLIKE in \emph{variance}
+units, seed-averaged per horizon before the minimum is taken. Denominators:
+25 arms in panel~(a), 16 for the rank correlation. The rank correlation's $p$
+is a single uncorrected test of association across arms; the efficiency
+artefact carries no pre-declared Holm family, and the correlation prices
+architectures rather than an effect of compute.
+}
+\label{fig:app-compute-accuracy-b}
+\end{figure}
+
+Figures~\ref{fig:app-compute-accuracy} and~\ref{fig:app-compute-accuracy-b} and panel~(b) of
+Figure~\ref{fig:app-model-spectrum-b} read the same 25 rows of the same
+committed file, and are drawn twice on purpose. The earlier panel is an
+orientation: it separates the zero-cost band, prints the CPU wall-clock
+seconds those arms consumed, and states the unit ambiguity in its own source.
+The later figure is the compute question at full resolution: it adds the
+accuracy rank of every arm, the share of the budget each consumed, and the
+rank correlation that turns ``the frontier is free'' from an impression into a
+statistic. A reader who wants one compute figure should take
+Figure~\ref{fig:app-compute-accuracy}; a reader who wants the spectrum in one
+frame should take Figure~\ref{fig:app-model-spectrum}.
+
+Four things the figure does not show bound the reading. It does not price
+energy or carbon: no facility-level measurement was taken and none is
+inferred, so 590.4 GPU-hours is an accounting of machine time and not an
+environmental figure. It excludes prompted large-language-model inference
+entirely, which has no row in the cost artefact, so the total is a
+training-fleet figure and not a study-wide one. The two prompted arms,
+one of which carries the study's only surviving residual, are therefore absent
+from both panels. And the rank correlation is descriptive rather than causal:
+the expensive arms are the fine-tuned encoders and the cheap ones the
+frozen-embedding fusions, so the panel prices architectures and says nothing
+about what a larger budget on a fixed architecture would do. Nor is the
+accuracy ranking a ranking of usefulness: an arm can rank sixteenth on
+standalone loss and still be one of the cells that adds at the first rung of
+the reference ladder, which is the dissociation Section~\ref{app:res-itemgeography}
+finds again inside a single document.
+
+% No \clearpage before this section, and none before Section E.5 either. All
+% seven section headings once carried one; five still do, and the five that
+% remain were each tested and each earns its place. Every float in this chapter
+% is set [p], so a \clearpage at a section boundary is what holds the section's
+% figures inside it: remove the one before Section E.4 and Figure E.10, which
+% belongs to Section E.3, lands after the E.4 heading, and remove the one
+% before Section E.6 and Figure E.16 does the same to Section E.5. Removing the
+% one before Section E.3 saves no page and opens a 78 per cent white one;
+% removing the one before Section E.1 saves no page and takes the page that
+% closes Section E.2 from 55 to 73 per cent white; removing the one before
+% Section E.7 saves no page either. The two dropped here were the only two
+% doing none of that work. Each left its section's closing paragraph alone on a
+% page that was 85 and 80 per cent white, and dropping them takes this appendix
+% from 40 pages to 38, clears those two pages and a third at 48 per cent, cuts
+% a fourth from 73 to 55, moves no figure out of the section that discusses it
+% and overflows no float. Measured by typesetting this file on its own at
+% report geometry, one variant per \clearpage, not guessed. The arithmetic is
+% what decides this, so re-measure before adding or removing a float here.
+
+\FloatBarrier
+\section{The Prompted Arm's Prompt, in Full}
+\label{app:hyperparams:prompt}
+
+Section~\ref{app:hyperparams:blocks} gives the decoding settings and the rule
+that builds the curated excerpt. The strings themselves are printed here, so
+that the instrument can be read rather than described. They are transcribed
+from \texttt{scripts/experiments/e1\_llm\_forecast/prompt.py}, where the system
+string, the task string and the message builder sit at lines 53, 59 and 137. % src: scripts/experiments/e1_llm_forecast/prompt.py
+The transcription is verbatim, so the American spellings and the capitalisation
+below are the source's and not this report's.
+
+Every prompted call sends two chat messages. The system message is one string
+and is identical in every variant.
+
+\begin{verbatim}
+You are a quantitative analyst who forecasts equity realised
+  volatility from corporate SEC disclosures. You always answer
+  with ONLY a single JSON object and no other text, no markdown,
+  no explanation.
+\end{verbatim}
+
+Here and below, a line indented by two spaces is a typographic continuation;
+every other line break is a newline in the string itself.
+
+The user message is assembled from three pieces: a metadata header, a body and
+a task instruction. The header is written first, by one code path, for every
+variant.
+
+\begin{verbatim}
+Company SEC filing.
+- Form type: 8-K (items: 2.02,9.01)
+- Filing date: 2023-02-02
+\end{verbatim}
+
+The item list is the filing's \texttt{item\_subtype} field, and the parenthesis
+is dropped when that field is empty, which it is for every 10-K and 10-Q: the
+field is populated on all 117{,}407 event-driven rows and on none of the
+35{,}635 long-form rows. % src: results/runs/C6_llmtext_full_{event_driven,long_form}_seed2026/predictions.parquet (item_subtype null share)
+The header carries no ticker and no company name.
+
+The body is what separates the arms. The full-text arm C6 inserts the curated
+excerpt:
+
+\begin{verbatim}
+Filing excerpt:
+<<<
+[the curated excerpt]
+>>>
+\end{verbatim}
+
+the date-only contamination control inserts one line in its place:
+
+\begin{verbatim}
+(No filing text is provided.)
+\end{verbatim}
+
+and the date-and-ticker control inserts that same line, preceded by a ticker
+field appended directly to the header:
+
+\begin{verbatim}
+- Ticker: AAPL
+
+(No filing text is provided.)
+\end{verbatim}
+
+The task instruction closes the user message, and the same string closes all
+three of the arms above.
+
+\begin{verbatim}
+Task: based ONLY on the disclosure text above, forecast this
+  company's ANNUALIZED realised stock-return volatility over the
+  next 5, 10 and 20 trading days after the filing. Express each
+  forecast as a decimal (e.g. 0.25 means 25% annualized; typical
+  values lie between 0.10 and 1.00; extreme stress can exceed
+  1.00).
+Respond with ONLY this JSON object: {"vol_5d": <number>,
+  "vol_10d": <number>, "vol_20d": <number>}
+\end{verbatim}
+
+Decoding is then constrained by the schema handed to the serving engine, where
+that engine exposes guided decoding, which is why a malformed answer is rare:
+
+\begin{verbatim}
+{"type": "object",
+ "properties": {"vol_5d":  {"type": "number"},
+                "vol_10d": {"type": "number"},
+                "vol_20d": {"type": "number"}},
+ "required": ["vol_5d", "vol_10d", "vol_20d"],
+ "additionalProperties": false}
+\end{verbatim}
+
+Two properties of this prompt read as holes on their own, so each is set out here with its answer.
+
+\paragraph{The model is told the item code.} The header names the form type, the
+filing date and, where the form carries them, the item codes, and it never
+names the ticker or the company. The item codes are the part that needs saying out loud, because
+Table~\ref{tab:app-item-qwen} partitions the 8-K residual by item code and so
+cuts on a field the model was handed. The answer is in the composition printed
+above. The builder writes the identical header and the identical task string
+for the date-only control as for the full-text arm, and the two differ only in
+the body, one carrying the document and the other a line saying there is none.
+That control is significantly positive in 0 of 6
+channel-horizon cells under Holm against the recalibrated HAR. % src: results/tables/llm_contamination.md (dateonly rows; Holm within the 18-cell block)
+The metadata the header carries therefore buys nothing measurable on its own,
+on either channel. The partition table is scored against a different reference and the
+two sets of percentages are not interchangeable; what the control establishes
+is the narrower point, that the item field is not itself the signal the
+partition is cutting.
+
+\paragraph{The task string states a prior.} Before the model has read anything
+it is told that ``typical values lie between 0.10 and 1.00'' and that
+``extreme stress can exceed 1.00''. That is an unconditional prior written into
+the instrument rather than estimated from the training split, and a forecaster
+that ignored the document and answered inside the band would already be roughly
+scaled. The same control answers it. The task string is appended byte for byte
+to the date-only and date-and-ticker controls as to the full-text arm, so both
+hold the prior with no document at all. The date-only arm, which carries
+nothing else either, is the one that scores 0 of 6 above; the date-and-ticker
+arm adds the firm's name to the same prior and does not. The two elicitation paraphrases of
+Chapter~\ref{ch:validation} restate the same band in different words, so they
+vary the wording and not the prior. % src: scripts/experiments/e1_llm_forecast/prompt.py (_TASK_PARA1, _TASK_PARA2)
+The bound is on the increment over the price reference, which is what this
+report reads. It is not a claim that the prompted forecast is prior-free.
+
+\FloatBarrier
+\section{The Tuned Challenger Arm}
+\label{app:hyperparams:asha}
+
+The one arm that deliberately relaxes the fixed recipe is FinBERT under the S1
+truncation strategy, specified in
+\texttt{configs/hpo\_arm.yaml}, frozen at tag time.
+% src: configs/hpo_arm.yaml tasks block (T1a and T1c both name model: C2_finbert_s1)
+Sampling is Sobol
+quasi-random with seed 2026 and adaptive search is banned. Asynchronous
+successive halving promotes on pooled volatility-unit validation QLIKE through
+rungs at 2, 5 and 15 epochs (2/5/10 for the Longformer task) with elimination
+factor 3. The executed budget is \textbf{32} Sobol trials on the long-form
+channel (task T1a) and \textbf{24} on the event-driven channel (T1c), the
+event-driven search additionally running its first rung on a 30 per cent
+subsample of training rows. % src: configs/hpo_arm.yaml sampler/asha/tasks (T1c carries rung0_subsample: 0.30; T1a does not)
+The validation years are themselves split: fit rows to 2021-06-30 drive early
+stopping and rung promotion, selection rows from 2021-07-01 rank configurations.
+Test rows are \emph{physically deleted} before anything trains, and a SHA-256
+manifest of the surviving row keys is stored per trial. % src: scripts/experiments/hpo/asha_hpo.py docstring and prepare_data
+The eight-dimensional space covers learning rate (log-uniform
+$5\times10^{-6}$--$1\times10^{-4}$), head learning-rate multiplier $\{1, 10\}$,
+weight decay (log-uniform $10^{-4}$--0.3), head width $\{128, 256\}$, head dropout
+$\{0, 0.1, 0.3\}$, freezing $\{$none, all but the top four encoder blocks, whole
+encoder$\}$, effective
+batch $\{32, 128\}$ and objective $\{$squared error, QLIKE$\}$; epochs is not a
+dimension, being capped by the rung. % src: configs/hpo_arm.yaml space block (the three freeze_mode values none/top4/encoder); the semantics live in src/sp500vol/models/neural_text/bert_s1.py:442-451, where "top4" sets requires_grad=False on the whole encoder and then re-enables the last four transformer blocks, so it is the top four that stay trainable
+The top two configurations by selection QLIKE were retrained under all three
+seeds, the winner being the lower three-seed ensemble selection QLIKE.
+
+The search selected trial 21 for long-form (learning rate
+$9.11\times10^{-5}$, head multiplier 10, weight decay $1.57\times10^{-3}$, head
+width 256, all but the top four blocks frozen, effective batch 32, QLIKE
+objective) and trial 11 for event-driven (learning rate
+$1.85\times10^{-5}$, head multiplier 10, weight decay $4.49\times10^{-4}$, head
+width 256, dropout 0.3, no freezing, effective batch 128, QLIKE objective). % src: results/hpo/T1a/T1a_trial021_rung2/summary.json; results/hpo/T1c/T1c_trial011_rung2/summary.json
+Both therefore depart from the fixed recipe in learning rate, head width and
+training objective; Chapter~\ref{ch:results} reports what that bought.
+
+\FloatBarrier
+\section{Seeds, the Ensemble, and the Cross-Family Probes}
+\label{app:hyperparams:seeds}
+
+Every fine-tuned Block~C/D arm runs under seeds \textbf{2026, 2027 and 2028}. The
+seed is applied before any data or model code executes, seeding Python's
+\texttt{random}, NumPy and PyTorch \cite{paszke2019pytorch}; it is embedded in the
+run identifier and in each per-horizon checkpoint fingerprint, so runs and
+resumptions can never cross seeds. % src: configs/base.yaml; scripts/train.py
+The \emph{seed-ensemble forecast} that serves as the primary evaluation object is
+the per-observation arithmetic mean of the three seeds' predictions, formed by an
+inner join on the filing-by-horizon key so that the ensemble is defined only on
+rows every seed scored. % src: scripts/analysis/m1_ensemble_primary.py ensemble_text
+The tuned arm of Section~\ref{app:hyperparams:asha} instead uses a per-observation
+log-space mean, matching the rule that selected it; the two conventions are each
+internally consistent and are never mixed.
+
+Five cross-family replications re-read the identical prompt at temperature 0:
+Llama-3.1-70B-Instruct in AWQ-INT4 quantisation (the \emph{only} quantised arm,
+run tensor-parallel across two cards at 8{,}192-token context) together with
+Yi-1.5-34B-Chat, Phi-4-14B, Mistral-Small-24B and Gemma-3-27B-Instruct, all in
+bfloat16. % src: release/run_configs/C6_llmtext_{llama70,yi34,phi4,mistral24,gemma27}_*.json (llm field, quantisation); configs/prereg_residual_family_audit.md line 48 (vLLM offline batch, TP2, --max-model-len 8192, recorded as byte-identical to the C6/llama70 serving plan); scripts/experiments/e1_llm_forecast/run_inference.py:355 (--max-model-len default 8192); TECHNICAL_SUPPLEMENT.md Table S11
+Three families (Llama-3.1-70B, Mistral-Small-24B and Gemma-3-27B) additionally carry three-run repeat ensembles. Because the runner
+does not pass a seed to the serving engine and decodes at temperature 0, those
+replicates differ only through kernel non-determinism: they are
+reproducibility-jitter ensembles rather than stochastic-decoding ones, and
+Chapter~\ref{ch:validation} reads them on that basis. % src: scripts/experiments/row15_llama70_ensemble/launch.sh header
+
+The production fleet ran on NVIDIA A100-SXM4-40GB cards, four to a box with one
+run per card. Physical batch sizes come from the per-arm configurations, which
+set gradient accumulation so that every fine-tuned arm trains at the same
+effective 128. A probe under an explicit headroom rule --- the largest passing
+batch whose peak allocated memory stays at or below 36\,GB --- was run over two
+arms only. The committed summary retains measured rows for those two
+chunk-pooling arms (peak 29.1--29.2\,GB, first out-of-memory at batch 8 for
+the hierarchical arm); the per-run configuration files, not the probe, are the
+record of what executed. % src: results/tables/a100_40g_probe_summary.md
+An earlier 24\,GB-class probe that sized a pilot campaign is retained as a tagged
+pilot record and supports no production number. % src: results/tables/rtx3090_probe_24g_summary.md
+
+\FloatBarrier
+\section{Representative Run Commands}
+\label{app:hyperparams:commands}
+
+\begin{sloppypar}
+All commands run from the repository root. Model identifiers are the
+\texttt{model\_id} fields of \texttt{configs/models/}; \texttt{DISCLOSURE}
+$\in \{$\texttt{long\_form}, \texttt{event\_driven}, \texttt{combined}$\}$.
+\end{sloppypar}
+
+\begin{verbatim}
+# one fine-tuned arm, one seed (repeat over 2026 2027 2028)
+python scripts/train.py --model C2_finbert_s1 --dataset full \
+    --disclosure DISCLOSURE --seed 2027
+
+# the production fleet: four cards, one run per card
+python scripts/run_matrix.py --stage full --dataset full --gpus 4 \
+    --seeds 2026 2027 2028
+
+# per-run evaluation and cross-run grids
+python scripts/evaluate.py --run-id C2_finbert_s1_full_long_form_seed2027 \
+    --baseline A2_har_rv
+python scripts/compare_runs.py --dataset full --disclosure DISCLOSURE \
+    --split test --metrics mae rmse r2 qlike
+
+# prompted arm: build the validation+test manifest, then decode offline
+python scripts/experiments/e1_llm_forecast/run_inference.py build-manifest \
+    --out results/e1_llm_forecast/manifest_valtest.parquet
+python scripts/experiments/e1_llm_forecast/run_inference.py run \
+    --manifest results/e1_llm_forecast/manifest_valtest.parquet \
+    --model models/Qwen3-32B --variant both --max-model-len 8192 \
+    --max-tokens 120 --out-dir /data/e1_raw_full --checkpoint-every 500
+python scripts/experiments/e1_llm_forecast/postprocess.py build-runs \
+    --raw-dir /data/e1_raw_full
+
+# tuned arm: plan, search one rung across four shards, promote, select
+python scripts/experiments/hpo/asha_hpo.py plan    --task T1a
+python scripts/experiments/hpo/asha_hpo.py search  --task T1a --rung 0 \
+    --shard 0 --num-shards 4
+python scripts/experiments/hpo/asha_hpo.py promote --task T1a --rung 0
+python scripts/experiments/hpo/asha_hpo.py select  --task T1a
+
+# evidence layer: seed ensembles, the combination grid, the ladder
+python scripts/analysis/m1_ensemble_primary.py
+python scripts/analysis/forecast_combination.py
+python scripts/analysis/firm_identity_control.py
+python scripts/analysis/signal_injection_power.py
+\end{verbatim}
+
+Interrupted neural runs are resumed by re-issuing the identical
+\texttt{train.py} command: completed horizons are recognised by their
+fingerprinted checkpoints and skipped. Prompted decoding checkpoints every 500
+generations --- one per filing and variant, not per filing --- so a preemption
+costs at most the current chunk. % src: scripts/experiments/e1_llm_forecast/run_inference.py:249-253 and :276-281 (the work list holds one item per filing x variant and the flush counts those items)
+
+\FloatBarrier
+\section{Configuration Fingerprints}
+\label{app:hyperparams:fingerprints}
+
+Each run's configuration is canonicalised (serialised to JSON with sorted keys
+and no separator whitespace) and hashed with SHA-256, so that a single changed
+byte changes the digest. Across the fleet this gives \textbf{240} fingerprinted production runs
+(smoke and sample probes excluded) carrying \textbf{233} distinct digests, with
+\textbf{7} byte-identical pairs. % src: results/tables/config_fingerprints.md
+Every one of those pairs is a single cross-family probe's combined and
+event-driven run, byte-identical because that distinction is a downstream
+row-subset selection rather than a configuration field: the fingerprint
+identifies the configuration, not the run. % src: results/tables/config_fingerprints.md collisions table
+A second digest hashes only the canonicalised training block, which is how the
+one-recipe claim of Section~\ref{app:hyperparams:recipe} becomes checkable.
+
+The released index publishes, per run, both the original digest and the digest of
+the released preimage, together with the exact fields neutralised for anonymity
+(38 of the 240 configurations named an absolute machine path, whose rewriting
+necessarily changes the digest) and the 240 preimages themselves. Invoking
+\texttt{config\_fingerprints.py} with the \texttt{-{}-verify-preimages} flag
+re-hashes every released configuration against the published index. % src: results/tables/config_fingerprints.md method/release notes; release/config_hashes.csv header
+A reader who wants to know exactly what produced a number in
+Appendix~\ref{app:fullresults} can therefore go from the reported cell to a run
+identifier, from the run identifier to a digest, and from the digest to the
+configuration file that generated it.
+
+\FloatBarrier
+\section{Two Worked Filings, and the Prompt They Were Read With}
+\label{app:vis-worked}
+
+The object this section documents is a prompt and two documents rather than a
+distribution, so it is set out in full rather than summarised into fields. Section~\ref{sec:res-residual} boxes the pair; what
+follows is the same pair with the material the box had no room for, and the
+exact prompt the arm was given.
+
+\subsection*{The prompt, as issued}
+
+The prompted arm receives two chat messages and returns one JSON object. The
+variant shown is \texttt{c6\_text}, the text-only variant of the C6 arm; five
+further variants share the template, among them the two paraphrases of
+Table~\ref{tab:app-elicit} and the zero-content probes of
+Figures~\ref{fig:app-elicitation-b} and~\ref{fig:app-elicitation-c}, which
+delete the excerpt altogether. Reproduced verbatim, including
+its American spellings and its emphasis capitals, the pair of messages for
+Case~2 below reads:
+
+\medskip
+\noindent\fbox{\begin{minipage}{0.94\textwidth}
+{\small\ttfamily\raggedright
+\textrm{\textit{system message}}\\
+You are a quantitative analyst who forecasts equity realised volatility from
+corporate SEC disclosures. You always answer with ONLY a single JSON object
+and no other text, no markdown, no explanation.\\[6pt]
+\textrm{\textit{user message}}\\
+Company SEC filing.\\
+- Form type: 8-K (items: 8.01)\\
+- Filing date: 2023-03-06\\[4pt]
+Filing excerpt:\\
+% T1 typewriter ligates << and >>, so the box printed «< and »> where the prompt
+% holds <<< and >>>.  The braces break the ligature; the box claims to be verbatim
+% and the paragraph below makes its character count checkable, so it must be.
+<{}<{}<\\
+\textrm{\textit{[the filing text, within the excerpt budget]}}\\
+>{}>{}>\\[4pt]
+Task: based ONLY on the disclosure text above, forecast this company's
+ANNUALIZED realised stock-return volatility over the next 5, 10 and 20 trading
+days after the filing. Express each forecast as a decimal (e.g. 0.25 means
+25\% annualized; typical values lie between 0.10 and 1.00; extreme stress can
+exceed 1.00).\\
+Respond with ONLY this JSON object: \{"vol\_5d": <number>, "vol\_10d":
+<number>, "vol\_20d": <number>\}
+\par}
+\end{minipage}}
+\medskip
+
+Of the three header lines only the latter two carry interpolated fields, so
+those two and the excerpt are all that change from filing to filing. No
+price, return or volatility quantity enters the text-only variant, which is
+what makes it comparable with the trained text arms rather than with the
+fused arm. The excerpt budget is 21{,}200 characters: a 6{,}000-token prompt
+cap less a 700-token allowance for the scaffold, converted at the four
+characters per token the prompt builder assumes off the GPU host, with the
+host-side runner re-checking true token counts against the model's own context
+limit. An 8-K shorter than the budget is passed whole and one longer is
+truncated from the head, which is the policy that governs both cases here. % src: scripts/experiments/e1_llm_forecast/prompt.py (MAX\_PROMPT\_TOKENS, SCAFFOLD\_TOKENS, CHARS\_PER\_TOKEN, EXCERPT\_CHAR\_BUDGET, build\_excerpt)
+That the template above is what the model actually saw is checkable rather
+than asserted: rebuilding it over the two filings reproduces the released
+prompt-length field exactly, at 21{,}723 characters for Case~1 and 4{,}789 for
+Case~2. % src: release/raw_generations/raw/part-00197.parquet and part-00112.parquet (prompt\_chars, variant c6\_text)
+
+\subsection*{Case 1: the document carries its own driver}
+
+Fifth Third Bancorp, Form 8-K, items 1.01 and 9.01, accepted 2025-10-08 at
+21:28:40 UTC and therefore assigned the effective trading day 2025-10-09;
+accession 0001193125-25-234686, a test row. % src: release/accession_index.csv
+The document reports entry into an agreement and plan of merger under which
+Comerica is acquired for stock, each Comerica share converting into 1.8663
+Fifth Third shares, conditional on both shareholder votes and regulatory
+approval. % src: the filing itself, accession 0001193125-25-234686, indexed in release/accession\_index.csv. The released generation file carries the arm's output, its prompt length and an excerpt\_source flag taking the values full/head/sections; it does not ship the filing text, so the exchange ratio and the two conditions are verified against EDGAR rather than against that parquet
+The document runs past the 21{,}200-character budget, so the arm
+read the leading portion and not the tail. % src: release/raw_generations/raw/part-00197.parquet (excerpt\_source head, prompt\_chars 21723)
+It answered \texttt{\{"vol\_5d": 0.35, "vol\_10d": 0.30, "vol\_20d": 0.25\}}
+on the first attempt, with no retry and no parse failure. % src: release/raw_generations/raw/part-00197.parquet (raw\_output, parse\_ok true, retry\_used false)
+
+Those three numbers sit at the top of the arm's own range. At $h{=}5$ the
+value 0.35 is exceeded on 11 of the 25{,}109 event-driven test rows, and the
+same row's price-only forecast from arm A2 sits at the 3.8th percentile of its
+own distribution, the bottom decile at all three horizons. % src: results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet; results/runs/A2_har_rv_full_event_driven_seed2026/predictions.parquet
+The realised outcome fell in the top decile at $h{=}5$ and $h{=}10$ and the
+eighth at $h{=}20$, and the text forecast carried the lower QLIKE at all three
+horizons. % src: results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet
+One further reading of the same document is available and it is not
+flattering. The fused D4 variant, given this excerpt together with three
+trailing realised-volatility figures, answered 0.1500, 0.1650 and 0.1800, so
+on the one filing of this pair where the text was right the addition of price
+context removed what the text contributed. % src: release/raw_generations/raw/part-00197.parquet (variant d4\_fused, raw\_output)
+That is one filing and settles nothing; the fused arm's standalone position is
+the D4 row of Table~\ref{tab:res-leaderboard}.
+
+\subsection*{Case 2: the driver is not in the document}
+
+The same filer, Form 8-K, item 8.01, accepted 2023-03-06 at 21:30:14 UTC,
+effective trading day 2023-03-07; accession 0000035527-23-000135, also a test
+row. % src: release/accession_index.csv
+The document announces that a previously disclosed accelerated share
+repurchase of about \$200 million has finished: 5{,}589{,}996 shares
+repurchased at an average price of \$35.78, leaving roughly 32.1 million
+shares of authority outstanding. % src: the filing itself, accession 0000035527-23-000135, indexed in release/accession\_index.csv. As above, the released generation file records excerpt\_source = full (the whole document fitted the budget) but does not ship the text, so the three figures are verified against EDGAR
+Read at face value it is a routine,
+backward-looking capital-return notice, and if it points anywhere it points
+away from turbulence. The whole text sits inside the
+budget, so nothing was truncated. % src: release/raw_generations/raw/part-00112.parquet (excerpt\_source full, prompt\_chars 4789)
+The arm answered \texttt{\{"vol\_5d": 0.18, "vol\_10d": 0.16, "vol\_20d":
+0.14\}}, again first attempt. % src: release/raw_generations/raw/part-00112.parquet (raw\_output, parse\_ok true, retry\_used false)
+
+The outcome fell in the top decile at all three horizons, above the 99th
+percentile at $h{=}5$ and $h{=}10$. % src: results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet
+The price-only forecast missed it as well, sitting in the third decile, though
+it carried the lower QLIKE of the two at all three horizons. % src: results/runs/A2_har_rv_full_event_driven_seed2026/predictions.parquet
+The five trading days following 2023-03-07 lie inside the March 2023 stress in
+United States regional banking, and the failure is therefore not a misreading
+of the document: it is a demand for information the document does not contain.
+No completed-buyback notice anticipates a sector-wide repricing three sessions
+later, and the arm is given no price history with which to notice one
+beginning.
+
+That the miss is structural rather than particular can be shown on the same
+committed rows. Filings whose effective trading days fall between 2023-03-06
+and 2023-03-10 number 116, spread over 97 firms. A quarter of their $h{=}5$
+rows land in the top decile of the realised outcome and 32.8 per cent in the
+top two, against the tenth and the fifth that a decile cut allows. % src: results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet
+The arm's forecasts over the same window do not move with them: its median
+forecast there is 0.18 against 0.22 across the panel, 1.7 per cent of its rows
+carry a forecast of 0.32 or more against 2.4 per cent panel-wide, and it carries the
+lower QLIKE against the price-only forecast on 24.1 per cent of those rows
+against 43.1 per cent panel-wide. % src: results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet; results/runs/A2_har_rv_full_event_driven_seed2026/predictions.parquet
+This is the within-date decomposition of Section~\ref{sec:res-identity}
+observed at the level of one week: the arm supplies cross-sectional ordering,
+and a week in which the whole cross-section turns at once is where ordering is
+worth least.
+
+\subsection*{How coarse the arm's readings are}
+
+The pair is legible partly because the arm's output space is small. Over the
+25{,}109 event-driven test rows at $h{=}5$ it returns ten distinct values, and
+two of them, 0.18 and 0.22, cover 92.6 per cent of the rows. % src: results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet
+Its Spearman correlation with the realised outcome is 0.17 against the
+price-only forecast's 0.45, so on its own it is much the weaker ranking of the
+two, which is the standalone result of Section~\ref{sec:res-standalone}
+restated as a correlation. % src: results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet; results/runs/A2_har_rv_full_event_driven_seed2026/predictions.parquet
+What the arm does have is a usable high tail. On the 593 rows where it returns
+0.32 or more, 36.1 per cent of outcomes land in the top two deciles against
+20 per cent unconditionally. % src: results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet
+That contingency is reported here as description and is not an incremental
+result: 43.0 per cent of those same 593 rows also sit in the price-only
+forecast's top two deciles against 20 per cent unconditionally, so part of the
+lift is information the price model already has, and conditioning on the
+price-only decile shrinks the lift and reverses its sign in two of the ten
+deciles. % src: results/runs/A2_har_rv_full_event_driven_seed2026/predictions.parquet; results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet
+No test is run on any of it.
+
+\subsection*{How the pair was chosen, and what it is not}
+
+The selection rule is stated so that it can be checked rather than trusted.
+Case~1 was drawn from the 34 event-driven $h{=}5$ test rows on which the arm
+returned 0.30 or more, the outcome fell in the top two deciles, the price-only
+forecast fell in the lower six, and the text forecast carried the lower QLIKE. % src: results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet; results/runs/A2_har_rv_full_event_driven_seed2026/predictions.parquet
+Case~2 was drawn from the 84 rows on which the arm returned 0.18 or less, the
+outcome fell in the top decile and the price-only forecast in the lower three. % src: results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet; results/runs/A2_har_rv_full_event_driven_seed2026/predictions.parquet
+Six filers appear in both pools, and one of the six was set aside because
+its document concerns a named individual's alleged conduct, which
+Appendix~\ref{app:ethics} treats as an incidental token in a model's input and
+not as material to reproduce in a report. % src: results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet (filers present in both pools)
+The pair reported shares a filer, which is the property that removes firm
+identity from the contrast between the two cases and is the reason this
+particular pair was preferred over the others available.
+
+Four things the pair does not establish. It was chosen for legibility and is
+not a random draw from either pool, so its two outcomes carry no sampling
+interpretation. It enters no multiplicity family, and no count, test or
+interval in Chapters~\ref{ch:results} or~\ref{ch:validation} moves by a single
+unit whether it is included or not. Every outcome above is a decile or a
+percentile within the event-driven test distribution at the horizon named,
+because the release withholds per-filing realised volatility and a level would
+disclose exactly the quantity it withholds; the deciles are computed on the
+committed prediction files rather than published as a table. % src: release/DATA_CARD.md; results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet
+And the elicited forecast shown is not the quantity the chapters test. Those
+tests concern the combination of the text forecast with a recalibrated price
+reference, and the combination enters the text forecast with an
+out-of-sample log elasticity of $+0.264$ in this cell, so a swing from 0.18 to
+0.35 reaches the combined forecast heavily damped. % src: results/tables/forecast_combination_grid.csv (event\_driven, C6\_llmtext, h=5, g\_log)
+That damping is one reason an increment this visible on a single document
+aggregates, in this cell, to $+1.21$ per cent over the recalibrated price
+reference --- about one per cent, not a fraction of one, and smaller again once
+the firm-identity term enters the reference. % src: results/tables/control_intersection_ensemble.csv (event_driven C6_llmtext h=5, vol_rel_impr_pct 1.214)
+
+\clearpage

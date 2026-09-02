@@ -1,0 +1,74 @@
+\section{Models}
+\label{sec:methods}
+
+Every model maps a filing (and, for fusion models, its price context) to a forecast of forward log realised volatility $\ln\mathrm{RV}_{i,d,h}$ at horizon $h\in\{5,10,20\}$ trading days. Table~\ref{tab:models} organises the matrix into four blocks whose joint purpose is to make the incremental-value question \emph{falsifiable at every level of representation and elicitation}: price-only baselines (A), classical text (B), neural and LLM text (C), and price--text fusion (D). The text spectrum runs from word counts to a prompted 32-billion-parameter instruction LLM; the cleanest standalone contrast is A2 versus Block~D---identical price information, with and without text.
+
+\paragraph{Price-only baselines (A).}
+A1 is naive historical volatility, the backward realised volatility carried forward and the floor any useful model must clear. A2 is HAR-RV \citep{corsi2009har}, a linear regression of future log-RV on daily, weekly, and monthly realised-volatility components ($rv\_1d$, $rv\_5d$, $rv\_22d$); it is the \emph{primary baseline} for all significance tests, being the acknowledged hard-to-beat workhorse of the realised-volatility literature. A3 and A4 are GARCH(1,1) \citep{engle1982arch,bollerslev1986garch} and EGARCH \citep{nelson1991egarch}; A5 is ARIMA on log-RV \citep{box1970time}; GARCH(1,1) alone is notoriously difficult to out-forecast \citep{hansen2005garch}. Two further baselines ensure the price-side frontier is never represented by a single model: A6 is the realised-semivariance HAR (SHAR) of \citet{pattonsheppard2015shar}, which splits the daily RV regressor into signed semivariances, and A7 is HAR-X, adding point-in-time log VIX as an exogenous regressor \citep{blair2001forecasting}. The protocol (Section~\ref{sec:protocol}) draws on this block to define its \emph{maximal price pool} of five models (A2, A6, A3, A4, A5).
+
+\paragraph{Classical text (B).}
+B1 (bag-of-words) and B2 (TF--IDF \citep{salton1988term}) feed ridge regression \citep{hoerl1970ridge}, strong lexical baselines in the tradition of \citet{kogan2009predicting}. B3 uses Loughran--McDonald financial-sentiment dictionary counts \citep{loughran2011liability} in a linear model, and B4 augments them with engineered readability and length features \citep{loughran2016survey}. Block~B controls for the possibility that any neural effect is merely surface lexical statistics.
+
+\paragraph{Fine-tuned encoders (C1--C4).}
+Four pretrained transformers are fine-tuned for log-RV regression: C1 BERT-base \citep{devlin2019bert} (general-domain control), C2 FinBERT \citep{araci2019finbert} (the headline domain-pretrained encoder), C3 RoBERTa-base \citep{liu2019roberta} (general-domain control sharing Longformer's lineage), and C4 Longformer-base-4096 \citep{beltagy2020longformer} (native sparse-attention long context). Pairing C4 against C3 isolates long context on a single pretraining lineage.
+
+\paragraph{Long-document strategies (S1--S5).}
+Every long-form filing exceeds 4{,}096 tokens (Section~\ref{sec:dataset}), so how a fixed-context encoder meets such a document is a first-class design axis, not an implementation detail. \textbf{S1} truncates to the first 512 tokens; \textbf{S2} encodes 512-token chunks and mean-pools the chunk embeddings; \textbf{S3} replaces mean-pooling with learned attention over chunks \citep{vaswani2017attention}; \textbf{S4} stacks a transformer over the chunk embeddings, a hierarchical encoder \citep{pappagari2019hierarchical}; \textbf{S5} is native long context, a single pass over 4{,}096 tokens realised by the Longformer encoder (so S5 and C4 share an implementation). The full S1--S4 sweep runs on FinBERT (encoder fixed, strategy varied) while C1/C3 at S1 vary the encoder with strategy fixed (C1 additionally runs S2)---a two-axis design that keeps strategy and family effects unconfounded.
+
+\paragraph{Frozen decoder-LLM embeddings (C5, C5x).}
+C5 asks whether representation scale alone---without fine-tuning---recovers disclosure signal. Three open 7--8B embedding families, Qwen3-Embedding-8B, gte-Qwen2-7B-instruct, and e5-mistral-7B, encode each filing frozen within the embedder's native context window, and light ridge or MLP heads map the pooled embedding to log-RV. C5x is an \emph{input-parity} variant: Qwen3-Embedding-8B applied to the byte-identical curated excerpts that the prompted model C6 reads. Because C5x and C6 share lineage and input (though not parameter count), any C6-versus-C5x gap is attributable to the elicitation mechanism---prompting versus embedding pooling---rather than to excerpt curation, the dissociation exploited in Section~\ref{sec:results}.
+
+\paragraph{Prompted generative LLM (C6).}
+C6 elicits a numeric volatility forecast from Qwen3-32B \citep{qwen3_2025} by instruction prompting: the model runs in bf16 under offline batched vLLM \citep{kwon2023vllm} with temperature~0, thinking mode disabled, an 8K-token context, and JSON-constrained output with parse-retry. Inputs are curated excerpts: for 10-K/10-Q filings, Items 1A, 7, and 7A where extractable, else head truncation; for 8-K filings, the full text (median $\sim$930 tokens). Temperature-0 decoding is near- but not exactly deterministic---repeat decodes are 94--97\% exact-equal---which we disclose and probe with an elicitation-sensitivity suite (Section~\ref{sec:ablations}). Two cross-family replications, Yi-1.5-34B-Chat \citep{yi_2024} (4K context) and Phi-4-14B \citep{phi4_2024}, test whether any prompted increment generalises beyond the Qwen3 family.
+
+\paragraph{Price--text fusion (D).}
+D1 and D2 combine the standardised price features with the FinBERT \texttt{[CLS]} embedding $\mathbf{e}$: D1 concatenates the two into a multilayer perceptron, while D2 learns a scalar gate that modulates the text contribution conditional on the price state $\mathbf{p}$,
+\begin{equation}
+\label{eq:gate}
+g=\sigma(\mathbf{w}^{\top}[\mathbf{p};\mathbf{e}]+b),\qquad
+\mathbf{z}=[\mathbf{p};\,g\odot\mathbf{e}],
+\end{equation}
+with $\sigma$ the logistic function and $\mathbf{z}$ fed to the regression head; D1 is deliberately naive so that any D2 advantage is attributable to gating alone. D3 fuses the price features with each frozen C5 embedding family through the same light heads, and D4 fuses them with the C6 prompted forecast itself, treating the LLM's output as one more feature the combiner may use or discard.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Model matrix. Text-input handling: full = full text to a lexical vectoriser; S1 truncation-512, S2 chunk-mean, S3 chunk-attention, S4 hierarchical, S5 native 4{,}096; nat.\ = frozen embedder's native context window; exc.\ = the curated excerpts of the C6 prompt (10-K/10-Q Items 1A/7/7A, else head truncation; 8-K full text).}
+\label{tab:models}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{ID} & \textbf{Model} & \textbf{Inputs} & \textbf{Text in.} \\
+\midrule
+A1 & Naive hist.\ volatility & price & --- \\
+A2 & HAR-RV & price & --- \\
+A3 & GARCH(1,1) & price & --- \\
+A4 & EGARCH & price & --- \\
+A5 & ARIMA on log-RV & price & --- \\
+A6 & SHAR (semivariance HAR) & price & --- \\
+A7 & HAR-X (log VIX) & price+VIX & --- \\
+\midrule
+B1 & Bag-of-words\,+\,ridge & text & full \\
+B2 & TF--IDF\,+\,ridge & text & full \\
+B3 & L--M dictionary, linear & text & full \\
+B4 & L--M\,+\,engineered & text & full \\
+\midrule
+C1 & BERT-base & text & S1--S2 \\
+C2 & FinBERT & text & S1--S4 \\
+C3 & RoBERTa-base & text & S1 \\
+C4 & Longformer-4096 & text & S5 \\
+C5 & Frozen LLM embed.\ ($\times$3) & text & nat. \\
+C5x & Qwen3-Emb.-8B (parity) & text & exc. \\
+C6 & Prompted Qwen3-32B & text & exc. \\
+\midrule
+D1 & Concat-MLP & price+text & S1 \\
+D2 & Gated fusion & price+text & S1 \\
+D3 & Price\,+\,C5 embedding & price+text & nat. \\
+D4 & Price\,+\,C6 forecast & price+text & exc. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Training and seeds.}
+Each model fits one independent submodel per horizon rather than a multi-task head, mirroring the horizon-specific baselines and removing any risk that a shared trunk trades 5-day against 20-day accuracy. Neural and fusion models regress $\ln\mathrm{RV}$ under squared-error loss with AdamW at learning rate $1\times10^{-5}$ for 3 epochs. The recipe is deliberately fixed across every Block~C/D run: comparability across the matrix, not per-model tuning, is the design goal, and the training diagnostics discussed in Section~\ref{sec:discussion} show the regime it induces is overfitting, not underfitting, so a richer budget is not what text is missing. Per-device batch sizes are set by an empirical VRAM probe, and the trainer checkpoints each completed horizon under a configuration fingerprint, so an interrupted campaign resumes without recomputing or silently reusing a stale horizon. Every stochastic C/D run is repeated under three seeds (2026, 2027, 2028); the per-observation mean of the three forecasts---the \emph{seed-ensemble}---is the declared primary forecast object (Section~\ref{sec:protocol}), with single-seed results reported only as robustness restatements. Neural models use PyTorch \citep{paszke2019pytorch} with HuggingFace Transformers \citep{wolf2020transformers}; classical models use scikit-learn \citep{pedregosa2011sklearn}.
+

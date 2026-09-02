@@ -1,0 +1,366 @@
+\chapter{Results of the Empirical Investigation}
+\label{ch:results}
+
+% ============================================================================
+% Ground-up rebuild (W1, 2026-08): assembled from the frozen sources only.
+% The basis-declaration paragraph below is the single counting-convention
+% authority for the chapter; every number carries a same-line evidence comment
+% per the blueprint's verification protocol.
+% ============================================================================
+
+This chapter narrows one claim in five steps: whether text wins alone at all; what it adds beyond a recalibrated reference, and is therefore \emph{detectable}; the one model--channel pair that survives; how much of that is \emph{attributable} to content, not the filer; and whether it is \emph{realisable} as economic value. Every headline count is computed on one declared \emph{primary basis} (Table~\ref{tab:res-basis}). The forecast object there is a seed ensemble, not any single run, because single runs are seed-fragile; Chapter~\ref{ch:validation} evidences that choice. % src: results/tables/seed_aggregate.md; results/tables/m1_ensemble_primary.md
+Any number departing from it --- single-seed, observation-level, variance-unit, merged-grid, two-way clustered or deployable --- carries its tag inline.
+
+\begin{center}
+\captionsetup{type=table,hypcap=false}
+\caption[The primary basis of the results chapter]{The primary basis. Sections~\ref{sec:design-training}, \ref{sec:design-ladder} and~\ref{sec:design-inference} fix these conventions; they are restated here because every headline count below is read against them.}
+\label{tab:res-basis}
+{\small\singlespacing
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.74\textwidth}@{}}
+\toprule
+Element & Convention \\
+\midrule
+Forecast object & Seed ensemble: the per-observation mean of three runs at random seeds 2026, 2027 and 2028; the prompted arms C6 and D4 are single-pass rows (Section~\ref{sec:design-training}). \\ % src: results/tables/seed_aggregate.md; results/tables/m1_ensemble_primary.md; frozen 05_protocol.tex
+Test & Diebold--Mariano on paired loss differentials \cite{diebold1995comparing}, with the small-sample adjustment of \cite{harvey1997testing}. \\ % src: frozen 05_protocol.tex
+Clustering & Loss differentials averaged within each trading day and tested on the resulting daily series (794--996 trading days per panel), Newey--West at lag $h-1$ \emph{days}. \\ % src: results/tables/dm_pairwise_clustered.md; frozen 05_protocol.tex
+Clustering effect & Median shrink of the absolute DM statistic is 0.31 of its observation-level value over the 180 standalone comparisons and 0.49 over the single-seed grid; observation-level figures are inflated roughly two- to threefold. \\ % src: results/tables/dm_pairwise_clustered.md (0.31); results/tables/m1_clustered.md (0.49)
+Multiplicity & Holm's step-down procedure \cite{holm1979simple} within each of the 15 pre-declared families enumerated in Table~\ref{tab:app-holm-families}, holding the chance of even one false positive below five per cent. \\ % src: results/tables/holm_families.md
+Genuine cell & Clustered DM negative, Holm-adjusted $p<.05$, and a label-shuffle placebo (the text forecast replaced by a permuted copy, over five shuffle seeds) inside $|\mathrm{DM}|<2$. \\ % src: frozen 05_protocol.tex
+Loss & Squared error for the 180-comparison census; QLIKE \cite{patton2011proxies} in volatility units for the combination grid, variance units for the standalone leaderboard. \\ % src: frozen 05_protocol.tex
+Standalone census & 180 comparisons: 20 challengers over nine disclosure-by-horizon panels (long-form, event-driven and combined channels at $h=5$, 10 and 20 trading days). Three challengers are price models and 17 text or fusion, the latter forming a 153-comparison variance-unit sub-family. \\ % src: frozen 05_protocol.tex
+Combination grid & 69 cells: 15 long-form and 8 event-driven challengers at three horizons. \\ % src: frozen 05_protocol.tex
+Test rows, full panels & 7,951/7,933/7,902 long-form, 25,109/25,001/24,732 event-driven and 33,060/32,934/32,634 combined observations at $h=5/10/20$. \\ % src: results/tables/dm_pairwise_clustered.md (n_obs); dossier Part 1.4
+\bottomrule
+\end{tabular}
+}
+\end{center}
+
+\section{Standalone Performance}
+\label{sec:res-standalone}
+
+No text model beats the price baseline out of sample. Across all 180 standalone squared-error comparisons against HAR-RV, the heterogeneous autoregressive model of realised volatility and the field's standard price-history baseline \cite{corsi2009har}, none favours the challenger, at raw $p<.05$ as well as after Holm correction applied within each 20-challenger disclosure-by-horizon panel. Of the 180, 155 are significantly \emph{worse} (Table~\ref{tab:app-dm180}). % src: results/tables/dm_pairwise_clustered.md (0/180 better, 155/180 worse)
+The verdict is insensitive to the inference convention: under two-way firm-by-day clustering \cite{cameron2011twoway}, which additionally allows errors of the same firm to correlate over time, 152 of 180 remain significantly worse and still 0 are better. On the observation-level basis (superseded, inflated) the worse-count reads 174 of 180. % src: results/tables/twoway_cluster.md; results/tables/dm_pairwise_clustered.md
+It is likewise insensitive to the loss: under volatility-unit QLIKE the census is again 0 of 180 better and 161 significantly worse, the harshest of the three conventions. % src: results/tables/variance_unit_standalone180.csv; TECHNICAL_SUPPLEMENT.md S7
+Joint tests that guard against data-snooping across the whole leaderboard agree: Hansen's test for superior predictive ability returns $p=1.000$ for the hypothesis that no \emph{text or fusion} challenger beats HAR-RV. Over the full alternative set the same test does reject HAR-RV in nine of the 18 loss-panels, but all nine rejections favour price models; no pure-text model enters any 90\% model confidence set \cite{hansen2005spa,hansen2011mcs} (Tables~\ref{tab:app-spa} and~\ref{tab:app-mcs}). % src: results/tables/row13_spa_mcs.md; frozen 06_results.tex
+
+One convention produces apparent winners, and their identity is instructive. Under variance-unit QLIKE, 7 of 180 comparisons favour the challenger: every one a GARCH-family \emph{price} arm (A3 in six cells, A4 at long-form $h=5$), so the 17 text and fusion arms remain 0 of 153 better even there. % src: results/tables/variance_unit_standalone180.csv; TECHNICAL_SUPPLEMENT.md S7
+The depth of the failure is clearest in explained variance. Out-of-sample $R^2$ is the share of variation in realised volatility a forecast explains on the test years; it is negative whenever the model does worse than a constant benchmark. Text-alone models on the long-form channel post negative $R^2$ in all 45 seed-mean cells, from $-0.015$ for the strongest frozen-embedding arm at $h=20$ to $-0.468$ for bag-of-words ridge at $h=5$. HAR-RV posts $+0.089/+0.121/+0.208$ on the same rows in the comparison table (Figure~\ref{fig:app-model-spectrum}). Its own run metrics read higher, at $+0.169/+0.181/+0.264$; Section~\ref{app:hyperparams:blocks} sets the two vintages side by side. % src: results/tables/seed_aggregate.csv (the 45 text cells); results/tables/compare_full_long_form_test.md A2 row (+0.089/+0.121/+0.208); results/runs/A2_har_rv_full_long_form_seed2026/metrics.json (r2 0.16939/0.18084/0.26399 on the same 7,951/7,933/7,902 rows). The sign of every text cell is unaffected by which A2 vintage is quoted
+Table~\ref{tab:res-leaderboard} puts magnitudes beside those counts. The fine-tuned encoders sit at roughly twice the baseline's loss at the short horizons, and domain pretraining does not close the gap: FinBERT reads 1.343 against HAR-RV's 0.556 at $h=5$ and sits above the count-based TF--IDF pipeline at all three long-form horizons (Table~\ref{tab:app-domain}); the frozen 7--8B-parameter embedding arm narrows the gap substantially (0.654) yet remains significantly worse. The gated fusion arm lands between the two regimes (Table~\ref{tab:app-leaderboard} carries all 25 arms). % src: TECHNICAL_SUPPLEMENT.md S7 leaderboard table; results/tables/seed_aggregate.csv (long_form qlike_mean, C2_finbert_s1 1.3428/1.2440/0.7262 against B2_tfidf_ridge 1.2371/1.0522/0.7083)
+
+A weak reference manufactures apparent value; the choice of reference, not the text model, decides the verdict. Figures~\ref{fig:res-standalone180}--\ref{fig:res-standalone180-b} draw the full census, and the lower panel of the first makes that case on this census's own arms: the same text arms that lose to HAR-RV by DM $+12.2$ to $+18.5$ merely \emph{tie} a naive persistence forecast. All six statistics fall inside $\pm1.96$, and four of the six point estimates favour the text arm (single-seed, observation-level basis). The reference-ladder apparatus of Section~\ref{sec:res-ladder} follows from that fact. % src: results/tables/dm_weak_vs_strong_baseline.md; frozen 07_ablations.tex
+The third panel shows the null is no artefact of the 2022 volatility shock: in every sub-period stratum (2022, 2023 and 2024--25), all 45 cells remain positive, that is, worse than HAR-RV (single-seed, observation-level basis). % src: results/tables/dm_stratified.md; TECHNICAL_SUPPLEMENT.md S7
+
+\begin{table}[tbp]
+\centering
+\caption[Representative standalone leaderboard]{Representative standalone leaderboard: test QLIKE in \emph{variance units} on the long-form panel, with trained C- and D-block rows averaged over three seeds. The verdict column is the day-clustered variance-unit DM test against A2 on the seed-ensemble forecasts, Holm-corrected (** $p<.05$). $\dagger$: evaluated on a 90\%-coverage return-matched subsample on which A2 reads 0.5635/0.4226/0.3076, and outside the 180-comparison census, whose three price challengers are A3--A5; its verdict is observation-level and uncorrected, off this table's declared basis. $\ddagger$: single-pass prompted rows, combination-track and outside the 180-comparison census.}
+\label{tab:res-leaderboard}
+\begin{tabular}{@{}lrrrl@{}}
+\toprule
+Model & $h{=}5$ & $h{=}10$ & $h{=}20$ & vs.\ A2 \\
+\midrule
+A2 HAR-RV (baseline)         & 0.5564 & 0.4618 & 0.2970 & --- \\ % src: TECHNICAL_SUPPLEMENT.md S7; results/tables/cost_accuracy.md
+A3 GARCH                     & 0.4829 & 0.3750 & 0.2686 & n.s. \\ % src: TECHNICAL_SUPPLEMENT.md S7
+A6 SHAR$^\dagger$            & 0.5568 & 0.4106 & 0.2948 & better \\ % src: TECHNICAL_SUPPLEMENT.md S7; results/tables/stronger_baselines.md
+B2 TF--IDF ridge             & 1.2371 & 1.0522 & 0.7083 & worse** \\ % src: TECHNICAL_SUPPLEMENT.md S7
+C2 FinBERT (S1)              & 1.3428 & 1.2440 & 0.7262 & worse** \\ % src: TECHNICAL_SUPPLEMENT.md S7; results/tables/longdoc_sweep.md
+C4 Longformer                & 1.2351 & 1.0637 & 0.6051 & worse** \\ % src: TECHNICAL_SUPPLEMENT.md S7; results/tables/longdoc_sweep.md
+C5 frozen emb.\ (gte-Qwen2)  & 0.6538 & 0.5714 & 0.3916 & worse** \\ % src: TECHNICAL_SUPPLEMENT.md S7
+C6 prompted Qwen3-32B        & 1.2259 & 1.0950 & 0.9258 & $\ddagger$ \\ % src: TECHNICAL_SUPPLEMENT.md S7
+D2 gated fusion              & 0.7964 & 0.6022 & 0.4410 & worse** \\ % src: TECHNICAL_SUPPLEMENT.md S7
+D4 price+C6 fusion           & 1.1943 & 0.6628 & 0.4295 & $\ddagger$ \\ % src: TECHNICAL_SUPPLEMENT.md S7
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F3_standalone_180_and_reference_strength__a.pdf}
+\caption[The standalone census and the strength of the reference]{The standalone census and the strength of the reference. Panel (a): all 180 day-clustered DM statistics against HAR-RV, one strip per loss convention (squared error, volatility-unit QLIKE, variance-unit QLIKE), filled where Holm-significant within each 20-comparison disclosure-by-horizon panel; positive statistics mean the challenger is worse. Panel (b): two representative text arms scored on identical long-form test rows against a naive persistence reference and against HAR-RV (single-seed, observation-level basis; magnitudes not comparable with panel (a)). Panel (b) is not Holm-corrected and does not belong to a family; only (a)'s fills are.} 
+\label{fig:res-standalone180}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F3_standalone_180_and_reference_strength__b.pdf}
+\caption[Sub-period DM statistics for 2022, 2023 and 2024--25]{Continued from Figure~\ref{fig:res-standalone180}. Panel (c): sub-period DM statistics for 2022, 2023 and 2024--25 (single-seed, observation-level basis), where an asterisk marks a raw, uncorrected two-sided $p<0.05$ and ``ns'' its absence; positive statistics mean the challenger is worse. As in panel (b) of Figure~\ref{fig:res-standalone180}, (c) is not Holm-corrected and does not belong to a family; only (a)'s fills are.} 
+\label{fig:res-standalone180-b}
+\end{figure}
+
+The census closes the obvious escapes in turn: representation, optimisation, tuning and feature construction. Representation first: the study's long-document question. The median long-form filing runs to 29,278 wordpiece tokens, of which a 512-token truncation reads under two per cent. The sweep of handling strategies S1--S5 (truncation, chunk mean, chunk attention, hierarchical encoding, native long context) therefore asks whether reading more of the document rescues the channel. % src: frozen 03_dataset.tex Table 1; dossier Part 1.4
+It does not, although it does help within text. On the primary QLIKE loss, native 4,096-token long context (Longformer, S5 \cite{beltagy2020longformer}) significantly beats S1 truncation at all three long-form horizons (DM $-4.10/-9.69/-3.02$, observation-level statistics on the seed-ensembled losses, the sweep's own convention; the $h=20$ squared-error counterpart is not significant at $-0.71$). Each FinBERT-based chunking strategy S2--S4 beats truncation at two horizons and is significantly worse at the third. % src: results/tables/longdoc_sweep.md; configs/models/C4_longformer.yaml (max_length 4096)
+Yet the best QLIKE anywhere in the sweep, 0.572, remains nearly double HAR-RV's 0.297 at the same horizon, and the long-context arm costs roughly twenty times the truncation arm's compute (254.7 against 12.7 GPU-hours). % src: results/tables/longdoc_sweep.md; results/tables/cost_accuracy.md
+
+Nor is the failure one of undertraining; it is an overfitting regime. The convergence audit records 136 of 146 runs converged under early stopping, nine unverifiable for at least one horizon (no retained curve, concentrated in one architecture) and a single epoch-cap hit that is a pilot run; the fleet trained to its validation optima. % src: results/tables/convergence_gate.md; TECHNICAL_SUPPLEMENT.md S10
+What those optima look like is the point: on the 2020--21 validation years the text-only encoders' $R^2$ sits between $-0.249$ and $-0.407$ while HAR-RV posts $+0.077/+0.032/-0.074$ --- representations that memorise rather than generalise (single-seed diagnostic figures, long-form validation years). % src: results/tables/gate_cushioning.md (G3 single-seed); TECHNICAL_SUPPLEMENT.md S10
+A dedicated hyperparameter search closes neither gap. An ASHA search over FinBERT (32/24 Sobol trials, test rows physically withheld) recovers about 74\% of the long-form standalone \emph{validation} gap, yet the tuned three-seed ensemble stays worse than the recalibrated HAR standalone in all six test cells, five of six Holm-significant. It adds no combination cell either: its one Holm-and-placebo-clean cell (event-driven $h=10$, $+2.13$ per cent) was already genuine under the fixed recipe at $+2.42$, while its $h=5$ fails both permutation controls, one of which the fixed recipe passes. % src: results/tables/hpo_test_eval.md (T1c event_driven h=10 +2.13, Holm .0446);
+% results/tables/m1_ensemble_primary.md (fixed recipe, same cell, +2.42); frozen 06_results.tex
+
+Nor does building the text feature \emph{within} the firm rescue it, which is the natural reading of the change-based tradition of Section~\ref{sec:bg-text}. A delta-TF--IDF feature is the change in a filing's word weights from its own predecessor \cite{cohen2020lazy}. It \emph{hurts} against the recalibrated HAR at every long-form horizon ($-0.16$, $-0.22$ and $-1.46$ per cent) on rows where the level features gain $+3.32$, $+3.55$ and $+6.02$. A FinBERT trained on firm-demeaned targets adds on seed 2026 in all six cells against that reference, yet none of its six survives the firm-identity rung and its one Holm-passing cell fails the placebo. Constructing the identity out of the text model, in other words, reproduces the ladder's verdict rather than escaping it. % src: results/tables/row2_delta_demeaned_m1.md
+
+One further standalone finding shapes everything that follows. HAR-RV, the designated reference, is not itself the strongest price model under QLIKE: the semivariance HAR of \cite{pattonsheppard2015shar}, which splits realised variance by the sign of the underlying returns, is better in all nine channel-horizon panels (QLIKE-DM $-3.7$ to $-13.5$, observation-level and uncorrected, off the primary basis). % src: results/tables/stronger_baselines.md (DM_q -3.735 to -13.504; "DM on the common (kept) test sample", no clustering and no Holm column)
+Substituted for HAR as the reference, it changes no verdict in the 18 incremental cells, the largest per-cell disagreement being 0.18 percentage points (Table~\ref{tab:app-shar}). % src: results/tables/stronger_baselines.csv (A2_rel_impr_pct vs A6_shar_rel_impr_pct, max |diff| 0.181 pp)
+GARCH's lower long-form QLIKE level is not significant. % src: results/tables/variance_unit_standalone180.csv (A3_garch long_form holm_qlike_var_clu 0.185/0.858/1.000)
+GARCH reads returns, not HAR's realised-variance measures, so their loss differential is widely dispersed; semivariance HAR shares those measures and its differential is tight.
+No pairwise test can therefore name a strongest single price arm, and crediting text with whatever one reference misses is unsafe.
+
+\section{The Reference Ladder}
+\label{sec:res-ladder}
+
+Standalone loss cannot separate ``the text carries information'' from ``the text inherits volatility persistence.'' The study's central instrument, the log-space combination introduced in Chapter~\ref{ch:data}, recalibrates a price reference $f_R$ on the validation years, adds the text forecast as one further term to give $f_U$, freezes all weights before the test years, and credits text with the out-of-sample QLIKE reduction from $f_R$ to $f_U$ over the 69-cell grid. % src: frozen 05_protocol.tex Eq.(1)
+Against the most generous rung, a single recalibrated HAR-RV, the primary basis leaves \textbf{38 of 69} cells genuine (46 at raw $p<.05$; Tables~\ref{tab:res-ladder} and~\ref{tab:app-ladder}). % src: results/tables/m1_ensemble_primary.md; results/tables/control_intersection_ensemble.md
+Off-basis restatements already temper the count: on the single training seed 2026 it reads 29 of 69; under two-way firm-by-day clustering, 27 (24 on seed 2026); under variance-unit QLIKE, 20. Adding market-level implied volatility (the VIX index) to the reference leaves 19 of 38 standing, on the earlier single-seed screen's 38 rather than this rung's (Table~\ref{tab:app-denominators}). % src: results/tables/m1_clustered.csv; results/tables/twoway_cluster.md; frozen 06_results.tex tab:cascade; results/tables/vix_control.md
+None of that makes the apparent gains negligible: the surviving increments reach $+5.92\%$ of reference QLIKE (TF--IDF ridge, long-form, $h=20$), and the full grid spans $-3.86\%$ to $+5.92\%$. % src: results/tables/m1_ensemble_primary.md; TECHNICAL_SUPPLEMENT.md S12
+
+The first strengthened rung asks whether the ``signal'' merely re-identifies \emph{which firm} filed. The firm-identity reference refits $f_R$ with one additional zero-text term, the firm's mean realised volatility over the validation years, so that any text feature that only proxies for the firm's identity earns no credit. Under it, on the merged-grid rows, \textbf{8 of 69} survive Holm (15 raw; Figure~\ref{fig:app-matched-rows}). % src: results/tables/firm_identity_ensemble.md
+The registered specification battery has four identity variants: validation-window mean, train-period mean, an expanding point-in-time pre-filing mean, and an empirical-Bayes shrunk mean. The count moves only between 8 and 14 across them (seed-2026 text basis; its baseline survivor set coincides exactly with the ensemble's eight). % src: results/tables/firm_fe_battery.md
+The zero-text term is not a technicality. The firm mean \emph{alone}, with no text anywhere, beats the plain recalibrated HAR in four of the six channel-horizon comparisons on the merged-grid rows (long-form $h=5/10/20$ and event-driven $h=5$; day-clustered DM $<0$, $p<.05$; three of six over the full A2 panels, long-form $h=5$ being the one that moves). Adding it flips 38 of the 45 long-form cells to \emph{negative} increments. Text now hurts (Figure~\ref{fig:app-firm-identity-rung}). % src: TECHNICAL_SUPPLEMENT.md S13; frozen 08_discussion.tex; results/tables/firm_identity_ensemble.md
+Firm-stable long-form disclosure text approximates a firm dummy: expressive representations of a 10-K encode \emph{who is speaking} well before they encode anything about future risk. % src: frozen 06_results.tex
+
+The second strengthened rung closes the price side. The maximal price pool is a validation-fitted log-space combination of five price models (HAR, semivariance HAR, GARCH, EGARCH and ARIMA), so that text is credited only with what its five members do not supply. Against it, on the same merged-grid rows, \textbf{9 of 69} cells survive Holm (26 raw). % src: results/tables/maximal_reference_ensemble.md
+The absorption is no artefact of fitting the pool's weights: a never-fitted equal-weight pool cuts the merged-grid 30 to 17, and the single validation-best member leaves 34 (Figure~\ref{fig:app-pool-audit}). Nor is its membership flattering: restoring the two omitted price models cuts further, the archived single-seed 8 falling to 3 (Figure~\ref{fig:app-pool-frontier-b}). % src: results/tables/maximal_pool_robustness.csv (adds_holm counts, ens basis: eqw_pool 17, valbest_single 34, fitted_pool 9); results/tables/pool_frontier_cascade.csv (genuine_holm 8 under pool5 vs 3 under pool7, archived seed-2026 basis only, never to be netted against the ensemble-basis 9); TECHNICAL_SUPPLEMENT.md S12 fig S5
+The pool absorbs mainly through its information, not its parameters. % src: frozen 06_results.tex
+
+The rungs then close jointly. No cell survives the maximal-pool \emph{and} firm-identity references together under Holm: the conjunction is \textbf{0 of 69} (4 at raw $p<.05$). % src: results/tables/control_intersection_ensemble.md
+The two survivor sets are not merely small but \emph{disjoint}, and not trivially so: all 9 pool survivors are long-form while the 8 identity survivors split six event-driven and two long-form. Eleven survivors therefore coexist within the 45 long-form rows without one intersection (Table~\ref{tab:app-survivors} names the eleven). % src: results/tables/control_intersection_ensemble.md; TECHNICAL_SUPPLEMENT.md S12
+Figure~\ref{fig:res-ladder-matrix}, drawn from the committed evidence table \texttt{control\_intersection\_ensemble.csv}, shows all 345 cell-level decisions behind the ladder's five 69-cell columns, redrawn by reference specification in Figure~\ref{fig:app-reference-spec-matrix}; the emptiness of its last two columns is the dissertation's central negative result.
+
+An empty conjunction is a strict selection device, not evidence of absence. Oracle firm-orthogonal signals injected at known effect sizes clear the full conjunction in 2, 6 and 13 of 69 cells at 0.3\%, 0.5\% and 1.0\% respectively. A pooled test across all 69 cells does detect a systematic micro-increment ($t=+8.29$, minimum detectable effect 0.375\%): detectable, not attributable. Chapter~\ref{ch:validation} reports the full power calibration. % src: results/tables/signal_injection_power.csv; frozen 06_results.tex
+
+\begin{table}[tbp]
+\centering
+\caption[The reference ladder on the 69-cell combination grid]{The reference ladder on the 69-cell combination grid (seed-ensemble basis, volatility-unit QLIKE, day-clustered DM unless noted; indented rows restate the primary rung off-basis). Raw/Holm: survivors at clustered-DM $p<.05$ before/after Holm correction; the primary-rung Holm count is additionally placebo-gated. The VIX-augmented row is a seed-2026 re-test of the cells an earlier single-seed screen had passed, not a restatement of the primary rung. The final row reports how many injected firm-orthogonal signals of known size recover through the full conjunction.}
+\label{tab:res-ladder}
+\begin{tabular}{@{}lccl@{}}
+\toprule
+Reference / control & Raw & Holm & Note \\
+\midrule
+Recalibrated HAR (primary rung)   & 46 & 38 & upper bound \\ % src: results/tables/control_intersection_ensemble.md; m1_ensemble_primary.md
+\quad single seed 2026            & --- & 29 & single-seed restatement \\ % src: results/tables/m1_clustered.csv
+\quad two-way clustering          & --- & 27 & 24 on seed 2026 \\ % src: results/tables/twoway_cluster.md; frozen 06_results.tex tab:cascade
+\quad variance-unit QLIKE         & --- & 20 & unit restatement \\ % src: frozen 06_results.tex tab:cascade; results/tables/m1_variance_unit.md
+VIX-augmented reference           & --- & 19 & of the original 38 \\ % src: results/tables/vix_control.md
+Firm-identity reference           & 15 & 8  & 4-spec battery 8--14 \\ % src: results/tables/firm_identity_ensemble.md; firm_fe_battery.md
+Maximal price pool (fitted)       & 26 & 9  & equal-weight pool 17 \\ % src: results/tables/maximal_reference_ensemble.md; TECHNICAL_SUPPLEMENT.md S12
+\textbf{Full conjunction}         & \textbf{4} & \textbf{0} & survivor sets disjoint \\ % src: results/tables/control_intersection_ensemble.md
+\midrule
+Injected 0.3\,/\,0.5\,/\,1.0\%    & \multicolumn{2}{c}{2\,/\,6\,/\,13} & conjunction recovery \\ % src: results/tables/signal_injection_power.csv
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F4_ladder_cell_matrix.pdf}
+\caption[The reference ladder, cell by cell]{The reference ladder, cell by cell. All 69 combination cells (event-driven panel left, long-form panel right; one row per model-horizon pair) against five columns: the placebo-gated primary rung, the fitted maximal price pool, the firm-identity reference, the pool-and-identity conjunction, and the full conjunction. A filled square marks survival at that rung; basis is seed-ensemble forecasts, volatility-unit QLIKE, day-clustered DM with Holm correction within each rung's own 69-cell family. The margin bars give each cell's primary-rung relative QLIKE improvement on one shared scale ($-3.86\%$ to $+5.92\%$); filled circles mark three-seed ensemble cells, open circles single-seed cells. The last two columns contain no filled square in any row.}
+% caption numbers src: results/tables/m1_ensemble_primary.csv (vol_rel_impr_pct min -3.86, max +5.92 over the 69 cells)
+\label{fig:res-ladder-matrix}
+\end{figure}
+
+\section{The Surviving 8-K Residual}
+\label{sec:res-residual}
+
+An empty conjunction says nothing about the cells the individual rungs leave standing, and one model--channel pair stands on the identity rung at all three horizons: the prompted-LLM reading of the event-driven 8-K current reports. Only its five-day cell survives all four identity specifications of the battery; two of the four remove $h{=}10$ and $h{=}20$. % src: results/tables/firm_fe_battery.md (specs ii, iii)
+
+The C6 arm elicits a numeric volatility forecast from the instruction-tuned Qwen3-32B language model \cite{qwen3_2025} reading the filing text under near-deterministic temperature-zero decoding; single-pass, as the chapter opening recorded, so its rows are identical on either seed basis. % src: writing/dissertation/supporting/sections/04_methods.tex; results/tables/residual_symmetric_holm.md (gate G6)
+Against the firm-identity reference of Section~\ref{sec:res-ladder}, the event-driven C6 cells retain $+0.52/+0.24/+0.21$ per cent relative QLIKE at $h{=}5/10/20$, cell by cell in Table~\ref{tab:app-grid-ed} (day-clustered DM $-4.98/-4.43/-3.58$, Holm within the 69-cell family $.000/.001/.013$), on the merged-grid rows Table~\ref{tab:app-denominators} counts. % src: results/tables/firm_identity_ensemble.md
+Against the single recalibrated HAR the same cells read $+1.21/+1.00/+0.66$ per cent, the twenty-day cell weakest (raw clustered $p=.048$). % src: results/tables/postcutoff_effects.md (full-sample context rows)
+The Clark--West adjustment for nested forecasts, promised in Section~\ref{sec:design-inference}, tells the same story from the generous side. On the single-seed basis it records the text term as adding at Holm-corrected $p<.05$ in 44 of 69 cells under day clustering, and in 50 under observation-level inference; adding the firm-identity term cuts that most text-favourable count to 22. % src: results/tables/m1_clustered.md (CW Holm: 44 clustered, 50 obs-level);
+% results/tables/firm_identity_control.csv (same obs-level CW convention, cw_t>0 and
+% Holm over the 69 cells: 22, 26 raw) --- the 22 is the obs-level 50's counterpart,
+% never the clustered 44's
+The other five identity-rung survivors split across four further model--channel pairs, none surviving at more than two horizons: a bag-of-words pair at the two shorter event-driven horizons and three isolated cells. % src: results/tables/firm_identity_ensemble.md
+
+Is that residual the prompting, or the curated excerpts C6 is fed? The C5x arm of Section~\ref{sec:design-models} pools Qwen3-Embedding-8B representations of the \emph{byte-identical} excerpts C6 reads. The only parity cell is on the long-form panel, where the health screen of Section~\ref{sec:val-instruments} fails this family. There C6 gains $+1.79/+2.25/+0.27$ per cent against the recalibrated HAR and is genuine at all three horizons. C5x on those same excerpts loses at $-0.32/-3.74/-4.12$ and seed-ensemble C5 on its natural input at $-1.02/-3.10/-6.39$, neither genuine anywhere (Table~\ref{tab:app-c5x}; Figure~\ref{fig:app-elicitation}). The arms share a lineage but not a parameter count (32B decoder against 8B embedder), so the comparison is same-lineage, not same-size. Because that section treats a screened-out run as uninformative rather than disconfirming, the contrast points to elicitation over curation without settling it. % src: results/tables/c5x_input_parity.md
+Table~\ref{tab:res-residual-checks}'s seven checks separate ``small but real'' from ``artefact''.
+
+\begin{table}[tp]
+\centering
+\caption[Seven checks on the event-driven C6 residual]{Seven checks on the event-driven C6 residual. Vol-unit QLIKE, day-clustered Diebold--Mariano inference throughout; the C6 arm is single-pass, so the other six rows carry identical DM statistics on both bases; the two-way row's Holm values still differ, corrected inside a 69-cell family whose other cells do change. Each check is described in the text with its evidence file. The VIX and deployable rows are measured against the HAR rung, the VIX row additionally on seed 2026, Holm-corrected inside that control's own 40-cell re-test rather than inside any of the 15 pre-declared families (Section~\ref{app:res-ladder}).}
+\label{tab:res-residual-checks}
+{\small
+\begin{tabular}{@{}p{0.30\textwidth}p{0.44\textwidth}l@{}}
+\toprule
+Check & Outcome at $h=5/10/20$ & Verdict \\
+\midrule
+Earnings-window control (Item 2.02 indicator added to the reference) & $+0.21/+0.18/+0.20\%$, Holm $\le 2.8\times10^{-4}$ & survives 3/3 \\ % src: results/tables/itemcode_control.md
+VIX-augmented price reference (point-in-time log VIX) & $+1.44/+1.12/+0.79\%$ vs.\ the HAR rung, Holm $3.1\times10^{-6}/.013/.34$ & survives 2/3 \\ % src: results/tables/vix_control.md
+Symmetric Holm (12-cell C6 family; 69-cell family, both seed bases) & 12-cell $p \le .0011$; 69-cell $.0000/.0005/.0134$ & survives 3/3 \\ % src: results/tables/residual_symmetric_holm.md
+Two-way firm$\times$day clustering & Holm $.0005/.0036/.0571$ (69-cell family) & $h{=}20$ attenuates \\ % src: results/tables/residual_symmetric_holm.md
+Deployable expanding weights & $+1.19/+0.98\%$ vs.\ the HAR rung, Holm $.000/.033$, placebo clean; $h{=}20$ null & survives 2/3 \\ % src: results/tables/deployable_combiner.md
+Post-2024-07 training-cutoff split & 0 of 12 cells significantly smaller post-cutoff; 2 larger & no shrinkage \\ % src: results/tables/postcutoff_effects.md
+Cross-family 70B replication & $+0.84/+0.64/+0.38\%$ vs.\ firm identity, DM $<0$ in 3/3 & sign replicates \\ % src: results/tables/crossfamily_llama70_ens.md
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+The first four checks target confounds and inference. Earnings announcements are the largest substantive 8-K item, so an indicator for Item 2.02 (the item code flagging results announcements, present on a third of test rows) is added to the reference alongside the firm-identity term. The residual retains $+0.21/+0.18/+0.20$ per cent (Holm $\le 2.8\times10^{-4}$), so it is not an earnings-window artefact (Figures~\ref{fig:app-item-geography}, \ref{fig:app-item-geography-b} and~\ref{fig:app-item-geography-c} decompose it by 8-K item group). % src: results/tables/itemcode_control.md
+That figure sits on the full event-driven panel, where the plain firm-identity residual reads $+0.45/+0.25/+0.20$ per cent: the same triple on the wider support, not a revision (Table~\ref{tab:app-denominators}). % src: results/tables/itemcode_control.md
+Figures~\ref{fig:app-section-geography}--\ref{fig:app-section-geography-b} carry a separate off-basis long-form diagnostic.
+A price-side control says the same on the other rung: adding the point-in-time log VIX to the recalibrated HAR leaves the increment on those same rows at $+1.44/+1.12/+0.79$ per cent, marginally \emph{above} the $+1.21/+1.00/+0.66$ the plain HAR concedes. Implied volatility is a price control, not a second identity term, so that row, like the deployable one below it, is read against the HAR rung. % src: results/tables/vix_control.md
+Because the null claims are Holm-protected, quoting the positive at raw $p$ would be an asymmetric standard. The residual survives all three horizons on both seed bases inside two pre-declared families: a 12-cell family symmetric around C6 (both channels $\times$ three horizons $\times$ both references), and the 69-cell family the nulls use. % src: results/tables/residual_symmetric_holm.md (FAMILY-1: C6_llmtext x {long_form, event_driven} x h in {5,10,20} x reference in {single recalibrated HAR, firm-identity})
+Under two-way firm-by-day clustering, $h{=}5/10$ survive while $h{=}20$ attenuates to $p=.0571$. % src: results/tables/residual_symmetric_holm.md
+
+The last three checks concern deployability and provenance. The primary grid fits combination weights once on the validation years; a deployable scheme refits them each test quarter on strictly prior filings only: a sixteen-block path a real forecaster could have produced (Figure~\ref{fig:app-quarterly}). This erases most of the grid: 36 of 69 cells genuine under frozen weights in the same deployable family, 6 of 69 under expanding weights (Figure~\ref{fig:app-freeze-point-b}); it nonetheless keeps the event-driven C6 cells at $h{=}5/10$ ($+1.19/+0.98$ per cent pooled, Holm $.000/.033$, placebo clean; $h{=}20$ null). % src: results/tables/deployable_combiner.md
+Against the memorisation worry, splitting the evaluation at 2024-07-01, the approximate boundary of the model's training corpus, finds the post-cutoff effect significantly smaller in 0 of 12 stratified cells, with the two significant differences going the other way. % src: results/tables/postcutoff_effects.md
+Finally, a three-seed Llama-3.1-70B rescoring of the same channel \cite{llama3_2024} reproduces the sign of the residual over the firm-identity reference at all three horizons ($+0.84/+0.64/+0.38$ per cent against the Qwen arm's $+0.45/+0.25/+0.20$ on the same rows). Clustered DM is negative in 3 of 3 and raw $p<.05$ in 2 of 3, with both triples in Table~\ref{tab:app-crossfamily}. After Holm in its own six-cell family, however, only the five-day cell survives against either reference: a directional replication, not an independent confirmation; the other four cross-family probes fail the health screen of Chapter~\ref{ch:validation}. % src: results/tables/crossfamily_llama70_ens.md
+
+The residual is therefore a \emph{bounded} positive. It does not clear the maximal price pool: no event-driven cell of any model survives that rung. % src: results/tables/control_intersection_ensemble.csv
+Restated in variance-unit QLIKE (off-basis), the three cells stay raw-significant but only $h{=}5$ survives Holm. % src: results/tables/variance_unit_cascade.md
+Under the range-based Parkinson relabelling \cite{parkinson1980extreme} with frozen predictions it clears the identity reference at $h{=}5$ ($+0.53$ per cent, Holm $8.8\times10^{-4}$; Garman--Klass \cite{garmanklass1980estimation} agrees at $+0.51$), with $h{=}10/20$ raw-significant only. % src: results/tables/rangebased_cascade.csv
+And it does not convert into money: switching an inverse-variance portfolio from the reference forecast to the text-augmented one moves annualised Sharpe by a median of $+0.003$ over the 18 cells tested, significant in 1 of 18 and in 0 of C6's own 6 (Table~\ref{tab:app-sharpe}). % src: results/tables/portfolio_econ.md
+Value-at-risk backtests and utility-based fees agree, on six arms excluding C6. % src: results/tables/var_backtest.md; results/tables/utility_value.md (both cover B2, C2 s1/s2, C4, C5 and D2 only)
+What survives: a statistically robust, cross-sectional, family-replicating increment of a fifth to half of one per cent whose five-day cell no identity specification removes. And no test converts it into portfolio value.
+
+Two filings put the arm's behaviour on the page. Both are current reports from one filer, so the contrast cannot be the firm's name; Table~\ref{tab:res-worked} states them and Section~\ref{app:vis-worked} adds the prompt, the selection rule and the week behind the second.
+
+\begin{table}[tbp]
+\centering
+\caption[One driver the prompted arm reads and one it cannot]{One driver the prompted arm reads and one it cannot. Selected for legibility; neither case enters any Holm family and neither is evidence. Outcomes are deciles, never levels.}
+\label{tab:res-worked}
+\fbox{\begin{minipage}{0.955\textwidth}
+{\small
+\noindent\textbf{An illustrative pair, not evidence.} Two Fifth Third Bancorp 8-K reports, both event-driven C6 test rows.
+
+\medskip
+\noindent\textbf{Case 1. The driver is inside the document.} Items 1.01 and 9.01, effective trading day 2025-10-09, accession 0001193125-25-234686: an all-stock agreement to acquire Comerica at a fixed exchange ratio. % src: release/accession_index.csv; results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet (item\_subtype)
+The arm read the leading 21{,}200 characters, its whole excerpt budget, and answered % src: release/raw_generations/raw/part-00197.parquet (prompt_chars 21723, excerpt_source head)
+\texttt{\{"vol\_5d": 0.35, "vol\_10d": 0.30, "vol\_20d": 0.25\}}. % src: release/raw_generations/raw/part-00197.parquet (raw_output, variant c6_text)
+Only 11 of the 25{,}109 event-driven test rows carry a higher $h{=}5$ text forecast, while the price-only forecast for the same row sits in the bottom decile. % src: results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet; results/runs/A2_har_rv_full_event_driven_seed2026/predictions.parquet
+The outcome fell in the top decile at $h{=}5$ and $h{=}10$, the eighth at $h{=}20$. % src: results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet
+
+\medskip
+\noindent\textbf{Case 2. The driver is outside it.} Item 8.01, effective trading day 2023-03-07, accession 0000035527-23-000135: completion of a \$200 million share repurchase. % src: release/accession_index.csv; results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet (item\_subtype)
+The arm read the filing in full, inside the budget, and answered % src: release/raw_generations/raw/part-00112.parquet (prompt_chars 4789, excerpt_source full)
+\texttt{\{"vol\_5d": 0.18, "vol\_10d": 0.16, "vol\_20d": 0.14\}}, % src: release/raw_generations/raw/part-00112.parquet (raw_output, variant c6_text)
+0.18 being its second-lowest of ten distinct values and shared with 43 per cent of those rows. % src: results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet
+The outcome fell in the top decile at all three horizons, the price-only forecast in the third. % src: results/runs/A2_har_rv_full_event_driven_seed2026/predictions.parquet
+The five trading days that follow lie inside the March 2023 stress in United States regional banking.
+\par}
+\end{minipage}}
+\end{table}
+
+The second case is not an isolated misreading: across the 116 filings whose effective trading days fall in that same week, the arm's forecasts run below its panel-wide forecasts. % src: results/runs/C6_llmtext_full_event_driven_seed2026/predictions.parquet
+The arm orders the cross-section rather than timing regimes, so a week in which every firm turns volatile at once is where it has least to add. Two limits attach beyond the selection: the tests above concern the text forecast combined with the price reference, whereas the box shows the elicited forecast alone, and the price-only column is arm A2 before the recalibration those references apply.
+
+\section{Attributing the Increment: Identity Instruments}
+\label{sec:res-identity}
+
+Ordering the cross-section rather than timing regimes is the grid's behaviour, not one arm's. A within-date permutation reshuffles text forecasts among the filings sharing a trading day, destroying only the document--firm correspondence; a date-mean combiner supplies the opposite extreme, a pure timing signal. Over the 38 genuine cells of the archived single-seed grid (observation-level selection; the same size as the primary rung's 38, not the same cells), the decomposition reads 33 cross-sectional, 4 regime-timing and 1 mixed. Chapter~\ref{ch:validation} details the machinery. % src: results/tables/withindate_placebo.md
+Whatever the text adds is \emph{which firm} is riskier on a given day, not \emph{when} markets are turbulent --- exactly what a firm-identity term prices. The ladder measures how much of each gain such a term absorbs; it does not say what the absorbed component is made of, nor how much of the surviving residual is still the firm's name rather than the filing's content.
+
+The anonymisation arm asks this by direct intervention. Under a protocol registered before any statistic was computed, every firm name, ticker symbol, executive name, product name and CIK in all 112{,}528 event-driven documents is replaced with a neutral mask, and the text forecasts are regenerated from the masked text in an identical environment. A masking gate audits the treatment (all but one of the 112{,}528 documents carry at least one mask, 9.48 per cent of characters masked on average, own-ticker leakage 0.00 per cent, own-name tokens 0.17 per cent). % src: results/tables/anon_arm.md
+The \emph{identity share} is one minus the ratio of the masked to the unmasked combination increment: the fraction of the gain that disappears once the model can no longer read who is speaking. Three arms were registered; the TF--IDF arm exited at its reproduction gate before
+scoring, and the two that executed entered on the registered bit-identity deviation
+route, each pair's legs regenerated together so the within-pair contrast holds. % src: results/tables/anon_arm.md
+The estimate is scoped to the 8-K channel: the long-form masking gate ran (31{,}601 documents, 5.24 per cent masked characters) but that channel closed with zero executed arms. % src: results/tables/anon_arm_lf.md
+
+For the prompted arm the per-horizon identity shares are $0.51/0.56/0.71$ at $h{=}5/10/20$, with day-block bootstrap 95\% intervals $[0.40,0.62]$, $[0.43,0.69]$ and $[0.57,0.84]$ \cite{politis1994stationary} ($B{=}2{,}000$ draws; the resampling unit is the effective trading day; combiner weights stay frozen inside every draw, so the intervals carry test-day sampling uncertainty only). % src: results/tables/anon_share_ci.md
+The masked residual itself survives both references at $h{=}5$: $+0.60$ per cent against the recalibrated HAR (Holm $6.0\times10^{-4}$) and $+0.33$ per cent against the firm-identity reference (Holm $.003$). % src: results/tables/anon_arm.md
+Three summary statistics circulate and must not be conflated (Table~\ref{tab:app-identity}): the $h{=}5$ cell share, $0.51$ $[0.40,0.62]$; the prompted arm's median, $0.56$ $[0.47,0.69]$; and the single-seed pooled median over both executed arms' six vs-HAR cells, $0.51$ $[0.44,0.56]$, the report's headline figure. That the first and third round to the same two decimals is coincidence between different quantities. % src: results/tables/anon_share_ci.md
+Figures~\ref{fig:res-anon-price}--\ref{fig:res-anon-price-b} draw the nine registered readouts (evidence files \texttt{anon\_arm.csv}, \texttt{anon\_share\_ci.csv}).
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F7_anonymisation_price__a.pdf}
+\caption[Registered identity shares and the increments behind them]{What anonymisation prices. Panel (a): the nine registered identity-share readouts on the 8-K channel, namely six per-cell shares (two arms $\times$ three horizons), one median per arm and one pooled median, with day-block bootstrap 95\% intervals. The two rules mark the triangulating instruments (matched-swap retention 0.29, reference-interval bound 0.72), and the arm that exited its reproduction gate is drawn as an empty row. Panel (b): the masked and unmasked increments the shares are formed from, against both references; a cell whose unmasked increment is at or below zero has no share and is marked n/a. Vol-unit QLIKE, log-space combiner fitted on validation and frozen on test, day-clustered inference, seed 2026.} 
+\label{fig:res-anon-price}
+% caption numbers src: results/tables/anon_arm.md ("matched-swap retention median +0.29", the median over the two executed arms' six cells; matched_firm_swap.md's own median over the 38 genuine cells is 0.31 and is a different set);
+% results/tables/anon_arm.md (reference-interval bound, median 0.72)
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F7_anonymisation_price__b.pdf}
+\caption[Exploratory same-lineage long-form annex]{What anonymisation prices, continued from Figure~\ref{fig:res-anon-price}. Panel (c): the exploratory same-lineage long-form annex, in which masking \emph{raises} the increment; it is same-environment and internally coherent, but it does not reproduce the committed predictions, so its shares are descriptive only. Vol-unit QLIKE, log-space combiner fitted on validation and frozen on test, day-clustered inference, seed 2026.} 
+\label{fig:res-anon-price-b}
+\end{figure}
+
+The instrument is reported at full strength where it points the other way. The fine-tuned FinBERT arm prices its own increment at share $0.02$ $[-0.14,0.19]$ at $h{=}5$ (arm median $0.02$ $[-0.13,0.26]$): masking removes essentially nothing. Yet the masked increment is still absorbed by the firm-identity reference, so this arm carries genuinely firm-stable content rather than identity strings: proof that the mask and the reference price different things. % src: results/tables/anon_share_ci.md; results/tables/anon_arm.md
+An exploratory same-lineage annex on the long-form channel (not registered; its control leg does not reproduce the committed predictions) likewise shows masking raising the increment at all three horizons ($+1.83\!\to\!+3.45$, $+1.65\!\to\!+3.68$, $+3.47\!\to\!+5.95$ per cent). % src: results/tables/anon_annex_samelineage.md
+Anonymisation is not uniformly increment-reducing; the 0.51 is a property of these two arms on this channel, not a constant of disclosure text.
+
+The matched-firm swap is the complementary intervention (Figures~\ref{fig:res-matched-swap}--\ref{fig:res-matched-swap-b}; evidence file \texttt{matched\_\allowbreak firm\_\allowbreak swap.csv}). Within each calendar day, firms are paired on nearest validation-period mean realised volatility (pre-test information only), and their text forecasts are exchanged: every firm keeps its own volatility level and every filing its date, while which document belongs to which filer is destroyed. A matched partner exists for 94.0--94.5 per cent of test rows. % src: results/tables/matched_firm_swap.csv
+Retention, the swapped increment as a fraction of the real one, has median 0.31 over the 38 placebo-confirmed grid cells (0.33 over the 24 long-form, 0.17 over the 14 event-driven; single-seed combination-grid flag). % src: results/tables/matched_firm_swap.md
+For the residual against the firm-identity reference the swap removes 89/93/84 per cent of the point estimate ($+0.448\!\to\!+0.051$, $+0.253\!\to\!+0.016$, $+0.196\!\to\!+0.031$ per cent, on the full event-driven rows), distinguishable at conventional levels only at $h{=}5$ (swap DM $-2.26$, $p=.024$; $-0.76$ and $-1.56$ at $h{=}10/20$). % src: results/tables/matched_firm_swap.md
+An unmatched within-date random permutation, destroying identity and content together, leaves a median of $-0.08$ across the 69 cells: the increment does not survive an arbitrary reshuffle either. % src: results/tables/matched_firm_swap.csv
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F8_matched_firm_swap__a.pdf}
+\caption[Matched-firm swap: all 69 cells and their crowded core]{The matched-firm document swap. Panel (a): all 69 combination cells, real relative QLIKE improvement against the improvement after a within-day, validation-RV-matched document swap; the diagonal is full retention (a firm-level shortcut), the zero line full loss (content that must match its filer). Panel (b): the crowded core of (a) with group median retentions. Single-seed combination-grid basis; day-clustered inference; filled markers are that grid's own placebo-confirmed Holm survivors.} 
+\label{fig:res-matched-swap}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F8_matched_firm_swap__b.pdf}
+\caption[Matched-firm swap: prompted 8-K cells and permutation control]{The matched-firm document swap, continued. Panel (c): the three prompted 8-K cells against the firm-identity reference, with swap DM statistics and both row bases printed; those $p$ are raw, uncorrected across the three, and the swap tests carry no family. Panel (d): an unmatched within-date random permutation as the triangulation control. Marker shapes and colours are as in Figure~\ref{fig:res-matched-swap}, whose key they share. Single-seed combination-grid basis; day-clustered inference; filled markers are that grid's own placebo-confirmed Holm survivors.} 
+\label{fig:res-matched-swap-b}
+\end{figure}
+
+Three instruments now triangulate the decomposition, and they bracket rather than coincide. The anonymisation arm table carries its own six-cell swap-retention column, median 0.29 (deliberately kept distinct from the grid-wide 0.31, a different median over a different cell set). % src: results/tables/anon_arm.md
+It also carries the per-cell \emph{reference-interval bound}, the fraction of each cell's vs-HAR increment that adding the firm-identity term to the reference absorbs (for the prompted cells $0.63/0.75/0.70$); over the table's six executed cells the median bound is 0.72. % src: results/tables/anon_arm.md
+The pooled share of 0.51 lies between the two, as it should if the interval logic is sound; it is a point estimate with an interval, not an upper bound. % src: results/tables/anon_arm.md
+
+Each instrument prices a different channel, and none is complete. The mask strips identity strings but leaves the document--filer correspondence intact, so it cannot remove firm-stable content written without names: exactly what the FinBERT arm exhibits. The swap preserves the firm's volatility level by construction, so its retention reads the identity-level channel: 0.29 is the identity share under that reading and 0.71 the alignment-dependent content share. % src: writing/dissertation/supporting/TECHNICAL_SUPPLEMENT.md S19 dated correction 2026-07-27
+The interval bound over-counts identity, because the firm-mean term absorbs genuine firm-stable content along with identity proper. And all three are ratios of per-cell point estimates: a share near one half does not mean half of any variance is identity, the bootstrap intervals are unadjusted for multiplicity, and combiner-estimation, seed and model-selection uncertainty sit outside them. % src: results/tables/anon_share_ci.md (interval scope)
+Within those limits the triangulated verdict is stable: roughly half of the surviving 8-K increment is who spoke; the remainder is document content that anonymisation cannot strip and the swap destroys.
+
+\section{Economic Significance}
+\label{sec:res-econ}
+
+Statistical survival and economic value are different claims, and the 8-K residual has earned only the first. The frozen forecasts are priced in two decision problems and a utility-based fee, all three in economic units (Sharpe differences, violation rates, basis points) never comparable with the earlier sections' relative-QLIKE percentages.
+These tests need a matched forward return, carried by 91.3 per cent of the 431{,}245 aligned rows; the dropped rows are the less volatile ones, and the QLIKE grid never uses that join. % src: results/tables/join_drop_diagnosis.md
+Figures~\ref{fig:res-econ}--\ref{fig:res-econ-b} draw the two adjudications.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F14_economic_adjudication__a.pdf}
+\caption[Economic adjudication: portfolio Sharpe change across the 18 grid cells]{(a) Economic adjudication of the text increment: change in annualised Sharpe ratio when the text-augmented forecast $f_U$ replaces the recalibrated reference $f_R$ in a long-only inverse-variance portfolio, for all 18 cells of the economic grid. Whiskers are day-block bootstrap 95\% intervals, and the three long-form $h{=}20$ cells are drawn as bare dots because 39 holding periods cannot support the 20-period block bootstrap. No Holm family is carried: significance is each cell's own bootstrap interval, uncorrected across the 18.} 
+\label{fig:res-econ}
+% caption numbers src: results/tables/portfolio_econ.csv (18 cells; min n_periods 39,
+% the three long-form h=20 cells)
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth,height=0.83\textheight,keepaspectratio]{figures/F14_economic_adjudication__b.pdf}
+\caption[Economic adjudication: realised left-tail violation rates at two nominal levels]{(b) Economic adjudication of the text increment, continued from Figure~\ref{fig:res-econ}: realised left-tail violation rates for the raw HAR, the recalibrated HAR and the text-augmented forecast, 36 (channel, model, horizon) rows at each of two nominal levels under the pooled-drift convention. The ringed marker is the one marker of 108 whose realised rate falls under the nominal 1\% level, at 0.99\%---a hundredth of a percentage point, which the heavy rule cannot separate at this scale. Panel (b) carries no prompted-arm (C6) row, because the VaR table contains none, so it corroborates the grid without adjudicating the surviving 8-K residual.} 
+\label{fig:res-econ-b}
+% caption numbers src: results/tables/var_backtest.csv (alpha=0.01: 108 rows, exactly one
+% with viol_rate < 0.01, at 0.0099)
+\end{figure}
+
+On each rebalancing day, every firm with a live filing signal is held long with a weight inversely proportional to its forecast variance, so that firms forecast to be risky receive small positions. The book is held for non-overlapping $h$-day periods, with combination weights fitted on validation and frozen on test, exactly as in the statistical grid. The quantity plotted is the change in the annualised Sharpe ratio (the mean return earned per unit of return volatility \cite{sharpe1966mutual}) when $f_U$ replaces $f_R$, with 95\% intervals from a day-block bootstrap. Across the 18 cells of the economic grid (two disclosure channels; three text arms: TF--IDF ridge, fine-tuned FinBERT, the prompted C6; three horizons), the median change is $+0.003$, % src: results/tables/portfolio_econ.csv (re-derived 2026-08-02)
+and the bootstrap interval covers zero in 14 of the 15 cells that have one (Table~\ref{tab:app-sharpe}). % src: results/tables/portfolio_econ.csv
+The prompted arm, the identity rung's only three-horizon 8-K survivor, is priced at zero of its six cells. % src: results/tables/portfolio_econ.csv
+Three long-form $h{=}20$ cells have no interval: 39 holding periods cannot support a bootstrap over 20-period blocks; % src: results/tables/portfolio_econ.md
+their reference book also loses money (Sharpe $-0.104$), so a positive difference there improves a losing position rather than evidencing a profitable signal. % src: results/tables/portfolio_econ.csv
+
+One cell of the 18 does exclude zero: the event-driven TF--IDF ridge at $h{=}10$, at $+0.026$ with interval $[+0.004, +0.047]$. % src: results/tables/portfolio_econ.csv
+Two facts prevent reading that cell as text paying. First, one exclusion among 15 nominal-95\% intervals is about what chance produces. Second, and decisive for attribution, the ladder had already rejected this configuration: the cell fails the primary rung's Holm correction (adjusted $p = .068$), is not among the 38 genuine cells, and its increment over the maximal price pool is negative ($-0.06\%$). % src: results/tables/control_intersection_ensemble.csv
+The single economically significant cell therefore cannot be attached to the surviving 8-K residual.
+
+The downside-risk problem converts each volatility forecast into a left-tail value-at-risk threshold: a loss level that realised returns should breach on a stated fraction of occasions (here 1\% or 5\%). The realised breach fraction is the violation rate. Three forecasts are audited on each of 36 rows (two channels, six models, three horizons) at both nominal levels, 72 cells in all, under the pooled-drift convention (the mean-return term estimated once from the pooled panel). % src: results/tables/var_backtest.md
+The clearest reading is a decomposition: the move from raw HAR to $f_R$ shifts the violation rate further than the move from $f_R$ to $f_U$ in 69 of 72 cells, with median moves of 0.95 against 0.05 percentage points (Table~\ref{tab:app-econ-summary}). Recalibrating the price baseline buys roughly twenty times what adding text buys. % src: results/tables/var_backtest.csv (re-derived 2026-08-02)
+The tick loss is the asymmetric score for such thresholds, charging a forecast in proportion to its miss and more heavily on breach days \cite{gonzalezrivera2004forecasting}. On it, text improves on $f_R$ in 55 of 72 cells, significantly in 29 and significantly \emph{worse} in 12 (DM at observation level with HAC lag $h-1$, off the primary day-clustered basis). % src: results/tables/var_backtest.md
+Yet it moves the violation rate closer to nominal in only 35 of 72 cells: no better than a coin. % src: results/tables/var_backtest.md
+Recalibration alone improves the tick loss in 60 of 72 cells, 54 of them significantly. % src: results/tables/var_backtest.md
+Calibration remains imperfect throughout: at the 1\% level, 107 of the 108 forecast-cells over-violate, the single exception being the long-form Qwen3 embedding at $h{=}20$ under $f_U$, at 0.99\%. % src: results/tables/var_backtest.csv (re-derived 2026-08-02)
+Two qualifications bound this panel. The Kupiec unconditional-coverage test \cite{kupiec1995techniques} and the tick loss are valid as computed, but the Christoffersen conditional-coverage statistics \cite{christoffersen1998evaluating} are indicative only, because $h$-day return windows from filings less than $h$ trading days apart overlap. % src: results/tables/var_backtest.md (caveats)
+And the value-at-risk and utility tables contain no prompted-arm rows, so this panel corroborates the grid without adjudicating the 8-K residual; only the Sharpe panel touches that arm. % src: TECHNICAL_SUPPLEMENT.md S17
+
+The third reading is a performance fee in the tradition of volatility-timing studies \cite{fleming2001timing}: the annualised payment a mean--variance investor (one who trades expected return against variance) would pay to swap $f_R$ for $f_U$ when sizing filing-event bets by inverse forecast variance. At a 6\% expected-return assumption and risk aversion $\gamma = 2$, the fee is positive in 14 of its own 27 cells (nine channel--model pairs at three horizons; Table~\ref{tab:app-econ-summary}) with a median of 0.03 basis points a year. % src: results/tables/utility_value.csv (re-derived 2026-08-02)
+Individual cells span $-27$ to $+96$ basis points, and capping the largest bet weights at their common 99th percentile barely moves the tally (positive in 14 of 27, median 0.01). % src: results/tables/utility_value.csv
+The large per-cell fees are an artefact rather than skill: realised single-asset utility rewards a systematically higher (more conservative) volatility forecast. The largest fees occur precisely where QLIKE judges $f_U$ worse, and the fee agrees in sign with the QLIKE increment in only 6 of 27 cells. % src: results/tables/utility_value.md
+The cleanest leverage-controlled read, the target-volatility Sharpe, has $f_U$ ahead in 12 of 27 cells with a median gain of $-0.00003$. % src: results/tables/utility_value.csv
+Throughout, the book is long-only and frictionless --- no transaction costs, borrowing constraints or short side --- so every figure here is an upper bound on what an implementable strategy would deliver. % src: TECHNICAL_SUPPLEMENT.md S17
+
+The findings close into a strict ordering. Text is \emph{detectable}: encompassing regressions (tests of whether the reference forecast already contains all the information in a challenger) return a significantly positive text weight in 48 of 48 cases \cite{harvey1998encompassing}; fitted in sample with observation-level errors, they are the weaker of the two instruments. % src: results/tables/encompassing_regression.md
+The pooled 69-cell test of Section~\ref{sec:res-ladder} likewise finds a systematic micro-increment ($t = +8.29$ on the reference-minus-challenger series, minimum detectable effect 0.375 per cent; Figure~\ref{fig:app-encompassing}). % src: results/tables/omnibus_m1.md
+But detection is not attribution: anonymisation prices half of its two 8-K arms' increment as firm identity (pooled share 0.51, interval $[0.44, 0.56]$), % src: results/tables/anon_share_ci.md
+and the ladder collapses 38 apparent survivors to 8 against the firm-identity reference, 9 against the maximal pool and 0 under the full conjunction. % src: results/tables/control_intersection_ensemble.csv
+And attribution is not realisability: the deployable expanding-weight combiner keeps only 6 of 69 cells genuine, % src: results/tables/deployable_combiner.md
+and this section prices the surviving residual at zero of six Sharpe cells, its only economic instrument, the grid-wide median fee being a small fraction of a basis point. % src: results/tables/portfolio_econ.csv (Sharpe, six C6 cells); results/tables/utility_value.csv (27-cell grid median fee)
+The chapter's verdict is the ordering itself: conditional on a properly recalibrated price baseline, S\&P~500 disclosure text over the 2022--2025 test years is detectable, only partially attributable to content, and not realisable as economic value.

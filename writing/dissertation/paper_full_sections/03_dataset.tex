@@ -1,0 +1,41 @@
+\section{SP500Vol-Bench}
+\label{sec:dataset}
+
+Our first contribution is \textbf{SP500Vol-Bench}, a survivorship-free, point-in-time benchmark that aligns SEC regulatory disclosures to forward realised volatility for the S\&P~500 over 2010--2025. Every data-handling decision is made point-in-time: no information that became available after a filing's publication is allowed to influence its features, labels, splits, or entity mappings. Table~\ref{tab:dataset} summarises the resource.
+
+\paragraph{Firm universe.}
+The universe is the point-in-time membership of the S\&P~500 from the CRSP S\&P~500 Index Constituents file obtained through WRDS \citep{crsp2026data}, comprising 914 membership intervals over 832 distinct PERMNOs (CRSP security identifiers) and 884 tickers, with $\approx$499--505 active members per year-end. A static present-day membership list would introduce \emph{survivorship bias}: firms removed after distress, acquisition, or delisting are dropped, while long-lived survivors are over-represented. Volatility forecasting is exactly where this bias bites hardest, since removed firms are disproportionately those that experienced extreme volatility. A text model evaluated on survivors only would face a systematically easier task, flattering both text and price predictors and rendering any incremental-value claim unquantifiably optimistic. The CRSP constituents file is survivorship-free by construction: removed and delisted members retain their full price history. Because CRSP ships split- and dividend-adjusted daily \emph{total} returns (\texttt{DlyRet}) alongside membership, realised-volatility labels are computed directly as $r=\ln(1+\texttt{DlyRet})$, avoiding the silent adjustment errors of free-tier providers; the returns store holds 2{,}023{,}421 NaN-free daily observations.
+
+\paragraph{Point-in-time entity linking.}
+CRSP identifies securities by PERMNO; SEC EDGAR identifies filers by Central Index Key (CIK), and the mapping is \emph{time-varying}: after a merger or reorganisation the same PERMNO continues under a new registrant with a new CIK. We resolve PERMNO$\to$CIK through the CRSP/Compustat-Merged (CCM) link table, restricted to research-quality link types, splitting each membership spell across the CCM windows valid during it. CCM alone is insufficient, and documenting why is a data-quality contribution. CCM's company header reflects the \emph{current} (2026) registrant, so for firms acquired during 2010--2025 it can point a historical PERMNO at the successor's CIK, under which the original firm filed nothing during its membership window---a step naive pipelines miss, silently dropping precisely the distressed and reorganised firms whose exclusion would re-introduce survivorship bias through the back door of entity linking. A manual audit produced 17 audited successor-CIK link-window overrides: for example, Mylan's filings split across CIK \texttt{0000069499} (Mylan Inc.) and \texttt{0001623613} (Mylan N.V.) at its 2015 reincorporation, and Xerox across \texttt{0000108772} and \texttt{0001770450} at its 2019 holding-company reorganisation. Each override was verified against live EDGAR (the audited historical CIK has in-window filings; the successor CIK has none), recovering $\approx$2{,}000 filings that a naive CCM join would lose. After overrides, 832 of 833 PERMNOs resolve to a CIK (the 833 count includes one placeholder identifier).
+
+\paragraph{Disclosure corpus.}
+Using the resolved point-in-time CIK, we fetch and parse \textbf{144{,}443 filings} from the EDGAR full-text archives \citep{sec2024edgar}. The resource then has three layers. Of the parsed corpus, 144{,}129 filings align to the benchmark---each paired with forward realised-volatility labels at up to three horizons, giving 431{,}245 filing-by-horizon rows---and, after the feature--label joins described below, 427{,}429 of those rows enter the modelled panel on which all results are computed. The corpus is partitioned into two subsets corresponding to the two halves of the research question. \emph{Long-form} (10-K\,+\,10-Q): 31{,}601 filings, 94{,}237 modelled rows; these are long, scheduled, structured documents with a median length of 29{,}278 wordpiece tokens, and \emph{every} long-form filing (100\%) exceeds the 4{,}096-token context of even a long-context encoder, so a 512-token model sees under 2\% of the median long-form filing. \emph{Event-driven} (8-K): 112{,}528 filings, 333{,}192 modelled rows; these are short, unscheduled, news-like reports that mostly fit a single 512-token window, where truncation is essentially lossless. The subsets differ on three naturally confounded dimensions---length, periodicity, and information type---and we keep them separate throughout, so long-document modelling questions are never conflated with disclosure-type questions.
+
+\paragraph{Labels and alignment.}
+The target is forward realised volatility, the annualised standard deviation of daily log returns over the $h$ trading days following a filing, computed at $h\in\{5,10,20\}$ trading days; models regress $\ln\mathrm{RV}$. Each filing is mapped to its \emph{effective trading day}: the SEC acceptance timestamp is converted to US/Eastern, filings accepted at or after the 16:00\,ET close (or on non-trading days) roll forward to the next session. This prevents leaking the overnight market reaction into the label window---material because many 8-Ks are released after hours precisely so markets digest them overnight. The backward-looking price features end at the last close \emph{strictly before} the filing, so features never overlap labels; an automated no-look-ahead audit over the full aligned dataset reports zero violations, including for the firms covered by the 17 successor-CIK overrides, whose entity transitions are the likeliest place for subtle leakage to hide. Chronological splits by effective trading day (train 2010--2019, validation 2020--2021, test 2022--2025) are detailed in Section~\ref{sec:protocol}.
+
+\paragraph{Reproducibility.}
+CRSP raw data cannot be redistributed, so the benchmark is released as a regeneration pipeline rather than a static dump: committed scripts rebuild the universe and links (\texttt{ingest\_wrds.py}), the corpus and alignment (\texttt{build\_dataset.py}), and all result tables, with regression tests covering the CIK overrides, split assignment, and no-look-ahead audit. No reported number depends on an unrecorded manual step.
+
+\begin{table}[t]
+\centering
+\small
+\caption{SP500Vol-Bench summary. Modelled rows are filing-by-horizon observations after feature--label joins ($h\in\{5,10,20\}$); the aligned benchmark comprises 144{,}129 filings and 431{,}245 rows. Splits are chronological by effective trading day, day-inclusive. Token lengths are wordpiece tokens. Universe: S\&P~500, 2010--2025, 914 membership intervals over 832 PERMNOs.}
+\label{tab:dataset}
+\begin{tabular}{lrr}
+\toprule
+ & \textbf{Long-form} & \textbf{Event-driven} \\
+ & (10-K/10-Q) & (8-K) \\
+\midrule
+Filings & 31{,}601 & 112{,}528 \\
+Modelled rows (after joins) & 94{,}237 & 333{,}192 \\
+\quad train (2010--2019) & 58{,}602 & 215{,}785 \\
+\quad val (2020--2021) & 11{,}849 & 42{,}565 \\
+\quad test (2022--2025) & 23{,}786 & 74{,}842 \\
+\midrule
+Median length & 29{,}278 & $<$512 \\
+Share $>$ 4{,}096 tok. & 100\% & --- \\
+\bottomrule
+\end{tabular}
+\end{table}

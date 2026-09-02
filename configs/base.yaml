@@ -1,0 +1,66 @@
+# Default config layer — Hydra-style composition.
+# All experiment configs inherit from this and override fields.
+
+defaults:
+  - _self_
+
+# === Reproducibility ===
+seed: 2026
+
+# === Paths (relative to repo root) ===
+paths:
+  data_root: ./data
+  results_root: ./results
+  configs_root: ./configs
+
+# === Logging ===
+logging:
+  level: INFO
+  json: true
+
+# === Chronological splits ===
+# Revised 2026-06-06 to 2010-2025 (CRSP/WRDS): train=2010-2019 (10y) /
+# val=2020-2021 (2y, COVID vol regime isolated for tuning) / test=2022-2025 (4y,
+# multi-regime: 2022 rate-hike selloff, 2023 bank stress, 2024-2025 AI dispersion).
+#
+# PINNED SPLIT CONVENTION (train.py:_assign_splits — keep identical across Blocks
+# A-D, the single source of truth; do not re-split per model): a filing is assigned
+# by its EFFECTIVE TRADING DAY (the normalized ET trading day it becomes actionable,
+# from alignment), DAY-INCLUSIVE on both boundaries. Using the effective trading day
+# (not the raw UTC filing timestamp) removes tz/midnight drift at year boundaries.
+# No look-ahead: each filing's forward RV label window opens AFTER its effective
+# trading day, so a split's labels never read returns from a later split's first day
+# beyond the natural forward window.
+splits:
+  train_start: "2010-01-01"
+  train_end: "2019-12-31"
+  val_start: "2020-01-01"
+  val_end: "2021-12-31"
+  test_start: "2022-01-01"
+  test_end: "2025-12-31"
+
+# === Horizons + horizon policy ===
+# RV labels at 5/10/20 trading-day horizons. aligned_filings.parquet is LONG format
+# (one row per filing x horizon). PINNED HORIZON POLICY: train on the full set (all
+# horizons) and EVALUATE PER HORIZON — metrics are grouped by horizon_days
+# (train.py:_metrics_by_group), ragged-aware so each horizon uses only its valid
+# rows. ~0.6% of filings have <3 horizons (2025 tail + mid-window delistings); this
+# is expected boundary truncation and per-horizon metrics handle it without dropping
+# rows. Models that are not horizon-agnostic should treat horizon_days as an input
+# (or fit per horizon) so one filing's 5/10/20d predictions can differ.
+horizons: [5, 10, 20]
+
+# === Disclosure subsets ===
+disclosure_subsets:
+  - long_form          # 10-K + 10-Q
+  - event_driven       # 8-K (combined; no Item-subtype split per Light Compression)
+  - combined           # all of the above
+
+# === Run identification ===
+run:
+  name: ${now:%Y%m%d-%H%M%S}_${model_id}
+  out_dir: ${paths.results_root}/runs/${run.name}
+
+# === Training infrastructure ===
+training:
+  checkpoint: true        # per-horizon neural/fusion checkpoints under run_dir/checkpoints/

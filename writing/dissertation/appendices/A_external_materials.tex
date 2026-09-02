@@ -1,0 +1,918 @@
+\chapter{External Materials}
+\label{app:external}
+
+This appendix records what external material accompanies the dissertation, where
+each item sits, how the study is regenerated from scratch, and how any number
+printed in the preceding chapters can be traced back to the artefact that
+produced it. This report is submitted on its own, and everything behind it is shared through a
+public repository at \url{https://github.com/Beiciccc/sp500vol-bench}, open to the
+supervisor, the assessors and any other reader without an account or a request.
+Every artefact described in Sections~\ref{app:external:release}
+to~\ref{app:external:process} is in it, and none of those sections depends on a
+resource a marker cannot open. What the repository does not carry is what the
+licence bars from redistribution --- the returns, the labels, the price features,
+the predictions, and the two CRSP-derived crosswalks whose withdrawal
+Appendix~\ref{app:ethics} records. Nothing is held back from the assessors in
+particular: no reader receives those rows, and any holder of a CRSP licence
+regenerates them exactly from the released scripts.
+Sections~\ref{app:external:benchmarks} to~\ref{app:external:neural} then record
+external material of a different kind: where the benchmark built here stands
+among the corpora the background survey's literature was built on, and one
+branch of price forecasting that survey passes over.
+
+\FloatBarrier
+\section{Released Artefact Inventory}
+\label{app:external:release}
+
+The repository's public core is the directory \texttt{release/}, engineered so that a
+third party can reconstruct the exact study sample without receiving a single
+licensed market-data value. Two CRSP-derived files an earlier staging
+carried are withheld from it, as Appendix~\ref{app:ethics} sets out. Auditing the reported tests is the wider
+repository's job, not this directory's: the current evidence tables live under
+\texttt{results/tables/}, and the \texttt{aggregate\_results/} bundle inside
+\texttt{release/} is the pre-day-clustering vintage the earlier analysis quoted,
+as its own row below states. The
+membership and link crosswalks an earlier staging shipped carry CRSP identifiers and dates, on the
+reading Appendix~\ref{app:ethics} records.
+Table~\ref{tab:app-release} is its index.
+
+\begin{table}[htbp]
+  \centering
+  \caption[The released artefact inventory]{The released artefact inventory (\texttt{release/} in the repository).}
+  \label{tab:app-release}
+  \small
+  \begin{tabular}{lp{9.4cm}}
+    \toprule
+    Artefact & Contents \\
+    \midrule
+    \texttt{accession\_index.csv} & Accession index of all 144{,}129 benchmark filings: accession number, CIK, ticker, form, filing timestamp, effective trading day and split. Doubles as the exact SEC~EDGAR pull list, so no filing text needs redistributing \\ % src: release/accession_index.csv (144,129 data rows, verified 2026-08-02); release/DATA_CARD.md
+    \texttt{membership\_intervals.csv} & The 914 survivorship-free point-in-time S\&P~500 membership intervals (ticker, PERMNO, CIK, entry and exit dates). \emph{Withheld from the public core as CRSP-derived; rebuilt by the ingestion script} \\ % src: crsp_restricted/membership_intervals.csv (914 data rows, verified 2026-08-02)
+    \texttt{cik\_links\_pit.csv} & The 30{,}100 point-in-time PERMNO$\to$CIK link windows, including the 31 audited successor-CIK override windows covering 23 firms that recover filings from acquired and renamed registrants. \emph{Withheld on the same ground} \\ % src: crsp_restricted/cik_links_pit.csv (30,100 data rows, verified 2026-08-02); release/DATA_CARD.md
+    \texttt{split\_definition.md} & The chronological split rule and its filing counts (long-form 19{,}668/3{,}963/7{,}970 and event-driven 73{,}088/14{,}266/25{,}174 across train/validation/test), re-derivable from the effective trading day alone \\ % src: release/split_definition.md
+    \texttt{DATA\_CARD.md} & The datasheet: motivation, composition, collection, recommended uses, exclusions and the required CRSP/WRDS attribution \\ % src: release/DATA_CARD.md
+    \texttt{aggregate\_results/} & A twelve-file bundle of observation-level standalone comparisons, stratified breakdowns and the gate-cushioning table, cut before the inference stack moved to day clustering and seed ensembling; it is retained as the vintage the earlier analysis quoted. The tables this dissertation cites are the working evidence set under \texttt{results/tables/}, which travels with the repository rather than inside \texttt{release/}. Both are summary statistics only, carrying no per-row licensed value \\ % src: release/README.md; release/aggregate_results/
+    \texttt{config\_hashes.csv}, \texttt{run\_configs/} & The fingerprint chain: one row per production run and the 240 \texttt{config.json} preimages themselves, so the fingerprint check is executable rather than asserted \\ % src: release/config_hashes.csv (240 data rows, verified 2026-08-02); release/run_configs/ (240 files)
+    \texttt{tag\_manifest.txt} & The 26 repository tags, each with the commit it pins, that commit's date and the date the tag was written: the 21 pre-registration tags in eight families, one pre-test protocol and four writing milestones \\ % src: release/tag_manifest.txt (26 tag rows)
+    \texttt{raw\_generations/} & 1{,}221 parquet shards holding 608{,}221 prompted-model generations (each row the model's verbatim output string beside its parsed horizon forecasts), with the prompt templates and decoding configuration that produced them \\ % src: release/raw_generations/README.md
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Four further components ship alongside that index. The \emph{licence-free
+variant} rebuilds the price side from public sources so that the benchmark can be
+exercised end to end with no subscription at all. Its coverage is priced honestly
+rather than advertised; Section~\ref{sec:data-public} states what it costs.
+The \emph{fingerprint chain} covers 240 production runs carrying 233 distinct
+SHA-256 configuration digests, the 7 collisions being expected pairs whose
+configurations are byte-identical. % src: results/tables/config_fingerprints.md
+Its index publishes two digests per run: the original fingerprint and the
+fingerprint of the shipped preimage. Both are published because 38 preimages had
+absolute local paths neutralised before release, each row naming the exact
+fields that moved, while the remaining 202 hash identically to their originals. The released script
+\texttt{config\_fingerprints.py -{}-verify-preimages} re-hashes every preimage
+against the index using only files inside the repository. % src: release/config_hashes.csv (240 rows; 38 with a non-blank sanitised_fields, 202 whose released_config_sha256 equals config_sha256)
+The \emph{test suite} ships in full: 186 tests in 33 test modules, all passing, covering
+ingestion, alignment, split assignment, training and evaluation, and including
+byte-identity checks that the pre-tokenisation text caches reproduce their
+uncached reference exactly. A reader counting \texttt{def test\_} by hand will
+find 184: two of those definitions are parametrised over two model classes each,
+so the collected count is 186 and the file count is
+exact. % src: writing/dissertation/supporting/REPRODUCIBILITY.md; tests/ (33 modules, 184 test functions, two @pytest.mark.parametrize decorators in tests/models/test_classical_text.py, no conftest.py and no class-based tests)
+Finally the seven \emph{registered analysis records} (\texttt{configs/prereg\_*.md})
+travel with the code, so a reader can check each audit family's pre-declared
+design against what was reported. % src: configs/prereg_*.md (7 files, verified 2026-08-02); release/README.md
+
+% The inventory table is flushed here so that it cannot be deferred into the
+% directory listing below, which it interrupted mid-tree in earlier builds.
+\clearpage
+
+\FloatBarrier
+\section{Repository Layout}
+\label{app:external:layout}
+
+The code is one importable Python package, \texttt{sp500vol}, under
+\texttt{src/}, driven by thin command-line scripts and declarative
+configurations:
+
+\begin{verbatim}
+.                       the repository root
+|-- configs/            declarative experiment specifications
+|   |-- base.yaml         shared defaults: paths, seeds, split boundaries
+|   |-- data/             dataset scopes (full, sample, dry-run)
+|   |-- models/           one YAML per configured arm (A1-A5, B1-B4, C1-C5,
+|   |                       D1-D3); A6, A7, C6 and D4 are script-driven
+|   |-- ablations/, compute/   sweep and hardware profiles
+|   `-- prereg_*.md       the seven registered analysis records
+|-- data/universe/      scaffolding; the CRSP crosswalks are withheld
+|-- release/            the public bundle inventoried above
+|-- results/
+|   |-- runs/<run_id>/    per-run artefacts; the predictions are withheld
+|   `-- tables/           the evidence tables named by this report's sources
+|-- scripts/            command-line entry points
+|   |-- ingest_wrds.py    CRSP export -> membership, PIT links, returns store
+|   |-- build_dataset.py  EDGAR fetch and parse -> aligned filing-horizon rows
+|   |-- train.py, evaluate.py, compare_runs.py, dm_vs_baseline.py
+|   |-- analysis/         the audit layer: clustered_dm.py,
+|   |                     forecast_combination.py, firm_identity_control.py,
+|   |                     anon_*.py, matched_firm_swap.py,
+|   |                     signal_injection_power.py, config_fingerprints.py,
+|   |                     supp_figs/ (gated figure generators)
+|   |-- experiments/      arm drivers: prompted-LLM (incl. prompt.py),
+|   |                     tuning arm, external-panel replications
+|   `-- release/          bundle staging, disclosure scan, package build
+|-- src/sp500vol/       the package
+|   |-- data/             universe, crsp, edgar_fetcher, parser,
+|   |                     trading_calendar, alignment, pipeline_state
+|   |-- features/         returns, volatility, text_preprocess, lm_dictionary
+|   |-- models/           price/, classical_text/, neural_text/, fusion/
+|   |-- evaluation/       metrics, dm_test, bootstrap
+|   |-- training/         end-of-epoch checkpointing for resume on preemption
+|   `-- utils/            seeding, cost tracking, environment capture
+|-- tests/              the 186-test suite
+`-- writing/            this report's LaTeX sources and frozen drafting sources
+\end{verbatim}
+
+The division of labour is deliberate. \texttt{src/} holds everything a model or a
+metric needs and nothing about a particular experiment; \texttt{configs/} holds
+every experimental decision as data, which is what makes the fingerprint chain
+meaningful. \texttt{scripts/} holds the executable pipeline, with
+\texttt{scripts/analysis/} as the audit layer that produced the reference ladder,
+the identity controls, the power calibration and the figures. Every artefact
+under \texttt{results/tables/} that this report cites is written by a committed
+generator, never by hand, and each generator aborts if its source table has
+drifted from the values it recorded. Four are not, and are named here rather
+than left to be discovered: \texttt{event\_driven\_text\_cache\_validation.txt},
+\texttt{gate\_cushioning.md}, \texttt{rtx3090\_probe\_24g\_summary.md} and
+\texttt{yelp\_cascade\_synthetic.md} are records of one-off validation or pilot
+runs whose driver was never committed, so they can be read but not
+regenerated. % src: a search of scripts/, src/ and the Makefile for each basename under results/tables/; these four return nothing, while the dm_* and compare_* families are written under names their generators build at run time
+
+\FloatBarrier
+\section{Regenerating the Study from Scratch}
+\label{app:external:regen}
+
+Two external inputs must be supplied by the regenerator, because neither can be
+redistributed with the repository. The first is a \textbf{CRSP/WRDS export}
+\cite{crsp2026data}: survivorship-free S\&P~500 index-constituent membership,
+daily split- and dividend-adjusted total returns for 2010--2025, and the
+CRSP/Compustat-Merged link table used for point-in-time PERMNO-to-CIK resolution.
+The second is the \textbf{Loughran--McDonald master dictionary}
+\cite{loughran2011liability}, required by the two dictionary arms and obtained
+from its authors' distribution site. Filing text itself needs no supply: it is
+fetched from SEC~EDGAR by accession under the published fair-access limits
+\cite{sec2024edgar}, and the released accession index is the exact pull list.
+Pretrained checkpoints \cite{araci2019finbert,beltagy2020longformer,devlin2019bert,liu2019roberta,qwen3_2025}
+are downloaded through the usual model hub \cite{wolf2020transformers}; the
+software stack is PyTorch \cite{paszke2019pytorch}, scikit-learn
+\cite{pedregosa2011sklearn} and, for the prompted arm, offline vLLM
+\cite{kwon2023vllm}.
+
+Regeneration then runs in four stages: \texttt{ingest\_wrds.py} builds the
+membership table, the point-in-time link table and the returns store;
+\texttt{build\_dataset.py} fetches and parses EDGAR text and emits the aligned
+filing-by-horizon rows under the no-look-ahead rule of
+Section~\ref{sec:data-labels}; \texttt{train.py} trains one arm on one disclosure
+subset for one seed; and \texttt{evaluate.py}, \texttt{compare\_runs.py} and
+\texttt{dm\_vs\_baseline.py}, followed by the \texttt{scripts/analysis/} layer,
+rebuild the metric, inference and audit tables.
+Figure~\ref{fig:app-pipeline} draws the pipeline those stages rebuild, from the
+three sources through to the reproducibility record, and
+Figure~\ref{fig:app-components} draws the same programme as code: which
+packages the library holds, how large each is, and the only four import edges
+between them.
+Appendix~\ref{app:hyperparams}
+gives the exact per-arm command templates and settings. Budgeting matters here:
+the neural training fleet's 144 production runs consumed 590.4 GPU-hours on
+NVIDIA A100-SXM4-40GB hardware. % src: results/tables/cost_accuracy.md; TECHNICAL_SUPPLEMENT.md compute scope note; results/tables/a100_40g_probe_summary.md
+A full replication is therefore a fleet-scale undertaking. Re-deriving the audit
+layer on top of it is CPU-only and cheap, but it cannot be done from the
+released aggregate tables: those are the layer's outputs, and its inputs are the
+per-observation loss differentials in the per-run prediction files that
+Section~\ref{app:external:withheld} withholds. One
+environment freeze survives with declared scope: \texttt{ENVIRONMENT\_inference.txt},
+224 packages, pinning the prompted-inference stack rather than the
+encoder-training stack, whose declared constraints live in
+\texttt{pyproject.toml}. % src: writing/dissertation/supporting/REPRODUCIBILITY.md
+
+% The schematic is drawn inline rather than imported so that it cannot drift
+% from the sections it depicts. Every box states a stage sec:data-sources or
+% sec:design already specifies; no stage is added here.
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[
+    font=\footnotesize,
+    box/.style={draw, rounded corners=1.5pt, align=left, text width=66mm,
+                inner xsep=2.2mm, inner ysep=1.8mm},
+    head/.style={align=center, text width=70.4mm, font=\footnotesize\bfseries},
+    flow/.style={draw, -{Latex[length=1.8mm,width=1.4mm]}, semithick}]
+
+  \node[head, anchor=north] (h1) at (0mm,0mm)
+    {The benchmark (Section~\ref{sec:data-sources})};
+  \node[box, below=1.6mm of h1] (a1)
+    {\textbf{Sources.} CRSP index constituents and daily total returns, and the
+     CRSP/Compustat-Merged link table, licensed through WRDS; the SEC EDGAR
+     full-text archive.};
+  \node[box, below=3mm of a1] (a2)
+    {\textbf{Point-in-time universe.} 914 S\&P~500 membership intervals over
+     2010--2025 on 832 PERMNOs, delisted members retained rather than
+     dropped.}; % src: crsp_restricted/membership_intervals.csv (914 intervals, 832 PERMNOs)
+  \node[box, below=3mm of a2] (a3)
+    {\textbf{Entity linking.} PERMNO to CIK resolved window by window through
+     the CCM link table: 30{,}100 point-in-time windows, including 31 audited
+     successor overrides covering 23 firms.}; % src: crsp_restricted/cik_links_pit.csv; release/DATA_CARD.md lines 45-46
+  \node[box, below=3mm of a3] (a4)
+    {\textbf{Disclosure corpus.} 10-K, 10-Q and 8-K text fetched from EDGAR
+     under the resolved CIK: 144{,}443 filings parsed, 144{,}129 aligned to the
+     benchmark (31{,}601 long-form, 112{,}528 event-driven).}; % src: frozen 03_dataset.tex; TECHNICAL_SUPPLEMENT.md Table S1
+  \node[box, below=3mm of a4] (a5)
+    {\textbf{Labels and price features.} Forward realised volatility at
+     $h=5$, 10 and 20 trading days; every filing mapped to its effective
+     trading day; HAR components ending at the last close before the filing;
+     no-look-ahead audit reporting zero violations.}; % src: frozen 03_dataset.tex (horizons; effective trading day; zero violations)
+  \node[box, below=3mm of a5] (a6)
+    {\textbf{Modelled panel and splits.} 431{,}245 aligned filing-by-horizon
+     rows, 427{,}429 surviving the feature--label joins; chronological splits,
+     training 2010--2019, validation 2020--2021, test 2022--2025.}; % src: TECHNICAL_SUPPLEMENT.md Table S1; release/split_definition.md
+
+  \node[head, anchor=north] (h2) at (78.4mm,0mm)
+    {The audit (Section~\ref{sec:design})};
+  \node[box, below=1.6mm of h2] (b1)
+    {\textbf{Model matrix.} Block~A price references, Block~B lexical
+     baselines, Block~C contextual encoders and large language models,
+     Block~D price--text fusion.};
+  \node[box, below=3mm of b1] (b2)
+    {\textbf{Training.} One fixed recipe for every trained Block~C and~D arm,
+     three seeds (2026--2028), and the per-observation seed ensemble as the
+     primary forecast.}; % src: frozen 05_protocol.tex; seed_aggregate.md
+  \node[box, below=3mm of b2] (b3)
+    {\textbf{Forecast combination.} Price and text nested in one log-space
+     combiner, every weight fitted on the validation years and frozen before
+     the test years are touched.};
+  \node[box, below=3mm of b3] (b4)
+    {\textbf{Reference ladder.} The recalibrated HAR, then a
+     firm-identity-augmented reference, then a maximal price pool, then the
+     conjunction of all three.};
+  \node[box, below=3mm of b4] (b5)
+    {\textbf{Inference.} Day-clustered Diebold--Mariano tests, Holm correction
+     inside 15 pre-declared families, a label-shuffle placebo, and a
+     signal-injection power calibration.}; % src: results/tables/holm_families.md (15 families); results/tables/signal_injection_power.md
+  \node[box, below=3mm of b5] (b6)
+    {\textbf{Economic adjudication.} A portfolio Sharpe test, a value-at-risk
+     backtest and a utility-based fee, each fitted on validation and frozen on
+     test.};
+  \node[box, below=3mm of b6] (b7)
+    {\textbf{Reproducibility.} Self-describing run directories, 240
+     fingerprinted production runs and a 186-test suite, with generators that
+     abort when a source table drifts.}; % src: results/tables/config_fingerprints.md (240 runs); writing/dissertation/supporting/REPRODUCIBILITY.md (186 tests)
+
+  \foreach \i/\j in {a1/a2, a2/a3, a3/a4, a4/a5, a5/a6,
+                     b1/b2, b2/b3, b3/b4, b4/b5, b5/b6, b6/b7}
+    \draw[flow] (\i.south) -- (\j.north);
+  \draw[flow] (a6.east) -- ++(4mm,0mm) |- (b1.west);
+  \end{tikzpicture}
+  \caption[The pipeline behind SP500Vol-Bench and its audit]{The pipeline of
+  Chapter~\ref{ch:data}, drawn as a flow. The left column is the benchmark of
+  Section~\ref{sec:data-sources}, running from the three sources to the
+  modelled panel and its chronological splits. The right column is the audit of
+  Section~\ref{sec:design}, running from the model matrix to the
+  reproducibility record. Every box states a stage one of those two sections specifies,
+  and every count is the one that section reports; nothing is drawn that they
+  do not state. The two external portability panels of
+  Section~\ref{sec:data-portability} sit outside this pipeline and are not
+  drawn. The diagram carries no result. It shows what was run and in what
+  order, not what was found.}
+  \label{fig:app-pipeline}
+\end{figure}
+
+
+\begin{figure}[tbp]
+  \centering
+  \begin{tikzpicture}[
+    font=\footnotesize,
+    pkg/.style={draw, rounded corners=1.5pt, align=left, text width=42mm,
+                inner xsep=2.0mm, inner ysep=1.6mm},
+    grp/.style={draw, dashed, rounded corners=2pt, inner xsep=2.6mm, inner ysep=2.6mm},
+    dep/.style={draw, -{Latex[length=1.8mm,width=1.4mm]}, semithick},
+    lab/.style={align=center, font=\footnotesize\bfseries}]
+
+  \node[lab] (h) at (0mm,5mm) {The library: \texttt{src/sp500vol} --- 60 modules, 8{,}864 lines};
+
+  \node[pkg, anchor=north west] (data) at (-46mm,0mm)
+    {\textbf{data} \hfill 9 files, 1{,}574 lines\\
+     EDGAR fetching, parsing, point-in-time alignment, split assignment.};
+  \node[pkg, anchor=north west] (models) at (4mm,0mm)
+    {\textbf{models} \hfill 32 files, 6{,}366 lines\\
+     every arm behind one base class: \texttt{price} (6),
+     \texttt{classical\_text} (7), \texttt{neural\_text} (13),
+     \texttt{fusion} (4).};
+
+  \node[pkg, anchor=north west] (feat) at (-46mm,-30mm)
+    {\textbf{features} \hfill 5 files, 239 lines\\
+     log returns, the annualised label, text preparation.};
+  \node[pkg, anchor=north west] (utils) at (4mm,-30mm)
+    {\textbf{utils} \hfill 6 files, 327 lines\\
+     seeding, environment capture, run paths, hashing.};
+
+  \node[pkg, anchor=north west] (eval) at (-46mm,-52mm)
+    {\textbf{evaluation} \hfill 4 files, 217 lines\\
+     losses and the Diebold--Mariano machinery. Imported by nothing in the
+     library; the scripts call it.};
+  \node[pkg, anchor=north west] (train) at (4mm,-52mm)
+    {\textbf{training} \hfill 2 files, 138 lines\\
+     checkpoint save and resume. \textbf{pipelines} is declared and empty.};
+
+  \draw[dep] ([xshift=-10mm]data.south) -- ([xshift=-10mm]feat.north);
+  \draw[dep] ([xshift=10mm]models.south) -- ([xshift=10mm]utils.north);
+  \draw[dep] ([xshift=8mm]data.south) -- ([xshift=-12mm]utils.north);
+  \draw[dep] ([xshift=-8mm]models.south) -- ([xshift=12mm]feat.north);
+  \end{tikzpicture}
+  \caption[The library, component by component]{The same programme as
+  Figure~\ref{fig:app-pipeline}, read as code rather than as a flow. Counts are
+  tracked \texttt{.py} files and their lines. Arrows are the only four
+  package-level import edges the source contains, derived by parsing every
+  import statement rather than inferred from the names. Three non-edges are
+  worth as much as the four edges: \texttt{models} imports neither
+  \texttt{data} nor \texttt{evaluation}, so an arm cannot reach the corpus or
+  its own score while it runs, and nothing under \texttt{src/} imports
+  \texttt{scripts/}. Inside \texttt{models} the four arm families each depend
+  only on the shared base class, except that \texttt{fusion} and
+  \texttt{neural\_text} reuse the text loader in \texttt{classical\_text}. The
+  test suite is a sibling of the package, not a part of it: 33 modules
+  collecting 186 cases, nine of which exercise \texttt{scripts/} rather than
+  the library.} % src: parsed from src/sp500vol/ (60 tracked .py files; 4 package-level import edges: data->features, data->utils, models->features, models->utils); tests/ (33 modules, 184 test functions, two parametrised over two model classes each, so 186 collected)
+  \label{fig:app-components}
+\end{figure}
+
+\FloatBarrier
+\section{Withheld Data, and Why Withholding Is Reproducibility-Neutral}
+\label{app:external:withheld}
+
+The CRSP/WRDS licence permits academic research use and bars redistribution of
+the raw data and of per-row quantities derived from it \cite{crsp2026data}.
+Withheld, therefore, are the daily return series, the realised-volatility labels,
+the price features and the per-row model predictions: the last because a
+predictions file embeds its label in plain form and is licensed data by
+construction. Per-row loss-differential series could in principle be released in
+a non-invertible form, carrying differentials alone with no predictions, labels
+or features from which a label could be reconstructed. Release would require
+written confirmation from the institutional licensing administrator, which the
+project did not seek to assume.
+
+The withholding is nonetheless reproducibility-neutral, by design rather than by
+assertion. Everything needed to \emph{regenerate} the withheld rows is
+released: the universe, the point-in-time links, the split rule, the labelling
+code and the pinned configurations. What comes back is not uniform across that
+set, and the difference is stated rather than glossed. The CRSP-derived rows
+return exactly: the label-parity gate recomputes all 431{,}245 aligned
+realised-volatility labels from the raw series on the committed windows and
+finds them bitwise identical. The per-row model predictions do not, and this
+report turns on that fact elsewhere --- the two executed anonymisation arms were
+retained through the registered deviation route precisely because their
+regenerations were not bit-identical, one matching 111{,}458 of 117{,}407
+predictions and the other none of 333{,}192. A subscription holder therefore
+rebuilds the licensed inputs byte-for-byte and the GPU-produced outputs only to
+within the nondeterminism this report documents.
+% src: results/tables/label_parity.md GATE 1 (n = 431,245, unreconstructed 0, max abs diff 0.000e+00, bitwise exact True); results/tables/anon_arm.md (G1 c6 exact 111,458/117,407; G1 c2 exact 0/333,192)
+Everything needed to \emph{audit} the reported claims without a
+subscription is released too, because the aggregate evidence tables are summary
+statistics carrying no per-row licensed value. Every test statistic, p-value and
+correction printed in Chapters~\ref{ch:results} and~\ref{ch:validation} appears
+in them. And the one arm whose inputs are entirely public is the prompted model,
+which consumes SEC text and emits JSON. It ships nearly complete: prompts, decoding
+configuration and 608{,}221 generations, so those outputs can be re-parsed and
+re-scored by anyone. The exception is named in the repository rather than left to
+be found: the date-only and date-plus-ticker probe generations were not
+retained, and their results survive only in the aggregate evidence tables. % src: release/raw_generations/README.md ("The Qwen date-only and date+ticker probe generations were not retained; their results survive in the released aggregate evidence tables.")
+
+\FloatBarrier
+\section{Verifying the Numbers in This Report}
+\label{app:external:verify}
+
+Three mechanisms make this report checkable. First, the \textbf{source
+comments}: every number in the \LaTeX{} sources carries a same-line
+\texttt{\% src:} comment naming where it was read from. Of the 868 such comments, 799 name a file the repository carries, so a
+marker opening the sources goes from the printed number to the artefact behind
+it in one step. Forty-two of those lead with a file in \texttt{release/}, the
+public core; the rest lead with results tables, configurations, scripts and
+frozen drafting sources. A further 54 name an artefact the licence withholds ---
+the per-run predictions and the two CRSP-derived crosswalks --- and one is a
+wildcard standing for four configuration files that do ship. The
+remaining 14 the census cannot resolve to one file: ten name a cited paper, three
+the repository's own commit history and one this report's own chapters. The census is regenerated
+from the sources rather than typed, and the build fails if these counts drift.
+% src: results/tables/src_comment_census.txt (scripts/analysis/src_comment_census.py)
+Every count this report leads
+with --- the standalone census, each rung of the ladder, the injection
+recoveries and the economic adjudication --- names a file in
+\texttt{results/tables/} at its point of use. Any number carried on a secondary basis (a single seed, an
+observation-level test, a variance-unit restatement) says so in the prose
+beside it. Second, the \textbf{run-artefact contract}: every production run
+writes a self-describing directory named
+\texttt{\{model\}\_\{dataset\}\_\{disclosure\}\_seed\{seed\}} containing the
+fully resolved configuration (\texttt{config.json}), row-level predictions and
+per-split metrics. All 240 fingerprinted runs carry those three. An environment
+snapshot (\texttt{env.json}) and wall-clock and GPU-hour accounting
+(\texttt{cost.json}) are carried by 183 of the 240. The 57 without them are the
+38 prompted runs, which train nothing; the six SHAR and HARQ price runs; the six
+anonymisation control and mask legs, the four TF--IDF ones being the lineage
+whose missing package versions Section~\ref{sec:val-repro} records; and seven
+ancillary probe arms. The cut does not fall on training. Of the 178
+training-bearing runs 171 carry all five, the seven that do not being those
+anonymisation legs and the delta-text probe; and twelve runs that train nothing
+at all --- the A1, A3, A4 and A5 price models across the three channels --- carry
+them.
+% src: release/config_hashes.csv against results/runs/*/ (240 with config.json,
+% metrics.json and predictions.parquet; 183 with env.json and cost.json;
+% training_sha256_or_blank non-blank in 178, 18 distinct, 171 of them with env.json)
+Appendix~\ref{app:fullresults}
+reads its grids mechanically from stored artefacts rather than transcribing them
+from logs. Third, the \textbf{drift gates}: the fingerprint script re-hashes the
+released configurations against the published index, and every table and figure
+generator aborts when its source table no longer matches the numbers it
+recorded. A stale artefact therefore cannot quietly survive an upstream change.
+The recommended order for a marker with the repository to hand is to run
+\texttt{config\_fingerprints.py -{}-verify-preimages}, run the test suite, then
+pick any claim in Chapter~\ref{ch:results}, read its \texttt{\% src} comment, and
+open the named table in \texttt{results/tables/}, where 113 of Chapter~\ref{ch:results}'s 150 source comments lead.
+
+One reconciliation those three mechanisms do not perform for the reader, and
+which a careful marker will notice, is worth stating here rather than leaving
+to be found. Panel~(c), Figure~\ref{fig:data-membership-b}, stratifies the
+long-form test panel by whether the filer later exits, on 822 exiting and
+7{,}106 survivor filings. Those sum to 7{,}928, which is 42 fewer than the
+7{,}970 long-form test filings of Table~\ref{tab:data-splits}. The two are not
+the same denominator: that panel is carried on the superseded early-campaign
+convention, as its own caption states, so its row support is that campaign's
+rather than the released split's. Nothing else in
+the report is computed on the 7{,}928, and no count anywhere is taken as a
+share of it.
+
+\FloatBarrier
+\section{Project Management, Version Control and Continuous Integration}
+\label{app:external:process}
+
+The preceding sections describe what the project produced. This one describes
+how it was run, because a reproducibility claim is only as strong as the process
+that generated the artefacts behind it, and that process is itself inspectable.
+Two things are kept apart throughout. What the process \emph{was} is a matter of
+record in the tag list, the workflow definition and the build files; what it
+could and could not guarantee is an argument, and it is made explicitly so that
+a reader can discount it. The tag list is a property of the version-control
+history rather than of any single file, so it is enumerated below in full.
+
+\textbf{Planning: evidence-gated increments, not time-boxed sprints.} The
+project had one author and no external client, so no stakeholder existed from
+whom requirements had to be elicited. The requirements are the research question
+of Section~\ref{sec:intro-aim}, decomposed into the five objectives of
+Section~\ref{sec:intro-objectives}, and every deliverable in
+Section~\ref{sec:intro-deliverables} answers to one of them. No sprint cadence,
+burndown chart or ticket board was kept, and none is reconstructed here: a
+borrowed vocabulary applied after the fact would describe this project less
+accurately than what actually governed it.
+
+\textbf{Risk: what was not registered, and what actually materialised.} No risk
+register was kept either, and none is reconstructed here for the same reason.
+What can honestly be given is the other half: the risks that did materialise,
+the control that was standing against each when it did, and what the control
+cost. Every one is documented elsewhere in this report; gathering them in one
+place is what a register would have been for.
+
+\emph{Licence exposure.} The market data are licensed for research and may not
+be redistributed, which threatened the release rather than the result. The
+control was designed in rather than added: per-row licensed quantities are
+withheld and fully regenerable by any licence holder from the released scripts,
+and a licence-free variant rebuilds prices from public sources at 72.6, 89.3 and
+95.2 per cent coverage of the three splits. The cost is that the public core is
+not the panel the results are computed on, which
+Section~\ref{sec:data-sources} prices rather than hides.
+
+\emph{Lawful access.} A bulk retrieval from a free public service is a standing
+risk to the service and to the project's access. The fetcher declares its
+identity, stays inside the published rate limits, and logs every request in a
+resumable, retry-safe ledger so that no document is requested twice. The control
+was in place before the first bulk pull, not after a failure.
+
+\emph{Silent survivorship bias.} This one materialised. Where a constituent was
+acquired or reincorporated, the vendor link could point a historical identifier
+at the successor's registrant, under which the original firm filed nothing
+during its membership window --- a failure that removes exactly the delisted and
+acquired firms whose retention the benchmark's central claim rests on, and
+removes them without an error. It was caught by audit rather than by inspection,
+and is now held by 31 audited override windows covering 23 firms, a regression
+guardrail and dedicated unit tests; the no-look-ahead audit reports zero
+violations for those 23 firms in
+particular. % src: crsp_restricted/cik_links_pit.csv (30,100 link windows, 31 override windows over 23 firms); frozen 03_dataset.tex (no-look-ahead audit, zero violations including the 23 override firms)
+
+\emph{Loss of the compute estate.} A fleet-scale campaign on rented hardware
+carries the risk that the environment disappears before the analysis is
+finished, and this one materialised twice. The FinBERT checkpoints were
+destroyed in a disk cleanup, which cost the long-form matched-swap replication
+one of its three arms, the other two having missed their own reproduction gates
+for unrelated reasons; and the earliest run metadata logged no package versions,
+which retired three further arms --- the long-form anonymisation exit, the
+event-driven anonymisation and the swap TF--IDF arm --- at their gates rather
+than allowing them to be rebuilt. The control that was standing --- the reproduction gate
+itself, and a written retirement record for every arm that failed one --- did
+not save the arms, and was never going to. What it did was make the loss
+visible: the retirements are on the record with their thresholds and measured
+deviations, and Section~\ref{sec:conc-limitations} states what the missing arms
+would have measured. An artefact-retention policy and an environment snapshot on
+every run from the first day would have prevented both, and their absence is the
+one shortfall in this project's engineering that is hygiene rather than
+scope. % src: results/tables/swap_longform_retirement.md (gate, threshold and measured deviation per retired arm); results/runs/*/env.json (183 of 240 carry a snapshot)
+
+The pattern is worth stating because it is not flattering throughout. Two of the
+four were designed against in advance and held. One was caught by an audit that
+existed for a different purpose. One was not anticipated at all, and the only
+control that applied was the one that made the damage countable.
+
+What governed it was the \emph{arm}: a named experimental or audit unit that was
+specified in writing, registered under a version-control tag before it ran,
+executed, and then either admitted to the evidence base or retired at a stated
+gate. Increments closed on evidence rather than on the calendar, and the gates
+that closed them are the ones the preceding chapters already document. A derived
+arm's statistic may be cited only after a rerun reproduces that arm's committed
+predictions to a relative tolerance of $10^{-8}$. A cross-family probe counts as
+a live instrument only if it passes the forecaster-health screen, whose two
+thresholds read the run's own forecasts and never the contrast under test
+(Section~\ref{sec:val-instruments}). And a combination cell is declared genuine
+only under the conjunction of clustered significance, Holm correction and the
+label-shuffle placebo (Section~\ref{sec:design-inference}). The honest record of
+a scheme like this is not its list of successes but its register of failures,
+and Section~\ref{sec:val-repro} reports that register in full: the long-form
+matched-swap replication lost all three of its arms, and the long-form
+anonymisation channel closed with none executed, each exit carrying its gate,
+its threshold and its measured deviation. One further registered increment was
+retired without ever being scored: the fusion gate's internal weight readout,
+whose evidence in this report is behavioural because the direct readout needs a
+forward pass that was never run once the fleet was decommissioned. It is one
+pass for anyone holding the checkpoints, and it is recorded here rather than
+among the open questions of Section~\ref{sec:conc-future} because what the gate
+suppressed moves no count. % src: TECHNICAL_SUPPLEMENT.md S19 register
+An increment-based plan whose abandoned increments went unreported would be
+indistinguishable from no plan at all.
+
+\textbf{What the version-control record shows, and what it cannot.} The
+repository carries 26 tags. Twenty-one of them mark pre-registrations in eight
+families: seven tags for the long-form matched swap and the entity-anonymisation
+arm (\texttt{prereg-ea-v1.0} to \texttt{v1.6}), four for the residual family
+audit (\texttt{prereg-rfa-v1.0} to \texttt{v1.3}), three for the earnings-call
+panel audit (\texttt{prereg-maec-v1.0} to \texttt{v1.2}), two for the
+elicitation-fairness test (\texttt{prereg-ef-v1.0} and \texttt{v1.1}), two for
+the tuned challenger arm (\texttt{hpo-prereg-v1.0} and \texttt{v1.1}), and one
+each for the mechanism-and-relabelling record (\texttt{prereg-cd-v1.0}), the
+licence-free public-price variant (\texttt{prereg-h-v1.0}) and the founding 10-K
+corpus audit (\texttt{prereg-kc-v1.0}). % src: git tag -l (26 tags; 21 pre-registration tags in exactly the eight families named, verified 2026-08-04)
+The remaining five mark one further pre-test protocol and four writing
+milestones. The seven \texttt{prereg-} families correspond one to one with the
+seven registered analysis records shipped under \texttt{configs/}. That mapping is
+checkable rather than asserted without a copy of the version-control history:
+\texttt{release/tag\_manifest.txt} lists every tag beside the commit it pins and
+its date, so the eight families can be counted from the repository alone. A second
+version number inside a family records an amendment carried by its own tag rather
+than a silent edit to the registered file. % src: configs/prereg_*.md (7 records: swap_lf_and_anon, residual_family_audit, maec_audit, elicitation_fairness, mechanism_and_labels, public_variant, kogan_corpus)
+
+A tag is strong evidence of one thing and no evidence of another, and conflating
+the two would be an overclaim of exactly the kind this report exists to resist.
+It fixes the bytes of the specification the author later claims to have
+followed, so any divergence between what was registered and what was reported
+can be found mechanically by checking the tag out and comparing. It does not
+establish temporal priority. The author holds the repository and the clock
+alike, a tag can be moved and a history can be rewritten, so an internal tag
+evidences internal consistency and not that the specification preceded the
+result. That limitation is why one arm, and only one, carries the external
+instrument described at the end of this section.
+
+\textbf{Continuous integration: what runs, and what is only advised.} A workflow
+at \texttt{.github/workflows/ci.yml} runs on every push to \texttt{main} and on
+every pull request opened against it. Its first job installs the locked
+dependency set and runs the test suite on Python 3.11 under the marker
+expression \texttt{not slow and not gpu and not network}, so the fast
+correctness tests execute on every push while the fleet-scale, GPU-bound and
+network-dependent tests are excluded by design. Its second job holds the library and its tests to the
+full lint rule set, running \texttt{ruff check} and \texttt{ruff
+format -{}-check} over \texttt{src/} and \texttt{tests/}; it checks
+\texttt{scripts/} with \texttt{ruff check -{}-select F821,F811,E9}, which is
+the errors that would make an analysis script wrong --- an undefined name, a
+redefinition, a syntax error --- and not its style, because restyling code
+whose outputs are frozen would rewrite files this report depends on for no
+gain. It then runs \texttt{mypy} over
+\texttt{src/sp500vol/}. % src: .github/workflows/ci.yml (triggers push and pull_request on main; python-version matrix ["3.11"]; pytest marker expression; two ruff lint scopes, one ruff format scope, mypy step)
+
+Two properties of that arrangement need stating plainly, because a flattering
+description of them would be the very error this report audits others for.
+First, the type-checking step is invoked as
+\texttt{mypy src/sp500vol/ \textbar\textbar\ true}, beside a comment recording
+that strict typing was deferred, so static type checking here is \emph{advisory
+and not enforced}: a type error cannot fail the run. The \texttt{lint} target of
+the \texttt{Makefile} runs the same checker without that escape, so the check is
+available on demand, but continuous integration does not gate on
+it. % src: .github/workflows/ci.yml (mypy step trailing `|| true`, with the in-file comment deferring strict typing); Makefile (lint target runs mypy with no trailing escape)
+Second, the project has a single author and its history contains no merge
+commits at all, so although the workflow declares a pull-request trigger, no
+review by a second party ever took place. What the workflow supplies is a
+regression check on one person's pushes, and describing it as a peer-review
+process would be false. % src: git log --format='%an' (one author across the whole history); git log --merges (0 merge commits, verified 2026-08-04)
+
+\textbf{Dependency and environment reproducibility.} Three mechanisms operate at
+three time scales. \texttt{pyproject.toml} declares the constraints, including a
+floor of Python 3.11; \texttt{uv.lock} pins the fully resolved dependency graph
+those constraints admit, and the workflow installs through \texttt{uv sync}
+against that lock file rather than re-resolving, so the environment that is
+checked is the environment that is declared. The \texttt{Makefile} exposes the
+routine operations as named targets, among them \texttt{make test},
+\texttt{make lint}, \texttt{make format}, \texttt{make data},
+\texttt{make train}, \texttt{make tables} and \texttt{make dissertation}, so the
+command that produced an artefact is committed rather than
+remembered. % src: pyproject.toml (requires-python >= 3.11); uv.lock; Makefile (target list)
+The third mechanism is the per-run environment snapshot of
+Section~\ref{app:external:verify}, carried by 183 of the 240 runs on the coverage
+that section sets out, with the further exception Section~\ref{app:external:regen}
+states. The retirement register of
+Section~\ref{sec:val-repro} is what that third mechanism looks like when it
+fails: the arms whose early snapshots recorded no package versions could not be
+rebuilt, and were retired rather than reconstructed by guesswork.
+
+\textbf{The external timestamp, scoped to the one arm that needed it.} One arm
+is exposed enough to the priority objection above to warrant an
+author-independent instrument.
+The tuned challenger of Section~\ref{app:hyperparams:asha} exists to
+test whether the fixed training recipe rather than the text produced the null,
+and a hyperparameter search is the one arm whose specification, had it been
+free to follow the test evaluation, could have been steered towards whichever
+conclusion its author preferred. Its pre-registration bundle was therefore
+stamped outside the repository.
+
+The stamped object is a single archive,
+\texttt{results/prereg/hpo\_prereg\_v1.1.tar}, holding four files and no others:
+the arm configuration \texttt{configs/hpo\_arm.yaml}, the design record
+\texttt{results/HPO\_ARM\_SPEC.md}, the search harness
+\texttt{scripts/experiments/hpo/asha\_hpo.py} and its QLIKE objective
+\texttt{scripts/experiments/hpo/qlike\_loss.py}. % src: results/prereg/hpo_prereg_v1.1.tar (tar -tf lists exactly these four members, verified 2026-08-04)
+The archive's SHA-256 digest is published beside it in
+\texttt{hpo\_prereg\_v1.1.sha256}, and recomputing the digest over the shipped
+archive reproduces the published value
+exactly. % src: shasum -a 256 -c results/prereg/hpo_prereg_v1.1.sha256 returns OK (digest 2c9a1c9b0b774ef1f330725a39049a57da14e4e7f9a4423e1335fa5f022f5b59, verified 2026-08-04)
+An OpenTimestamps proof file sits alongside the archive, and the directory's own
+documentation records that the proof was submitted on 14 July 2026 to three
+independent calendar servers and anchored in the Bitcoin blockchain, an
+attestation that requires no account and discloses no
+identity. % src: results/prereg/README.md (timestamp section: submission date, the three named calendars, Bitcoin anchoring)
+
+That last sentence reports what the documentation records, not a check this
+report performed. The OpenTimestamps client is absent from the project's
+declared and locked environments, so no attestation was verified while this
+appendix was written, and the directory carries a smaller, earlier copy of the
+proof beside the current one, which is consistent with the upgrade step the same
+documentation describes but is not evidence of what either copy now
+contains. % src: results/prereg/ (hpo_prereg_v1.1.tar.ots 4,160 bytes dated 2026-07-23; hpo_prereg_v1.1.tar.ots.bak 1,015 bytes dated 2026-07-14; no opentimestamps entry in pyproject.toml or uv.lock, verified 2026-08-04)
+The digest is what this report checked. The anchoring is what a reader can check
+independently, by installing the client and running \texttt{ots verify} against
+the proof file, using nothing beyond that file and a client.
+
+The instrument's scope should not be inflated either. It covers the tuned arm's
+bundle and nothing else. The seven registered analysis records carry
+version-control tags but no external stamp, so for those seven the available
+claim remains internal consistency rather than temporal priority, exactly as set
+out above. What the stamp buys, if its attestation verifies, is priority over
+the test evaluation of one arm. It does not buy priority over the author's own
+thinking, and it says nothing about the audit protocol as a whole. Marking that
+boundary is the point of stating it: a report that repeatedly separates a
+checked claim from an asserted one cannot afford to assert this one.
+
+\FloatBarrier
+\section{The Benchmark Beside the Corpora It Joins}
+\label{app:external:benchmarks}
+
+The primary deliverable of this project is a benchmark, which makes its standing
+among the resources it joins a claim to evidence rather than to assume.
+Table~\ref{tab:app-benchmarks} sets it beside them property by property, and the
+properties are the ones an incremental verdict turns on rather than the ones that
+flatter a newcomer.
+
+The comparison set is small because the evidence base is small, and its size was
+established rather than guessed. The registered audit of the disclosure-text and
+volatility literature recorded a census instead of a sample: three corpora carry
+that literature. The models built on the earnings-call side all sit on one of the
+three by their own documentation, so counting models rather than corpora would
+inflate the denominator without adding evidence. % src: results/tables/kogan_corpus_audit.md (census block: three corpora, MDRM/MAEC/Kogan)
+Two of the three were audited end to end by this project and the third could not
+be obtained. FETILDA joins the table as the long-document evaluation framework
+closest to this study's own construction. FinText is treated below the table
+rather than tabulated, for the reason given there.
+
+\begin{table}[p]
+  \centering
+  \caption[The benchmark beside the corpora it joins]{SP500Vol-Bench beside the
+  corpora and evaluation frameworks the disclosure-to-volatility literature was
+  built on. Two conventions govern the cells, and the distinction between them is
+  the point of the table. \textbf{No} records a property this report
+  characterises as absent from the design named, on the reading given in
+  Section~\ref{sec:bg-text}.
+  \textbf{Unknown} records a property this project did not establish for that
+  resource from sources it could check; it is not a claim that the resource lacks
+  the property, and it is written rather than inferred. Sizes are what this
+  project verified, not what each original reports: the MAEC column gives the
+  slice actually audited here, while the other two counted columns give
+  whole-corpus totals. The table compares documented construction and evaluation
+  properties. It is not a ranking of research quality, and nothing in it is a
+  test statistic.}
+  \label{tab:app-benchmarks}
+  \singlespacing\footnotesize
+  \setlength{\tabcolsep}{2pt}
+  % Narrow measures are set ragged right so that a 1.85 cm column does not stretch
+  % its inter-word spacing; \arraybackslash restores \\ as the row terminator.
+  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.45cm}>{\raggedright\arraybackslash}p{2.85cm}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{1.85cm}>{\raggedright\arraybackslash}p{2.35cm}>{\raggedright\arraybackslash}p{2.15cm}@{}}
+    \toprule
+    Property & SP500Vol-Bench (10-K/10-Q/8-K, 2010--2025) & Kogan 10-K corpus (1996--2006) & FETILDA (10-K) & MAEC (earnings calls) & MDRM (earnings calls) \\
+    \midrule
+    Size, as verified here
+      & 144{,}129 filings; 427{,}429 modelled rows; 803 filing registrants
+      & 30{,}474 filings; 7{,}207 registrants
+      & unknown
+      & audited slice: 672 test rows; 143 call dates; 461 entities
+      & unknown; corpus not obtainable \\ % src: release/accession_index.csv (144,129 filings; 803 filing registrants, TECHNICAL_SUPPLEMENT.md Table S1 block b); frozen 03_dataset.tex Table 1 (427,429 modelled rows); results/tables/kogan_corpus_audit.md (30,474 filings, 7,207 unique CIKs); results/tables/maec_audit.md (672 test rows, 143 call dates, 461 entities per horizon)
+    \addlinespace[2pt]
+    Label and horizon
+      & forward realised volatility from daily closes, modelled in logs; $h = 5/10/20$ trading days
+      & log volatility over the 12 months after the filing
+      & 10-K forward volatility, the Kogan task
+      & post-call realised volatility; $h = 3/7/15/30$ days
+      & post-call realised volatility \\ % src: frozen 04_methods.tex (horizons h in {5,10,20}); results/tables/kogan_corpus_audit.md (prereg block: logvol.+12 as the target, logvol.-12 as the control); results/tables/maec_audit.md (HAC lag block: h = 3/7/15/30)
+    \addlinespace[2pt]
+    Survivorship-free point-in-time universe
+      & yes: 914 membership intervals, 411 of them closing inside the sample
+      & unknown
+      & unknown
+      & unknown
+      & unknown \\ % src: crsp_restricted/membership_intervals.csv (914 intervals; 411 closing inside the sample)
+    \addlinespace[2pt]
+    Entity linking audited
+      & yes: 30{,}100 point-in-time link windows; 31 successor overrides on 23 firms checked against EDGAR
+      & unknown
+      & unknown
+      & unknown
+      & unknown \\ % src: crsp_restricted/cik_links_pit.csv (30,100 link windows); release/DATA_CARD.md lines 45-46 (31 override windows covering 23 firms)
+    \addlinespace[2pt]
+    Recalibrated price reference
+      & yes: validation-fitted and frozen, in log space
+      & no
+      & no
+      & no
+      & no \\
+    \addlinespace[2pt]
+    Firm-identity control
+      & yes: identity-augmented reference rung, anonymisation, matched-firm swap
+      & no
+      & no
+      & no
+      & no \\
+    \addlinespace[2pt]
+    Inference clustered on the unit sharing the shock
+      & yes: day-clustered DM is the test of record
+      & no: filings treated as independent
+      & no
+      & no
+      & no \\
+    \addlinespace[2pt]
+    Power stated as a minimum detectable effect
+      & yes: per-cell MDE beside every null; median 0.82 per cent over 69 cells
+      & unknown
+      & unknown
+      & unknown
+      & unknown \\ % src: results/tables/signal_injection_power.md (per-cell MDE; median 0.82 per cent, IQR 0.37--1.27). The four non-project cells are Unknown, not No: this project did not establish what any of the four resources reports about its own power, and the caption reserves No for a property Section 2.1.2 characterises as absent.
+    \addlinespace[2pt]
+    Availability and licence
+      & public core released; CRSP market-data rows and the two CRSP-derived crosswalks withheld; public-price variant covers 72.6/89.3/95.2 per cent of train\slash validation\slash test rows
+      & public download from the authors' site; the fetch pipeline ships here, the data do not
+      & unknown
+      & obtainable and used as published; not redistributed here
+      & not obtainable: bundled text and audio, no licence, no longer redistributed \\ % src: results/tables/public_variant_cascade.md (72.6/89.3/95.2 per cent coverage); results/tables/kogan_corpus_audit.md (G-K0 provenance: authors' site, data not redistributed; census block: MDRM status)
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Read across, the table does not say that SP500Vol-Bench is the larger resource,
+and on two dimensions it is the smaller. On filer breadth the Kogan corpus spans
+7{,}207 registrants against this benchmark's 803, its universe being the
+population of 10-K filers where this one is confined to S\&P~500 membership. % src: results/tables/kogan_corpus_audit.md (7,207 unique CIKs); release/accession_index.csv (803 filing registrants, TECHNICAL_SUPPLEMENT.md Table S1 block b)
+That confinement was a decision with a price, and Section~\ref{sec:data-sources}
+gives the reason. Realised volatility computed from daily closes is noisiest on
+thinly traded stocks, so an index restriction buys a label a day-clustered test
+can carry. What it forfeits is whatever the small-firm end of the market would
+have shown. On modality the benchmark is poorer again, since both earnings-call
+resources align speech to text and a filing has no speech to align.
+
+What the table does show is an asymmetry of documentation on exactly the
+properties that decide an incremental verdict. Three of them this report
+characterises directly for the incumbent designs, and on its reading no
+incumbent imposes any: a recalibrated price reference, a firm-identity control,
+and inference clustered on the unit that shares the shock. % src: frozen writing/dissertation/supporting/sections/02_related.tex (none of the closest designs imposes a recalibrated price reference, a firm-identity control, or day-clustered inference); results/tables/maec_audit.md (prereg section 8: call-date-clustered inference never provided in the literature)
+On point-in-time construction, on entity linking, and on stated power for three
+of the four resources, the entry is \emph{unknown}. It is written rather than
+filled in. The pattern of unknowns is itself the finding worth stating: these are
+properties a reader of the incumbent resources cannot check, and being checkable
+is the condition a benchmark contribution is supposed to supply.
+
+The claim the comparison supports is therefore narrow, and it is the claim the
+study makes. To the author's knowledge no prior forecast-level evaluation of this
+question jointly imposes a survivorship-free point-in-time panel, a recalibrated
+reference interval closed by a maximal price pool, day-clustered inference with
+Holm correction and placebo gating, and a model spectrum running from word lists
+to a prompted large language model. That is a claim about a protocol and the
+fixtures released with it, not about corpus size. What makes it checkable is that
+the protocol was carried twice to data assembled by others rather than asserted
+at home. On the earnings-call corpus the published-convention gain is reproduced
+and then absorbed (Section~\ref{app:res-maec}). On the founding study's own 10-K
+corpus the published positive is reproduced at the same sign and order of
+magnitude, and the cascade then re-prices it
+(Section~\ref{sec:val-kogan}). % src: results/tables/maec_audit.md; results/tables/kogan_corpus_audit.md
+A protocol that travels to its predecessors and returns the same verdict is
+better positioning evidence than a table, and the table is offered as the map
+rather than as the argument.
+
+\textbf{FinText, and why it has no column.} FinText forecasts realised volatility
+from word embeddings trained on financial newswire and benchmarks against
+HAR-family models, which makes it the one design in the survey that cannot be
+charged with a weak price baseline \cite{rahimikia2021fintext}. It has no column
+because it is a method and a set of embeddings rather than a released volatility
+benchmark. Most of the construction properties compared above would have no entry
+for it, so the column would be a run of unknowns. Its lesson is the one the table
+is built around: a textual claim is won or lost on the baseline, not on the
+corpus.
+
+\FloatBarrier
+\section{Neural Price Models, and Why the Reference Here Is Linear}
+\label{app:external:neural}
+
+Section~\ref{sec:bg-price} takes the price-only reference as far as the HAR
+family and its parametric neighbours and stops. A reader is entitled to ask what
+lies further out, because every challenger in this study is neural while the
+reference each challenger is measured against is not. This section answers in
+the only way the evidence permits: it reports what the literature states, and it
+is explicit that this project fitted no neural price model and therefore cannot
+adjudicate the question itself.
+
+\textbf{What the literature reports.} Recurrent architectures have been applied
+to realised-volatility forecasting directly. Bucci \cite{bucci2020neural}
+compares feed-forward and recurrent networks, among them long short-term memory
+and nonlinear autoregressive specifications, and reports the recurrent models
+outperforming the econometric methods in that comparison, with the variants
+built to capture long-range dependence doing best. Kim and Won
+\cite{kimwon2018lstmgarch} take the hybrid route, feeding the fitted parameters
+of several GARCH-type models into a long short-term memory network and reporting
+the hybrid ahead of any single GARCH specification on a stock index. Closest to
+this project's own question is the comparison of Christensen, Siggaard and
+Veliyev \cite{christensen2023mlvol}. They set regularised regressions, regression
+trees and neural networks against several HAR specifications, on realised
+variance for the constituents of the Dow Jones Industrial Average, and report
+machine learning beating the HAR lineage even when the only predictors are the
+daily, weekly and monthly realised-variance lags HAR itself uses, with the margin
+widening at longer horizons. Their attribution matters as much as the verdict:
+the gain comes from greater fitted persistence, which approximates the long
+memory of realised variance more closely than a three-lag linear form does.
+
+\textbf{What this study can and cannot say.} It cannot say that HAR beats a
+neural price model, because it never fitted one, and no statement anywhere in
+this report should be read as a comparison against a neural price baseline that
+was tested. Nor can it claim that its reference is the best price forecast
+obtainable on this panel. Section~\ref{sec:bg-price} sets the standard that a
+credible audit allows the price side its best available representative. This is
+the one direction in which the study meets that standard only in part. The rungs
+of the reference ladder are recalibration, a firm-identity term and a pool of
+linear and parametric specifications, and not one rung is a learned nonlinear
+price model.
+
+\textbf{Why a linear reference was nevertheless the right one here.} Three
+reasons, in decreasing order of force. The first is protocol parity. HAR-RV is
+estimated by ordinary least squares, as is every combination the incremental
+instrument fits, so a comparison against it isolates the information source. A
+nonlinear learner on the reference side facing a nonlinear learner on the
+challenger side would instead confound the information source with estimator
+capacity, which is the confusion this design exists to prevent. The
+second is that the question is incremental rather than absolute. What the
+reference must be is well calibrated and identity-aware, because an uncorrected
+reference donates its own miscalibration to the challenger as credit, and the
+ladder pays for those two properties explicitly rather than for raw accuracy.
+The third is direction, and it is measured rather than argued. Two executed
+tests say what a stronger price reference does to the text verdict. The first is
+the VIX-augmented re-test of Table~\ref{tab:app-ladder}, which leaves 19 of the 38
+re-tested cells standing; the second is the frontier completion of
+Section~\ref{app:res-frontier}.
+% src: results/tables/vix_control.md (19 of the 38, seed 2026, Holm in 40)
+Adding a VIX-augmented HAR and a
+measurement-error-corrected HAR to the pool cuts the Holm survivor count from 8
+of 69 cells to 3 of 69, on the archived single-seed basis both readings share. % src: results/tables/pool_frontier_audit.md (Holm survivors 8 of 69 under pool5, 3 of 69 under pool7); results/tables/pool_frontier_cascade.csv (genuine_holm, per-cell)
+Strengthening the price side has therefore been shown, on this panel, to deepen
+the null rather than to relieve it.
+
+\textbf{What the gap costs, and why it cannot now be closed.} An omitted stronger
+reference threatens a positive finding, and the finding on text here is a bounded
+near-null, so the direction of the threat runs against the residual this study
+does report rather than in its favour. Nothing on this evidence suggests a neural
+rung would run the other way, though that expectation is an inference from the
+frontier test and not a result. Closing the gap would require a new fit, and the
+experimental record is frozen: the training fleet is decommissioned, so no rung
+can now be added and re-scored under the protocol the rest of the ladder ran.
+The gap is recorded as a limitation of scope, of the same class as the arms
+Section~\ref{sec:conc-limitations} already lists rather than a new one.

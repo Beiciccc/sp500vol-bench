@@ -1,0 +1,47 @@
+% ---------------------------------------------------------------------------
+% Float and caption geometry for the A4 text block.
+%
+% The eleven figures are regenerated at dissertation geometry by
+% scripts/analysis/diss_figs/regen.py (canvas only -- no figure content is
+% redrawn); this file is the other half of the same job, and the two are sized
+% against each other.  Text block: 160 mm x 252 mm = 455.24 pt x 717.01 pt.
+%
+% Captions.  Set at \small and single spaced.  The 11pt / one-and-a-half-spaced
+% rule governs the body of the report; a caption is a label, and these captions
+% are long (six to nine lines each) because they carry the basis, denominator
+% and does-not-show prose that keeps every figure readable on its own.  At body
+% size and body spacing those nine lines cost 149 pt -- a fifth of the page --
+% on top of a figure that already fills most of it, which is what pushed eight
+% floats past the page height and gave the "Float too large" warnings.
+%
+% Float fractions.  The eleven composites that used to fill this block have been
+% cut into eighteen parts by scripts/analysis/diss_figs/split_panels.py -- twenty
+% main-text figures in all -- so the floats now measure 0.20--0.58 of the text
+% height instead of 0.82--0.98.  Two of the eleven survive whole: F4, whose right column runs the full height so it has no
+% horizontal seam, and F12, whose panel-(a) note abuts the panel-(b) heading with
+% no gap at any canvas the generator will draw.
+%
+% The raised ceilings below are what let two of the new parts sit at one page top
+% with body text beneath them, which is the conventional look and the page
+% saving; \textfraction is the guarantee that goes with it, and
+% \floatpagefraction is set high so a float page is built only when floats really
+% do fill one -- lowering it costs pages, because it lets LaTeX spend a whole page
+% on floats that would otherwise have shared a page with text.
+% ---------------------------------------------------------------------------
+
+\usepackage[font={small,singlespacing},skip=5pt,justification=justified]{caption}
+
+% Floats may occupy more of a page than the stock report defaults allow.
+\renewcommand{\topfraction}{0.92}        % max page fraction for top floats
+\renewcommand{\bottomfraction}{0.85}     % max page fraction for bottom floats
+\renewcommand{\textfraction}{0.07}       % min page fraction that must be text
+\renewcommand{\floatpagefraction}{0.95}  % min fill before a float page is used
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{1}
+\setcounter{totalnumber}{4}
+
+% Tighter separation between a float and the text it interrupts; the stock
+% 20 pt above and below a page-wide float is generous for a 252 mm block.
+\setlength{\textfloatsep}{12pt plus 2pt minus 4pt}
+\setlength{\floatsep}{10pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}

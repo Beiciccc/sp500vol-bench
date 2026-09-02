@@ -1,0 +1,34 @@
+{
+  "anon": {
+    "channel": "long_form_stretch",
+    "masked_store": "sp500vol-data/processed/_text_cache/filing_texts_anonmask_lf.parquet",
+    "mode": "anonmask",
+    "prereg": "prereg-ea v1.1 \u00a7C-anon (long_form stretch)"
+  },
+  "dataset": "full",
+  "disclosure": "long_form",
+  "model": "B2_tfidf_ridge",
+  "model_config": {
+    "evaluation": {
+      "per_disclosure_subset": true,
+      "per_horizon": true
+    },
+    "model_class": "sp500vol.models.classical_text.tfidf_ridge.TfidfRidge",
+    "model_id": "B2_tfidf_ridge",
+    "training": {
+      "fit_per_horizon": true,
+      "log_target": true,
+      "ridge_alpha": null
+    },
+    "vectoriser": {
+      "max_features": 5000,
+      "ngram_range": [
+        1,
+        2
+      ],
+      "sublinear_tf": true,
+      "token_pattern": "(?u)\\b[a-z]{2,}\\b"
+    }
+  },
+  "seed": 2026
+}

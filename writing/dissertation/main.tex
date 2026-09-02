@@ -1,0 +1,66 @@
+\documentclass[11pt,a4paper,oneside]{book}
+% Leeds SoC MSc dissertation — ported from the official LaTeX template (Prepare/template-2),
+% font size set to 11pt per the written rule in SoC-report-Template.docx.
+\input{config.tex}
+\begin{document}
+\include{prelude}
+\include{chapters/01_introduction}
+\include{chapters/02_background}
+\include{chapters/03_datasets_and_experimental_design}
+\include{chapters/04_results}
+\include{chapters/05_validation}
+\include{chapters/06_conclusions}
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{References}
+\bibliography{refs}
+\begin{appendices}
+% The appendix package's [page] option was dropped: it emitted a divider page
+% carrying the single word "Appendices" and nothing else. The [toc] option
+% still contributes the one "Appendices" entry to the table of contents, from
+% \addappheadtotoc at the top of this environment, so the heading below is set
+% by hand and the page is spent on saying what the four appendices hold.
+\thispagestyle{plain}
+{\centering\normalfont\Huge\bfseries\appendixpagename\par}
+\vspace{2\baselineskip}
+\noindent
+Four appendices follow. They hold the material the sixty-page main body has no
+room for, and each one supports a named part of the argument.
+
+\noindent
+Appendix~\ref{app:external} records what the public repository carries, how the
+study is regenerated from scratch, how any number printed in the chapters is
+traced back to the artefact that produced it, how the project was managed and
+continuously tested, and why this benchmark and this price reference were
+chosen over their alternatives.
+Appendix~\ref{app:ethics} gives in full the ethical assessment that
+Section~\ref{sec:intro-ethics} summarises.
+Appendix~\ref{app:fullresults} carries at full width the result tables that
+Chapter~\ref{ch:results} compresses to headline counts and
+Chapter~\ref{ch:validation} draws on selectively, together with most of the figures the
+page cap kept out of those chapters, each placed in the section whose evidence it
+draws.
+Appendix~\ref{app:hyperparams} gives the configuration fields and run commands
+behind the design that Chapter~\ref{ch:data} states in prose, carries the
+remaining displaced figures --- the model spectrum and the efficiency frontier
+--- and closes with two
+worked filings beside the verbatim prompt they were read with.
+% Float pages are centred vertically by default, which in a results appendix
+% carrying 48 tables leaves the top third of a page blank above a table that
+% sits perfectly well under the running head.  Measured before this change:
+% four appendix pages opened with 8-11 cm of white between the header and the
+% first rule.  It is set here rather than in the preamble because applying it
+% to the whole document moves a full-page float in Chapter 5 and costs the
+% main body a page it does not have; the appendices carry no page cap.
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{12pt plus 1fil}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
+
+\include{appendices/A_external_materials}
+\include{appendices/B_ethics}
+\include{appendices/C_full_results}
+\include{appendices/D_hyperparams}
+\end{appendices}
+\end{document}

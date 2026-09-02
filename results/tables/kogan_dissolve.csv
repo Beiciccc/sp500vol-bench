@@ -1,0 +1,19 @@
+rung,h,n_eval,loss,text_gain_pct,stat_type,stat,p_raw,p_holm_L5,rung_desc,verdict
+L0,5.0,11907,log-vol MSE,-0.6812976764193672,naive obs t,-1.1448473809444504,0.2522953976249284,,"Kogan-style: TF-IDF + single lagged-vol control, per-year OOS 2020-25, log-vol MSE, naive obs t",null
+L0,10.0,11883,log-vol MSE,-4.851772996949125,naive obs t,-7.895602282893773,3.1425998035891446e-15,,"Kogan-style: TF-IDF + single lagged-vol control, per-year OOS 2020-25, log-vol MSE, naive obs t",text HURTS
+L0,20.0,11845,log-vol MSE,-7.648512841911473,naive obs t,-12.755115684968663,5.113170011909328e-37,,"Kogan-style: TF-IDF + single lagged-vol control, per-year OOS 2020-25, log-vol MSE, naive obs t",text HURTS
+L1,5.0,7951,log-vol MSE,0.1631200948502253,naive obs t,0.21713482822720998,0.8281088443115175,,+ strict chronological OOS (declared test split 2022-25 only),null
+L1,10.0,7933,log-vol MSE,-3.1562780692882657,naive obs t,-3.7793687022329494,0.00015837879083497252,,+ strict chronological OOS (declared test split 2022-25 only),text HURTS
+L1,20.0,7902,log-vol MSE,-6.911504745030287,naive obs t,-7.1460537163717195,9.726562571268489e-13,,+ strict chronological OOS (declared test split 2022-25 only),text HURTS
+L2,5.0,7951,vol-unit QLIKE,3.3305014262665753,obs-level DM,-11.338148065949502,1.4314838354283112e-29,,"weak control -> recalibrated HAR reference (M1 log-combiner, val-fit frozen), QLIKE, obs-level DM",text adds
+L2,10.0,7933,vol-unit QLIKE,3.4823316043620314,obs-level DM,-15.29925124265144,4.267875395131434e-52,,"weak control -> recalibrated HAR reference (M1 log-combiner, val-fit frozen), QLIKE, obs-level DM",text adds
+L2,20.0,7902,vol-unit QLIKE,5.9198595954670425,obs-level DM,-19.616773197113712,1.0655550259870722e-83,,"weak control -> recalibrated HAR reference (M1 log-combiner, val-fit frozen), QLIKE, obs-level DM",text adds
+L3,5.0,7951,vol-unit QLIKE,3.3305014262665753,day-clustered DM,-5.3907848396946605,9.213613664235412e-08,,"+ day-clustered DM (daily-mean loss diffs, HAC lag=h-1 days)",text adds
+L3,10.0,7933,vol-unit QLIKE,3.4823316043620314,day-clustered DM,-8.89254432852136,3.901005011622187e-18,,"+ day-clustered DM (daily-mean loss diffs, HAC lag=h-1 days)",text adds
+L3,20.0,7902,vol-unit QLIKE,5.9198595954670425,day-clustered DM,-9.041621963712146,1.1651051953355876e-18,,"+ day-clustered DM (daily-mean loss diffs, HAC lag=h-1 days)",text adds
+L4,5.0,7951,vol-unit QLIKE,-1.0353167682393298,day-clustered DM,5.039156518589352,5.772345826382865e-07,,+ firm-identity-augmented reference (HAR + firm mean val RV),text HURTS
+L4,10.0,7933,vol-unit QLIKE,-4.120771006345928,day-clustered DM,7.775731438433031,2.3022291828028664e-14,,+ firm-identity-augmented reference (HAR + firm mean val RV),text HURTS
+L4,20.0,7902,vol-unit QLIKE,-6.7115204185948265,day-clustered DM,7.291165828138875,7.446969075883029e-13,,+ firm-identity-augmented reference (HAR + firm mean val RV),text HURTS
+L5,5.0,7550,vol-unit QLIKE,-0.33249897650357285,day-clustered DM,3.5864061231686772,0.0003558566544831288,0.0007117133089662576,"+ maximal price pool (A2,A6,A3,A4,A5) on top of firm control, Holm over the L5 family",text HURTS
+L5,10.0,7167,vol-unit QLIKE,-1.445717453908933,day-clustered DM,5.018268975657426,6.488874605621915e-07,1.9466623816865746e-06,"+ maximal price pool (A2,A6,A3,A4,A5) on top of firm control, Holm over the L5 family",text HURTS
+L5,20.0,7097,vol-unit QLIKE,0.19987910177064802,day-clustered DM,-2.849152245755746,0.004501486305813985,0.004501486305813985,"+ maximal price pool (A2,A6,A3,A4,A5) on top of firm control, Holm over the L5 family",text adds

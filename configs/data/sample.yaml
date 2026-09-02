@@ -1,0 +1,33 @@
+# Tiny sample dataset for prototype spike and unit tests.
+# 5 hand-picked firms × 1 year = should fit in <1 GB raw, parse in seconds.
+
+defaults:
+  - _self_
+
+name: sample
+description: "5 firms × 2023 (1 year). Used for prototype spike and CI tests."
+
+universe:
+  source: explicit
+  tickers: [AAPL, MSFT, NVDA, AMZN, GOOGL]
+  # CIKs filled by data ingest pipeline from EDGAR ticker→CIK lookup
+
+date_range:
+  start: "2023-01-01"
+  end: "2023-12-31"
+
+forms:
+  - 10-K
+  - 10-Q
+  - 8-K
+
+edgar:
+  cache_root: ./data/raw
+  max_concurrency: 4
+  rate_limit_per_sec: 8
+
+market:
+  source: crsp
+  cache_root: ./data/market
+  crsp_store: ./data/market/crsp/daily_returns.parquet      # OHLCV (split-adjusted DlyClose)
+  returns_store: ./data/market/crsp/market_returns.parquet  # log1p(DlyRet) total return

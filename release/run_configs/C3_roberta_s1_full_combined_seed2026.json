@@ -1,0 +1,44 @@
+{
+  "dataset": "full",
+  "disclosure": "combined",
+  "model": "C3_roberta_s1",
+  "model_config": {
+    "compute": {
+      "estimated_hours_per_seed": 4,
+      "required_gpu": "A100_40G"
+    },
+    "encoder": {
+      "max_length": 512,
+      "pretrained": "roberta-base"
+    },
+    "head": {
+      "dropout": 0.1,
+      "hidden_dim": 128
+    },
+    "model_class": "sp500vol.models.neural_text.roberta_s1.RobertaS1",
+    "model_id": "C3_roberta_s1",
+    "strategy": "S1",
+    "training": {
+      "batch_size": 128,
+      "dataloader_num_workers": 8,
+      "dataloader_persistent_workers": true,
+      "dataloader_pin_memory": true,
+      "dataloader_prefetch_factor": 4,
+      "early_stopping": true,
+      "es_min_delta": 0.0,
+      "es_patience": 3,
+      "grad_accumulation_steps": 1,
+      "log_target": true,
+      "lr": 8e-05,
+      "max_epochs": 15,
+      "mixed_precision": "bf16",
+      "optimizer": "adamw",
+      "pretokenize": true,
+      "tokenization_batch_size": 512,
+      "tokenizer_threads": 24,
+      "warmup_ratio": 0.06,
+      "weight_decay": 0.01
+    }
+  },
+  "seed": 2026
+}

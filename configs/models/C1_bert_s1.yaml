@@ -1,0 +1,45 @@
+# C1 BERT-base + S1 truncation strategy.
+# General-domain reference encoder for AB1 long-doc-strategy sweep.
+
+defaults:
+  - /base
+  - _self_
+
+model_id: C1_bert_s1
+model_class: sp500vol.models.neural_text.bert_s1.BertS1
+strategy: S1
+
+encoder:
+  pretrained: bert-base-uncased
+  max_length: 512
+
+head:
+  hidden_dim: 128
+  dropout: 0.1
+
+training:
+  optimizer: adamw
+  lr: 8.0e-5                     # linear-scaled to effective batch 128 (1e-5 x 8)
+  weight_decay: 0.01
+  batch_size: 128                # A100-40G bf16 — confirm at probe (target 36G)
+  grad_accumulation_steps: 1     # effective batch = 128 (unified across C1-C4/D1-D2)
+  mixed_precision: bf16
+  warmup_ratio: 0.06             # linear warmup then decay — required at lr 8e-5
+  max_epochs: 15
+  early_stopping: true           # val-based; restore best-val epoch (COVID-2020/21 val)
+  es_patience: 3
+  es_min_delta: 0.0
+  pretokenize: true
+  tokenization_batch_size: 512
+  tokenizer_threads: 24
+  log_target: true
+  # DataLoader workers — S1 pretok path uses a picklable collate (safe for multi-worker).
+  # 4 concurrent runs share ~120 vCPU, so keep 4*num_workers well under that.
+  dataloader_num_workers: 8
+  dataloader_persistent_workers: true
+  dataloader_pin_memory: true
+  dataloader_prefetch_factor: 4
+
+compute:
+  required_gpu: A100_40G         # unified rerun hardware (4xA100 40G)
+  estimated_hours_per_seed: 4    # refine at the A100 smoke

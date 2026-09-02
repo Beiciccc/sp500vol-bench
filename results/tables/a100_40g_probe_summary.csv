@@ -1,0 +1,16 @@
+model,safe_batch_40g,batch_kind,peak_vram_gb,nvidia_smi_peak_gb,step_s,device_name,tested_batches,first_oom_batch
+C1_bert_s1,,train,,,,,,
+C2_finbert_s1,,train,,,,,,
+C3_roberta_s1,,train,,,,,,
+C4_longformer,,train,,,,,,
+D1_concat_mlp,,train,,,,,,
+D2_gated_fusion,,train,,,,,,
+C2_finbert_s2,,train,,,,,,
+C2_finbert_s3,6,train,29.095,30.251,0.462967,NVIDIA A100-SXM4-40GB,4 6 8,
+C2_finbert_s4,6,train,29.2,30.013,0.465651,NVIDIA A100-SXM4-40GB,4 6 8,8
+C5_qwen3,,encode,,,,,,
+C5_gteqwen2,,encode,,,,,,
+C5_e5mistral,,encode,,,,,,
+D3_qwen3,,encode,,,,,,
+D3_gteqwen2,,encode,,,,,,
+D3_e5mistral,,encode,,,,,,

@@ -1,0 +1,90 @@
+\section{Results}
+\label{sec:results}
+
+We report results in the order the protocol asks its questions: does any text or fusion model beat the price baseline \emph{standalone} (180 standalone comparisons); how much credit does text earn against the \emph{most generous} reference, a single recalibrated HAR (the 69-cell combination grid); does that credit survive the \emph{reference interval} and its controls; and what characterises the residual that remains. Throughout, inference is the day-clustered Diebold--Mariano (DM) test \citep{diebold1995comparing,harvey1997testing} with Holm correction \citep{holm1979simple} within each family; a \emph{genuine} cell additionally requires a null label-shuffle placebo. The two denominators are distinct by construction and must not be conflated: 180 standalone pairwise comparisons versus the 69-cell disclosure$\times$model$\times$horizon combination grid.
+
+\subsection{Standalone: text never beats price}
+\label{sec:results-standalone}
+
+No challenger beats HAR-RV out of sample. Across all 180 standalone comparisons on squared error, 0 of 180 favour the challenger---at raw $p<.05$ as much as after Holm---and 155 of 180 are significantly \emph{worse} (Holm $<.05$). The verdict does not depend on the clustering scheme: under two-way firm-by-day clustering \citep{cameron2011twoway} the counts are 0 of 180 better and 152 of 180 significantly worse. Text-alone models have negative test $R^2$ on long-form filings at every horizon (B2 TF--IDF $-0.12/-0.10/-0.12$ at $h{=}5/10/20$; C1 BERT $-0.27\pm0.12$ across seeds at $h{=}5$): they do not merely trail the baseline, they fail to track realised volatility at all. Figure~\ref{fig:dm_forest_longform} shows the long-form slice of this grid.
+
+One nuance motivates the rest of the protocol. HAR-RV \citep{corsi2009har} is the strongest baseline under squared error but not uniformly under QLIKE \citep{patton2011proxies}: on long-form filings (variance-unit QLIKE; A2 $=0.5564/0.4618/0.2970$ at $h{=}5/10/20$) GARCH attains $0.4829/0.3750/0.2686$ (QLIKE-DM $-7.49/-2.65/-3.05$ in GARCH's favour), EGARCH is better at $h{=}5$ and $h{=}10$, and ARIMA at all three horizons. Two further price baselines point the same way: the realised-semivariance HAR \citep[SHAR;][]{pattonsheppard2015shar} beats A2 by $+1.09$--$4.17\%$ QLIKE (clustered-significant), and a HAR-X(VIX) baseline improves event-driven QLIKE by $+3.09$ to $+3.60\%$ (raw $p<.05$, not Holm). A single price reference---even a strong one---understates what price alone can deliver, which is precisely the weakness the maximal price pool below repairs.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/dm_forest_longform}
+\caption{Standalone Diebold--Mariano comparisons against the HAR-RV baseline (A2) on the long-form test split, by model and horizon; positive values mean the challenger forecasts \emph{worse} than the price-only baseline. Every text-only and fusion model lies to the right of zero at every horizon. Across the full standalone grid, 0 of 180 comparisons favour any challenger under day-clustered inference, and 155 of 180 are significantly worse after Holm correction.}
+\label{fig:dm_forest_longform}
+\end{figure*}
+
+\subsection{Against the most generous reference: a small, placebo-confirmed increment}
+\label{sec:results-increment}
+
+The incremental-value test asks a weaker question: does text remove out-of-sample QLIKE beyond a \emph{recalibrated} HAR forecast $f_R$, with combination weights fit on validation only and frozen on test? Against this single-HAR upper bound of the reference interval, the answer is a qualified yes. On the \emph{seed-ensemble primary}---the declared primary object, which averages the seed-\{2026, 2027, 2028\} forecasts per observation for the three-seed C/D models---46 of 69 cells improve at raw $p<.05$ and 38 of 69 survive Holm and the label-shuffle placebo: 38 genuine cells, with effect sizes of 0.2--5.9\% relative QLIKE (vol-unit convention). Moving-block bootstrap intervals on the daily loss differentials, reported alongside the controls below, agree with the clustered DM verdicts \citep{politis1994stationary}.
+
+Three restatements bound how seriously to take this number. First, inference: on the single seed 2026, day-clustering alone leaves 39 of 69 raw and 29 of 69 Holm survivors; the original observation-level inference on the same forecasts gave 38 of 69, with a median $|$DM$|$ shrink factor of 0.49 once the roughly 10--25 same-day filings sharing each market shock are collapsed to daily means. Seed-ensembling then recovers 29$\to$38: of the 38 obs-level genuine cells, 30 survive, 8 are lost, and 8 are newly gained. Second, seed dispersion: across the 144 C/D disclosure-model-horizon cells, 37 flip DM sign across seeds, and of the 14 seed2026-genuine C/D cells only 5 remain significant in 3 of 3 seeds (12 in $\ge$2 of 3)---single-seed cells are fragile, which is why the ensemble, not any one seed, is primary. Third, conventions: evaluated in variance-unit QLIKE the genuine count falls to 20 of 69 (20 cells are convention-dependent), and under two-way clustering 29 becomes 24 of 69 (seed2026 basis), every flip toward the null. The increment against the most generous reference is real but small, and already sensitive to defensible analysis choices.
+
+\subsection{The controls cascade: the increment does not survive the reference interval}
+\label{sec:results-cascade}
+
+Table~\ref{tab:cascade} traces the survivor count as the reference strengthens from the upper to the lower bound of the reference interval.
+
+The lower bound adds a single zero-cost identity term---the firm's own mean validation-period RV---to the recalibrated reference. Text now survives in 15 of 69 cells at raw $p<.05$ and 8 of 69 after Holm (14 and 8 on the single-seed basis of the committed control), and on the committed single-seed control 40 of 45 long-form cells flip \emph{negative}: conditioning on who filed makes the text term hurt. Most tellingly, a \emph{zero-text} reference that adds only the firm mean beats the plain $f_R$ in 53 of 69 cells (mean $+0.52\%$)---a forecast with no access to any document reproduces the ``text'' gain. Periodic long-form filings are firm-stable, so their text approximates a firm dummy; the identity control makes that explicit. (The firm mean is defined for 62.9\% of firms, covering 91.5\%/91.9\% of long-form/event-driven test rows; the global validation mean is imputed otherwise.)
+
+Because the identity statistic could itself be contested, we re-run the control as a four-specification battery: validation-window mean, train-period (2010--2019) mean, a fully point-in-time expanding pre-filing mean, and an empirical-Bayes-shrunk mean. Holm survivors range over $[8,14]$ of 69 across specifications, the zero-text reference beats $f_R$ in 23--61 of 69 cells, and exactly \emph{one} cell survives all four: event-driven C6 at $h{=}5$. The point-in-time specification is defined for 98.7--99.5\% of firms with zero look-ahead, and the train-period specification draws identity from a window disjoint from both validation and test---so neither COVID-era fitting nor coverage and imputation choices explain the absorption.
+
+The maximal price pool closes the price side of the interval: a validation-fitted log pool of five price models (HAR, SHAR, GARCH, EGARCH, ARIMA). On the seed-ensemble basis text adds in 26 of 69 cells at raw $p$ and 9 of 69 after Holm, \emph{hurts} in 5, with a mean relative QLIKE of $-0.06\%$. The pool is not an overfit artefact: against the best member selectable on \emph{validation} it is significantly better in 5 of 6 disclosure$\times$horizon panels (worse in 1); it loses in 5 of 6 panels only to the \emph{test}-best member, an oracle unavailable without peeking. And the equal-weight pool---which fits no multi-model weights at all and beats the fitted pool on test in 6 of 6 panels---still cuts the survivor count to 17--19 of 69. The absorption is price-pool information, not weight fitting.
+
+A market-level control points the same way: adding point-in-time log VIX to the reference leaves 19 of the 38 originally-genuine cells (versus 29 of 38 under clustering alone). The decisive statistic is the intersection. On the declared-primary ensemble basis, no cell survives the maximal-pool \emph{and} the firm-identity control under Holm---0 of 69---and the two Holm-survivor sets are \emph{disjoint}: whatever one control leaves standing, the other removes. At raw $p$ the full conjunction retains only 4 of 69 scattered weak cells (long-form B3 $h{=}10$, C6 $h{=}20$, D4 $h{=}20$; event-driven B4 $h{=}10$), and the strictest gate---placebo-confirmed genuine plus both Holm controls---retains none. Whatever a single recalibrated HAR credits to text, some stronger price- or identity-aware reference claims instead.
+
+\begin{table}[t]
+\centering
+\caption{The controls cascade: text-increment survivor counts on the 69-cell grid as the reference strengthens (seed-ensemble basis unless noted). Raw $=$ clustered DM $p<.05$; Holm $=$ family-wise $<.05$. $^{\dagger}$Denominator is the 38 originally-genuine cells re-tested under the VIX-augmented reference.}
+\label{tab:cascade}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lccl@{}}
+\toprule
+Reference / control & Raw & Holm & Note \\
+\midrule
+Single recalibrated HAR (primary) & 46 & 38 & upper bound \\
+\quad single seed 2026            & 39 & 29 & robustness \\
+\quad two-way clustering          & --- & 24 & seed2026 basis \\
+\quad variance-unit QLIKE         & --- & 20 & convention \\
+VIX-augmented reference$^{\dagger}$ & --- & 19 & of 38 genuine \\
+Firm-identity reference           & 15 & 8  & battery $[8,14]$ \\
+Maximal price pool (fitted)       & 26 & 9  & equal-wt.\ 17--19 \\
+Pool $\wedge$ firm $\wedge$ primary & 4 & 0 & survivor sets disjoint \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{What survives: a thin, cross-sectional, economically nil 8-K residual}
+\label{sec:results-residual}
+
+Before dismissing the increment entirely, we characterise the little that survives (Table~\ref{tab:residual}). A within-date permutation placebo (which keeps all calendar information but destroys firm assignment) and a date-mean-text combiner (a pure ``when'' signal with zero cross-sectional content) decompose each genuine cell: of the 38, 33 are cross-sectional, 1 mixed, and 4 regime-timing, with a median regime-timing share of 0.00. The increment is about \emph{which firm}, not \emph{when}---consistent with the firm-identity control absorbing it.
+
+What no identity specification absorbs is confined to event-driven 8-K filings read by the prompted LLM: against the firm-identity-augmented reference, C6 retains $+0.45/+0.25/+0.20\%$ QLIKE at $h{=}5/10/20$, all clustered-significant---the $+0.2$--$0.5\%$ residual of the abstract---and only the $h{=}5$ cell survives all four identity specifications. Even this residual is fragile in deployment: over rolling 16-quarter windows many cells are significant in $\ge$8 of 16 quarters under the validation-frozen combiner, but under the deployable expanding scheme most collapse (event-driven B2 $h{=}5$: 8 of 16 $\to$ 1 of 16).
+
+Economically the residual is nil. In inverse-variance long-only portfolios, replacing the reference volatility with its text-augmented counterpart raises the Sharpe ratio significantly in 1 of 18 cells---about the multiplicity false-positive floor---with a median $\Delta$Sharpe of $+0.003$; VaR violation rates are indistinguishable between $f_R$ and $f_U$; and filing-level quadratic-utility performance fees are negative in most cells. The surviving signal is statistically detectable in a handful of event-driven cells, cross-sectional in nature, and of no portfolio-level value.
+
+\begin{table}[t]
+\centering
+\caption{Characterisation of the surviving residual.}
+\label{tab:residual}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Check & Outcome \\
+\midrule
+Within-date decomposition (38 cells) & 33 cross-sec.\ / 1 mixed / 4 regime \\
+Median regime-timing share & 0.00 \\
+8-K C6 vs firm-identity ref.\ ($h{=}5/10/20$) & $+0.45/+0.25/+0.20\%$ \\
+Cells surviving all 4 identity specs & 1 of 69 \\
+Rolling sig.\ quarters, fixed $\to$ expanding & e.g.\ 8/16 $\to$ 1/16 \\
+$\Delta$Sharpe significant (18 cells) & 1 of 18 (median $+0.003$) \\
+\bottomrule
+\end{tabular}
+\end{table}
+

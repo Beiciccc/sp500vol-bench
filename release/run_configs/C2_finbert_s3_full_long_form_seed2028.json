@@ -1,0 +1,51 @@
+{
+  "dataset": "full",
+  "disclosure": "long_form",
+  "model": "C2_finbert_s3",
+  "model_config": {
+    "attention": {
+      "attn_dim": 128
+    },
+    "chunking": {
+      "chunk_stride": 256,
+      "max_chunks": 8
+    },
+    "compute": {
+      "estimated_hours_per_seed": 0.5,
+      "required_gpu": "A100_40G"
+    },
+    "encoder": {
+      "max_length": 512,
+      "pretrained": "ProsusAI/finbert"
+    },
+    "head": {
+      "dropout": 0.1,
+      "hidden_dim": 128
+    },
+    "model_class": "sp500vol.models.neural_text.bert_s3.FinBertS3",
+    "model_id": "C2_finbert_s3",
+    "strategy": "S3",
+    "training": {
+      "batch_size": 8,
+      "dataloader_num_workers": 4,
+      "dataloader_persistent_workers": true,
+      "dataloader_pin_memory": true,
+      "dataloader_prefetch_factor": 2,
+      "early_stopping": true,
+      "es_min_delta": 0.0,
+      "es_patience": 3,
+      "grad_accumulation_steps": 16,
+      "log_target": true,
+      "lr": 8e-05,
+      "max_epochs": 15,
+      "mixed_precision": "bf16",
+      "optimizer": "adamw",
+      "pretokenize": true,
+      "tokenization_batch_size": 512,
+      "tokenizer_threads": 24,
+      "warmup_ratio": 0.06,
+      "weight_decay": 0.01
+    }
+  },
+  "seed": 2028
+}

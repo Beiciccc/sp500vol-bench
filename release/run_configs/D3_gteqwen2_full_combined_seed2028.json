@@ -1,0 +1,46 @@
+{
+  "dataset": "full",
+  "disclosure": "combined",
+  "model": "D3_gteqwen2",
+  "model_config": {
+    "compute": {
+      "estimated_hours_per_seed": 0.5,
+      "required_gpu": "A100_40G"
+    },
+    "encoder": {
+      "max_length": 4096,
+      "pretrained": "Alibaba-NLP/gte-Qwen2-7B-instruct"
+    },
+    "fusion": {
+      "proj_dim": 128
+    },
+    "head": {
+      "dropout": 0.1,
+      "hidden_dim": 128
+    },
+    "llm": {
+      "cache_embeddings": true,
+      "encode_batch_size": 8,
+      "instruction": "Represent this corporate financial disclosure for forecasting the issuing firm's future stock-return volatility",
+      "normalize_emb": true
+    },
+    "model_class": "sp500vol.models.fusion.llm_fusion.D3LLMFusion",
+    "model_id": "D3_gteqwen2",
+    "strategy": "D3_gteqwen2",
+    "training": {
+      "batch_size": 512,
+      "early_stopping": true,
+      "es_min_delta": 0.0,
+      "es_patience": 3,
+      "log_target": true,
+      "lr": 0.0001,
+      "max_epochs": 40,
+      "mixed_precision": "bf16",
+      "optimizer": "adamw",
+      "tokenizer_threads": 24,
+      "warmup_ratio": 0.06,
+      "weight_decay": 0.01
+    }
+  },
+  "seed": 2028
+}
